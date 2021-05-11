@@ -1,0 +1,64 @@
+{
+    "name": "egal/framework",
+    "type": "library",
+    "license": "Apache-2.0",
+    "description": "",
+    "require": {
+        "php": "^7.4",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-pcntl": "*",
+        "ext-zip": "*",
+        "ext-posix": "*",
+        "ext-redis": "*",
+        "illuminate/database": "^8.0",
+        "illuminate/console": "^8.0",
+        "illuminate/redis": "^8.0",
+        "illuminate/support": "^8.0",
+        "illuminate/cache": "^8.0",
+        "ramsey/uuid": "^4.0.0",
+        "fakerphp/faker": "^1.9.1",
+        "phpdocumentor/reflection-docblock": "^5.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "vlucas/phpdotenv": "^4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "EgalFramework\\Model\\": "src/Model/",
+            "EgalFramework\\Auth\\": "src/Auth/",
+            "EgalFramework\\CommandLine\\": "src/CommandLine/",
+            "EgalFramework\\Metadata\\": "src/Metadata/",
+            "EgalFramework\\Request\\": "src/Request/",
+            "EgalFramework\\Common\\": "src/Common/",
+            "EgalFramework\\APIContainer\\": "src/APIContainer/",
+            "EgalFramework\\FilterQuery\\": "src/FilterQuery/",
+            "EgalFramework\\RedisQueue\\": "src/RedisQueue/",
+            "EgalFramework\\Kerberos\\": "src/Kerberos/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EgalFramework\\Model\\Tests\\": "tests/Model/",
+            "EgalFramework\\Model\\Tests\\Samples\\": "tests/Model/samples/",
+            "EgalFramework\\Auth\\Tests\\": "tests/Auth/",
+            "EgalFramework\\CommandLine\\Tests\\": "tests/CommandLine/",
+            "EgalFramework\\CommandLine\\Tests\\Commands\\": "tests/CommandLine/commands/",
+            "EgalFramework\\CommandLine\\Tests\\Stubs\\": "tests/CommandLine/stubs/",
+            "EgalFramework\\Metadata\\Tests\\": "tests/Metadata/",
+            "EgalFramework\\Metadata\\Tests\\Samples\\": "tests/Metadata/samples/",
+            "EgalFramework\\Request\\Tests\\": "tests/Request/",
+            "EgalFramework\\Request\\Tests\\Stubs\\": "tests/Request/Stubs/",
+            "EgalFramework\\Common\\Tests\\": "tests/Common/",
+            "EgalFramework\\Common\\Tests\\Samples\\": "tests/Common/samples/",
+            "EgalFramework\\APIContainer\\Tests\\": "tests/APIContainer/",
+            "EgalFramework\\APIContainer\\Tests\\Samples\\": "tests/APIContainer/samples",
+            "EgalFramework\\FilterQuery\\Tests\\": "tests/FilterQuery/",
+            "EgalFramework\\RedisQueue\\Tests\\": "tests/RedisQueue/",
+            "EgalFramework\\RedisQueue\\Tests\\Samples\\": "tests/RedisQueue/samples/",
+            "EgalFramework\\Kerberos\\Tests\\": "tests/Kerberos/",
+            "EgalFramework\\Kerberos\\Tests\\Samples\\": "tests/Kerberos/samples/"
+        }
+    }
+}

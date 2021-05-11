@@ -1,0 +1,24 @@
+<?php
+
+namespace ModelNamespace;
+
+use EgalFramework\Model\Model;
+
+/**
+ * Class ModelClassName
+ * @package ModelNamespace
+Properties
+ * @method-roles create admin
+ * @method-roles update admin
+ * @method-roles delete admin
+ * @method-roles getItem admin
+ * @method-roles getItems admin
+ * @method-roles getTree admin
+ */
+class ModelClassName extends Model
+{
+
+    /** @var array */
+    protected $guarded = [Guarded];ExtraFields
+
+}
