@@ -5,6 +5,7 @@ namespace Egal\Core\ActionCaller;
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Core\Session\Session;
 use Egal\Exception\ActionCallException;
+use Egal\Model\Metadata\ModelActionMetadata;
 use Egal\Model\ModelManager;
 use Exception;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ class ActionCaller
     private function forceCall()
     {
         if (Session::isAuthEnabled() && !$this->isAccessedForCall()) {
-            throw new ActionCallException('No access!');
+            throw new ActionCallException('Нет доступа!');
         }
 
         return call_user_func_array(
@@ -72,26 +73,45 @@ class ActionCaller
         $modelMetadata = ModelManager::getModelMetadata($this->modelClass); # TODO: Убрать использование ReflectionClass
         $actionMetadata = $modelMetadata->getAction($this->actionName); # TODO: Убрать использование ReflectionMethod
 
+        return $this->isServiceAccess($actionMetadata) || $this->isUserAccess($actionMetadata);
+    }
+
+    private function isUserAccess(ModelActionMetadata $actionMetadata)
+    {
         $authStatus = Session::getAuthStatus();
         $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
-        $rolesAccess = $actionMetadata->getRolesAccess();
-        $permissionsAccess = $actionMetadata->getPermissionsAccess();
 
-        return (
-                $statusCheck
-                && $authStatus === StatusAccess::GUEST
-            )
-            || (
-                $statusCheck
-                && (
-                    $rolesAccess === []
-                    || count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess)) > 0
-                )
-                && (
-                    $permissionsAccess === []
-                    || count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess)) > 0
+        return $statusCheck
+            && (
+                $authStatus === StatusAccess::GUEST
+                || (
+                    $this->userHasRoles($actionMetadata)
+                    && $this->userHasPermissions($actionMetadata)
                 )
             );
+    }
+
+    private function userHasRoles(ModelActionMetadata $actionMetadata): bool
+    {
+        $rolesAccess = $actionMetadata->getRolesAccess();
+
+        return $rolesAccess === []
+            || count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess)) > 0;
+    }
+
+    private function userHasPermissions(ModelActionMetadata $actionMetadata): bool
+    {
+        $permissionsAccess = $actionMetadata->getPermissionsAccess();
+
+        return $permissionsAccess === []
+            || count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess)) > 0;
+    }
+
+    private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
+    {
+        return false;
+        //$serviceStatusCheck = in_array($authStatus, $actionMetadata->getServicesAccess());
+
     }
 
     /**
@@ -117,10 +137,7 @@ class ActionCaller
                 } elseif ($reflectionParameter->allowsNull()) {
                     $newActionParameters[$newActionParameterKey] = null;
                 } else {
-                    throw new ActionCallException(
-                        "Parameter value $actionParameterKey necessarily!"
-                        . ' There is not null and no default value!'
-                    );
+                    throw new ActionCallException("Значение параметра $actionParameterKey обязательно! Значение по умолчанию или позволение null отсутствует!");
                 }
             } else {
                 $newActionParameters[$newActionParameterKey] = $this->actionParameters[$actionParameterKey];

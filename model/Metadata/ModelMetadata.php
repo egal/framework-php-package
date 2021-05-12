@@ -4,8 +4,8 @@ namespace Egal\Model\Metadata;
 
 use Egal\Auth\Accesses\PermissionAccess;
 use Egal\Auth\Accesses\RoleAccess;
+use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Auth\Accesses\StatusAccess;
-use Egal\Model\Exceptions\ModelMetadataException;
 use Exception;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;
@@ -35,9 +35,6 @@ class ModelMetadata
      */
     protected array $actionsMetadata = [];
 
-    /**
-     * @throws ReflectionException
-     */
     public function toArray(): array
     {
         $result = [];
@@ -191,9 +188,10 @@ class ModelMetadata
             if ($modelReflectionClass->hasMethod($actionCurrentName)) {
                 $reflectionMethod = $modelReflectionClass->getMethod($actionCurrentName);
                 if (!$reflectionMethod->isStatic()) {
-                    throw new ModelMetadataException('All actions methods of the model must be static!');
+                    throw new Exception('Все actions должны быть статичными методами!');
                 }
                 $statusesAccess = [];
+                $servicesAccess = [];
                 $rolesAccess = [];
                 $permissionsAccess = [];
                 /** @var Generic $actionTag */
@@ -201,6 +199,9 @@ class ModelMetadata
                     switch ($actionTag->getName()) {
                         case StatusAccess::TAG:
                             $statusesAccess = explode(',', $actionTag->getDescription());
+                            break;
+                        case ServiceAccess::TAG:
+                            $servicesAccess = explode(',', $actionTag->getDescription());
                             break;
                         case RoleAccess::TAG:
                             $rolesAccess = explode(',', $actionTag->getDescription());
@@ -215,7 +216,8 @@ class ModelMetadata
                     $reflectionMethod->getParameters(),
                     $statusesAccess,
                     $rolesAccess,
-                    $permissionsAccess
+                    $permissionsAccess,
+                    $servicesAccess
                 ));
             }
         }
@@ -293,9 +295,7 @@ class ModelMetadata
             return $this->actionsMetadata[$actionName];
         }
 
-        throw new ModelMetadataException(
-            $actionName . ' does not exist in the model' . $this->modelClass . '!'
-        );
+        throw new Exception($actionName . ' не существует в модели ' . $this->modelClass . '!');
     }
 
     public function databaseFieldExists(string $string): bool
