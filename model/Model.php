@@ -55,6 +55,11 @@ abstract class Model extends EloquentModel
         UsesModelMetadata;
 
     /**
+     * Стандартное значение количества элементов на странице при пагинации.
+     */
+    protected $perPage = 10;
+
+    /**
      * @var string[]
      */
     protected $guarded = [
