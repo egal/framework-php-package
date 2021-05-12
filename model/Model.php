@@ -10,9 +10,11 @@ use Egal\Exception\UpdateException;
 use Egal\Exception\UpdateManyException;
 use Egal\Model\Filter\FilterPart;
 use Egal\Model\Order\Order;
+use Egal\Model\Traits\GuardsAttributes;
 use Egal\Model\Traits\HasDefaultLimits;
 use Egal\Model\Traits\HasEvents;
 use Egal\Model\Traits\HashGuardable;
+use Egal\Model\Traits\HidesAttributes;
 use Egal\Model\Traits\Pagination;
 use Egal\Model\Traits\UsesEgalBuilder;
 use Egal\Model\Traits\UsesModelMetadata;
@@ -45,39 +47,16 @@ use ReflectionException;
 abstract class Model extends EloquentModel
 {
 
-    use HasDefaultLimits,
+    use HidesAttributes,
+        HasDefaultLimits,
         Pagination,
+        GuardsAttributes,
         HasEvents,
         UsesEgalBuilder,
         UsesValidator,
         XssGuardable,
         HashGuardable,
         UsesModelMetadata;
-
-    /**
-     * @var string[]
-     */
-    protected $guarded = [
-        'created_at',
-        'updated_at',
-    ];
-
-    /**
-     * @var string[]
-     */
-    protected $fillable = [
-        'id',
-        'name',
-        'is_default',
-    ];
-
-    /**
-     * @var string[]
-     */
-    protected $hidden = [
-        'pivot',
-        'laravel_through_key',
-    ];
 
     /**
      * Retrieving Model Metadata
