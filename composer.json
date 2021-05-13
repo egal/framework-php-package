@@ -1,6 +1,7 @@
 {
   "name": "egal/egal",
   "type": "library",
+  "license": "Apache-2.0",
   "description": "",
   "require": {
     "ext-json": "*",
