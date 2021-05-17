@@ -240,6 +240,7 @@ class ModelMetadata
             $statusesAccess = [];
             $rolesAccess = [];
             $permissionsAccess = [];
+            $servicesAccess = [];
 
             $docComment = $reflectionMethod->getDocComment();
             if ($docComment) {
@@ -249,6 +250,9 @@ class ModelMetadata
                     switch ($actionTag->getName()) {
                         case StatusAccess::TAG:
                             $statusesAccess = explode(',', $actionTag->getDescription());
+                            break;
+                        case ServiceAccess::TAG:
+                            $servicesAccess = explode(',', $actionTag->getDescription());
                             break;
                         case RoleAccess::TAG:
                             $rolesAccess = explode(',', $actionTag->getDescription());
@@ -265,7 +269,8 @@ class ModelMetadata
                 $reflectionMethod->getParameters(),
                 $statusesAccess,
                 $rolesAccess,
-                $permissionsAccess
+                $permissionsAccess,
+                $servicesAccess
             ));
         }
     }

@@ -76,7 +76,23 @@ class ActionCaller
         return $this->isServiceAccess($actionMetadata) || $this->isUserAccess($actionMetadata);
     }
 
-    private function isUserAccess(ModelActionMetadata $actionMetadata)
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws \Egal\Core\Exceptions\CurrentSessionException
+     */
+    private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
+    {
+        $serviceName = Session::getServiceServiceToken()->getServiceName();
+        return in_array($serviceName, $actionMetadata->getServicesAccess());
+    }
+
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws Exception
+     */
+    private function isUserAccess(ModelActionMetadata $actionMetadata): bool
     {
         $authStatus = Session::getAuthStatus();
         $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
@@ -91,6 +107,11 @@ class ActionCaller
             );
     }
 
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws Exception
+     */
     private function userHasRoles(ModelActionMetadata $actionMetadata): bool
     {
         $rolesAccess = $actionMetadata->getRolesAccess();
@@ -99,19 +120,17 @@ class ActionCaller
             || count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess)) > 0;
     }
 
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws Exception
+     */
     private function userHasPermissions(ModelActionMetadata $actionMetadata): bool
     {
         $permissionsAccess = $actionMetadata->getPermissionsAccess();
 
         return $permissionsAccess === []
             || count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess)) > 0;
-    }
-
-    private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
-    {
-        return false;
-        //$serviceStatusCheck = in_array($authStatus, $actionMetadata->getServicesAccess());
-
     }
 
     /**
