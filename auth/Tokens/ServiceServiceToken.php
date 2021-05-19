@@ -59,7 +59,7 @@ class ServiceServiceToken extends Token
                 throw new InitializeServiceServiceTokenException('Incomplete information!');
             }
         }
-        if (TokenType::USER_SERVICE !== $array['type']) {
+        if (TokenType::SERVICE_SERVICE !== $array['type']) {
             throw new InitializeServiceServiceTokenException('Type mismatch!');
         }
         $token = new ServiceServiceToken();

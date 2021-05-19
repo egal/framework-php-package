@@ -83,6 +83,9 @@ class ActionCaller
      */
     private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
     {
+        if (!Session::isServiceServiceTokenExists()) {
+            return false;
+        }
         $serviceName = Session::getServiceServiceToken()->getServiceName();
         return in_array($serviceName, $actionMetadata->getServicesAccess());
     }
