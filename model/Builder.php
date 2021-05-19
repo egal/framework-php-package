@@ -2,8 +2,8 @@
 
 namespace Egal\Model;
 
-use Egal\Exception\FilterException;
-use Egal\Exception\OrderException;
+use Egal\Model\Exceptions\FilterException;
+use Egal\Model\Exceptions\OrderException;
 use Egal\Model\Filter\FilterCombiner;
 use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Filter\FilterPart;
@@ -143,6 +143,8 @@ final class Builder extends EloquentBuilder
      * @return $this
      * @throws FilterException
      * @throws ReflectionException
+     * @throws Exceptions\FilterException
+     * @throws FilterException
      */
     public function setFilterFromArray(array $array): Builder
     {

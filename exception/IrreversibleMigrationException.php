@@ -2,6 +2,11 @@
 
 namespace Egal\Exception;
 
+use Exception;
+
+/**
+ * @deprecated
+ */
 class IrreversibleMigrationException extends Exception
 {
 

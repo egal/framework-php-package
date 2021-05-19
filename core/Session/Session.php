@@ -3,12 +3,12 @@
 namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Auth\Exceptions\TokenExpiredException;
 use Egal\Auth\Tokens\UserServiceToken;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
+use Egal\Core\Exceptions\TokenSignatureInvalidException;
 use Egal\Core\Messages\ActionMessage;
-use Egal\Exception\AuthException;
-use Egal\Exception\TokenExpiredAuthException;
 use Exception;
 use Firebase\JWT\SignatureInvalidException;
 
@@ -89,7 +89,7 @@ final class Session
 
     /**
      * @param ActionMessage $actionMessage
-     * @throws AuthException
+     * @throws TokenSignatureInvalidException
      */
     public static function setActionMessage(ActionMessage $actionMessage): void
     {
@@ -98,12 +98,8 @@ final class Session
             $encodedToken = $actionMessage->getToken();
             try {
                 $ust = UserServiceToken::fromJWT($encodedToken, config('app.service_key'));
-            } catch (Exception $exception) {
-                if ($exception instanceof SignatureInvalidException) {
-                    throw new AuthException('Токен не прошел проверку подписи!');
-                } else {
-                    throw $exception;
-                }
+            } catch (SignatureInvalidException $exception) {
+                throw new TokenSignatureInvalidException();
             }
             self::setUserServiceToken($ust);
         }
@@ -111,7 +107,6 @@ final class Session
 
     /**
      * @param UserServiceToken $userServiceToken
-     * @throws TokenExpiredAuthException
      */
     public static function setUserServiceToken(UserServiceToken $userServiceToken): void
     {

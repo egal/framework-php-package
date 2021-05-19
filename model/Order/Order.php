@@ -2,7 +2,7 @@
 
 namespace Egal\Model\Order;
 
-use Egal\Exception\OrderException;
+use Egal\Model\Exceptions\OrderException;
 
 /**
  * @package Egal\Model

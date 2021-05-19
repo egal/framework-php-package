@@ -3,7 +3,7 @@
 namespace Egal\Model\Traits;
 
 use Egal\Model\Builder;
-use Egal\Exception\HashGuardException;
+use Egal\Model\Exceptions\HashGuardException;
 use Egal\Model\Model;
 use Illuminate\Support\Facades\Schema;
 use ReflectionException;

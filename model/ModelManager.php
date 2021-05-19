@@ -39,6 +39,7 @@ class ModelManager
 
     /**
      * @statuses-access guest,logged
+     * @throws ReflectionException
      */
     public static function actionGetAllModelsMetadata(): array
     {
