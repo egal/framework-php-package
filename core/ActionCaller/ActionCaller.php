@@ -2,6 +2,7 @@
 
 namespace Egal\Core\ActionCaller;
 
+use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Core\Session\Session;
 use Egal\Exception\ActionCallException;
@@ -83,11 +84,15 @@ class ActionCaller
      */
     private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
     {
+        $servicesAccess = $actionMetadata->getServicesAccess();
+        if (!in_array(ServiceAccess::ALL, $servicesAccess)) {
+            return true;
+        }
         if (!Session::isServiceServiceTokenExists()) {
             return false;
         }
         $serviceName = Session::getServiceServiceToken()->getServiceName();
-        return in_array($serviceName, $actionMetadata->getServicesAccess());
+        return in_array($serviceName, $servicesAccess);
     }
 
     /**
