@@ -28,7 +28,6 @@ class RabbitMQJob extends BaseRabbitMQJob
 
         switch ($payload['type']) {
             case MessageType::ACTION:
-            case MessageType::SERVICE_ACTION:
                 return [
                     'job' => ActionJob::class . '@handle',
                     'data' => $payload

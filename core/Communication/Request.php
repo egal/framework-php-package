@@ -2,9 +2,7 @@
 
 namespace Egal\Core\Communication;
 
-use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\RequestException;
-use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -18,8 +16,6 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 class Request extends ActionMessage
 {
-
-    protected string $type = MessageType::SERVICE_ACTION;
 
     public Response $response;
 
@@ -219,34 +215,6 @@ class Request extends ActionMessage
         }
         $this->publish();
         $this->closeConnection();
-    }
-
-    /**
-     * @param array $array
-     * @return Request
-     * @throws InitializeMessageFromArrayException
-     * @throws UndefinedTypeOfMessageException
-     */
-    public static function fromArray(array $array): Request
-    {
-        if (!isset($array['type'])) {
-            throw new UndefinedTypeOfMessageException();
-        }
-        if ($array['type'] !== MessageType::SERVICE_ACTION) {
-            throw new InitializeMessageFromArrayException('Invalid type substitution!');
-        }
-
-        $message = new Request(
-            $array['service_name'],
-            $array['model_name'],
-            $array['action_name'],
-            $array['parameters'],
-            $array['token'] ?? null
-        );
-
-        $message->uuid = $array['uuid'];
-
-        return $message;
     }
 
 }

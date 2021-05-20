@@ -8,12 +8,10 @@ use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
 use Egal\Auth\Tokens\TokenType;
 use Egal\Auth\Tokens\UserServiceToken;
-use Egal\Core\Communication\Request;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Messages\ActionMessage;
-use Egal\Core\Messages\MessageType;
 use Egal\Exception\AuthException;
 use Egal\Exception\TokenExpiredAuthException;
 use Exception;
@@ -61,33 +59,11 @@ final class Session
      */
     public static function getAuthStatus(): string
     {
-        if (Session::isUserServiceTokenExists()) {
+        if (Session::isUserServiceTokenExists() || Session::isServiceServiceTokenExists()) {
             return StatusAccess::LOGGED;
         } else {
             return StatusAccess::GUEST;
         }
-    }
-
-    /**
-     * Check if the current session is for communication between services.
-     *
-     * @return bool
-     */
-    public static function isServiceSession()
-    {
-        return isset(self::getSingleton()->actionMessage)
-            && self::getSingleton()->actionMessage->getType() === MessageType::SERVICE_ACTION;
-    }
-
-    /**
-     * Check if the current session is for communication between user and service.
-     *
-     * @return bool
-     */
-    public static function isUserSerssion()
-    {
-        return isset(self::getSingleton()->actionMessage)
-            && self::getSingleton()->actionMessage->getType() === MessageType::ACTION;
     }
 
     public static function isUserServiceTokenExists(): bool
@@ -110,10 +86,10 @@ final class Session
     }
 
     /**
-     * @return ActionMessage|Request
+     * @return ActionMessage
      * @throws Exception
      */
-    public static function getActionMessage()
+    public static function getActionMessage(): ActionMessage
     {
         if (!self::isActionMessageExists()) {
             throw new CurrentSessionException('The current Session does not contain ActionMessage!');
@@ -123,7 +99,7 @@ final class Session
     }
 
     /**
-     * @param ActionMessage|Request $actionMessage
+     * @param ActionMessage $actionMessage
      * @throws AuthException
      * @throws TokenExpiredAuthException
      * @throws UndefinedTokenTypeException

@@ -7,6 +7,4 @@ class ServiceAccess extends Access
 
     public const TAG = 'services-access';
 
-    public const ALL = 'all';
-
 }

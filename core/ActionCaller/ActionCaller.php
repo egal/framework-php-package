@@ -74,6 +74,12 @@ class ActionCaller
         $modelMetadata = ModelManager::getModelMetadata($this->modelClass); # TODO: Убрать использование ReflectionClass
         $actionMetadata = $modelMetadata->getAction($this->actionName); # TODO: Убрать использование ReflectionMethod
 
+        $authStatus = Session::getAuthStatus();
+        // For user and service we check if it guest
+        if ($authStatus === StatusAccess::GUEST) {
+            return in_array($authStatus, $actionMetadata->getStatusesAccess());
+        }
+
         return $this->isServiceAccess($actionMetadata) || $this->isUserAccess($actionMetadata);
     }
 
@@ -84,18 +90,11 @@ class ActionCaller
      */
     private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
     {
-        if (!Session::isServiceSession()) {
-            return false;
-        }
-        $servicesAccess = $actionMetadata->getServicesAccess();
-        if (in_array(ServiceAccess::ALL, $servicesAccess)) {
-            return true;
-        }
         if (!Session::isServiceServiceTokenExists()) {
             return false;
         }
         $serviceName = Session::getServiceServiceToken()->getServiceName();
-        return in_array($serviceName, $servicesAccess);
+        return in_array($serviceName, $actionMetadata->getServicesAccess());
     }
 
     /**
@@ -105,20 +104,12 @@ class ActionCaller
      */
     private function isUserAccess(ModelActionMetadata $actionMetadata): bool
     {
-        if (!Session::isUserSerssion()) {
-            return false;
-        }
         $authStatus = Session::getAuthStatus();
         $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
 
         return $statusCheck
-            && (
-                $authStatus === StatusAccess::GUEST
-                || (
-                    $this->userHasRoles($actionMetadata)
-                    && $this->userHasPermissions($actionMetadata)
-                )
-            );
+            && $this->userHasRoles($actionMetadata)
+            && $this->userHasPermissions($actionMetadata);
     }
 
     /**
