@@ -99,11 +99,11 @@ final class Session
 
     /**
      * @param ActionMessage $actionMessage
-     * @throws AuthException
-     * @throws TokenExpiredAuthException
+     * @throws TokenSignatureInvalidException
      * @throws UndefinedTokenTypeException
      * @throws \Egal\Auth\Exceptions\InitializeServiceServiceTokenException
      * @throws \Egal\Auth\Exceptions\InitializeUserServiceTokenException
+     * @throws \Egal\Auth\Exceptions\TokenExpiredException
      */
     public static function setActionMessage(ActionMessage $actionMessage): void
     {
@@ -114,21 +114,17 @@ final class Session
 
         try {
             self::setToken($actionMessage->getToken());
-        } catch (Exception $exception) {
-            if ($exception instanceof SignatureInvalidException) {
-                throw new AuthException('Signature verification failed!');
-            } else {
-                throw $exception;
-            }
+        } catch (SignatureInvalidException $exception) {
+            throw new TokenSignatureInvalidException();
         }
     }
 
     /**
      * @param string $encodedToken
-     * @throws TokenExpiredAuthException
      * @throws \Egal\Auth\Exceptions\InitializeServiceServiceTokenException
      * @throws \Egal\Auth\Exceptions\InitializeUserServiceTokenException
      * @throws UndefinedTokenTypeException
+     * @throws \Egal\Auth\Exceptions\TokenExpiredException
      */
     private static function setToken(string $encodedToken): void
     {
@@ -148,7 +144,7 @@ final class Session
 
     /**
      * @param ServiceServiceToken $serviceServiceToken
-     * @throws TokenExpiredAuthException
+     * @throws \Egal\Auth\Exceptions\TokenExpiredException
      */
     public static function setServiceServiceToken(ServiceServiceToken $serviceServiceToken): void
     {
@@ -159,6 +155,7 @@ final class Session
 
     /**
      * @param UserServiceToken $userServiceToken
+     * @throws \Egal\Auth\Exceptions\TokenExpiredException
      */
     public static function setUserServiceToken(UserServiceToken $userServiceToken): void
     {
