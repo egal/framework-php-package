@@ -2,7 +2,6 @@
 
 namespace Egal\Core\ActionCaller;
 
-use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Core\Session\Session;
 use Egal\Exception\ActionCallException;
