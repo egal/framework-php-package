@@ -8,10 +8,12 @@ use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
 use Egal\Auth\Tokens\TokenType;
 use Egal\Auth\Tokens\UserServiceToken;
+use Egal\Core\Communication\Request;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Messages\ActionMessage;
+use Egal\Core\Messages\MessageType;
 use Egal\Exception\AuthException;
 use Egal\Exception\TokenExpiredAuthException;
 use Exception;
@@ -52,6 +54,11 @@ final class Session
         return self::getSingleton()->userServiceToken;
     }
 
+    /**
+     * Return auth status for user.
+     *
+     * @return string
+     */
     public static function getAuthStatus(): string
     {
         if (Session::isUserServiceTokenExists()) {
@@ -59,6 +66,28 @@ final class Session
         } else {
             return StatusAccess::GUEST;
         }
+    }
+
+    /**
+     * Check if the current session is for communication between services.
+     *
+     * @return bool
+     */
+    public static function isServiceSession()
+    {
+        return isset(self::getSingleton()->actionMessage)
+            && self::getSingleton()->actionMessage->getType() === MessageType::SERVICE_ACTION;
+    }
+
+    /**
+     * Check if the current session is for communication between user and service.
+     *
+     * @return bool
+     */
+    public static function isUserSerssion()
+    {
+        return isset(self::getSingleton()->actionMessage)
+            && self::getSingleton()->actionMessage->getType() === MessageType::ACTION;
     }
 
     public static function isUserServiceTokenExists(): bool
@@ -81,27 +110,20 @@ final class Session
     }
 
     /**
-     * @return ActionMessage
+     * @return ActionMessage|Request
      * @throws Exception
      */
-    public static function getActionMessage(): ActionMessage
-    {
-        self::actionMessageExistsOrFail();
-        return self::getSingleton()->actionMessage;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public static function actionMessageExistsOrFail(): void
+    public static function getActionMessage()
     {
         if (!self::isActionMessageExists()) {
             throw new CurrentSessionException('The current Session does not contain ActionMessage!');
         }
+
+        return self::getSingleton()->actionMessage;
     }
 
     /**
-     * @param ActionMessage $actionMessage
+     * @param ActionMessage|Request $actionMessage
      * @throws AuthException
      * @throws TokenExpiredAuthException
      * @throws UndefinedTokenTypeException
@@ -119,7 +141,7 @@ final class Session
             self::setToken($actionMessage->getToken());
         } catch (Exception $exception) {
             if ($exception instanceof SignatureInvalidException) {
-                throw new AuthException('Токен не прошел проверку подписи!');
+                throw new AuthException('Signature verification failed!');
             } else {
                 throw $exception;
             }

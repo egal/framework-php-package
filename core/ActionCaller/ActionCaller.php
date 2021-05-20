@@ -53,7 +53,7 @@ class ActionCaller
     private function forceCall()
     {
         if (Session::isAuthEnabled() && !$this->isAccessedForCall()) {
-            throw new ActionCallException('Нет доступа!');
+            throw new ActionCallException('Access denied!');
         }
 
         return call_user_func_array(
@@ -84,8 +84,11 @@ class ActionCaller
      */
     private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
     {
+        if (!Session::isServiceSession()) {
+            return false;
+        }
         $servicesAccess = $actionMetadata->getServicesAccess();
-        if (!in_array(ServiceAccess::ALL, $servicesAccess)) {
+        if (in_array(ServiceAccess::ALL, $servicesAccess)) {
             return true;
         }
         if (!Session::isServiceServiceTokenExists()) {
@@ -102,6 +105,9 @@ class ActionCaller
      */
     private function isUserAccess(ModelActionMetadata $actionMetadata): bool
     {
+        if (!Session::isUserSerssion()) {
+            return false;
+        }
         $authStatus = Session::getAuthStatus();
         $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
 

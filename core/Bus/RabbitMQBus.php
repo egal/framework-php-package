@@ -10,6 +10,7 @@ use Egal\Core\Messages\EventMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
+use Egal\Core\Communication\Request;
 use Exception;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
@@ -73,7 +74,8 @@ final class RabbitMQBus extends Bus
                 );
                 break;
             case MessageType::ACTION:
-                /** @var ActionMessage $message */
+            case MessageType::SERVICE_ACTION:
+                /** @var ActionMessage|Request $message */
                 $this->connection->getChannel()->queue_declare($message->getUuid());
                 break;
             default:
@@ -100,6 +102,7 @@ final class RabbitMQBus extends Bus
     {
         switch ($message->getType()) {
             case MessageType::ACTION:
+            case MessageType::SERVICE_ACTION:
             case MessageType::EVENT:
                 return 'amq.topic';
             case MessageType::ACTION_RESULT:
@@ -118,7 +121,8 @@ final class RabbitMQBus extends Bus
     {
         switch ($message->getType()) {
             case MessageType::ACTION:
-                /** @var ActionMessage $message */
+            case MessageType::SERVICE_ACTION:
+                /** @var ActionMessage|Request $message */
                 return words_to_dot_case(
                     $message->getServiceName(),
                     $message->getModelName(),

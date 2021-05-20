@@ -4,6 +4,8 @@ namespace Egal\Core\Jobs;
 
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
+use Egal\Core\Communication\Request;
+use Egal\Core\Messages\MessageType;
 use Egal\Exception\ActionCallException;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -41,7 +43,13 @@ class ActionJob extends Job
     public function handle(RabbitMQJob $rabbitMQJob, array $data): void
     {
         $rabbitMQJob->delete();
-        $this->setActionMessage(ActionMessage::fromArray($data));
+
+        if (isset($data['type']) && $data['type'] === MessageType::SERVICE_ACTION) {
+            $this->setActionMessage(Request::fromArray($data));
+        } else {
+            $this->setActionMessage(ActionMessage::fromArray($data));
+        }
+
         Session::setActionMessage($this->getActionMessage());
         $this->publishMessageStartProcessing();
         $this->configureActionMessageResult();
