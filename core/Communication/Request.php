@@ -233,7 +233,7 @@ class Request extends ActionMessage
      * Send request to auth service and get sst token.
      *
      * @return mixed
-     * @throws Exception
+     * @throws RequestException
      */
     public function getSSTToken()
     {
@@ -252,13 +252,16 @@ class Request extends ActionMessage
         $response = $request->getResponse();
         $sst = '';
         if ($response->hasError()) {
-            throw new \Exception($response->getActionErrorMessage()->getMessage(), $response->getActionErrorMessage()->getCode());
+            throw new RequestException(
+                $response->getActionErrorMessage()->getMessage(),
+                $response->getActionErrorMessage()->getCode()
+            );
         } else {
             $result = $response->getActionResultMessage();
             $sst = $result->getData();
         }
         if (!$sst) {
-            throw new \Exception('SST is empty!');
+            throw new RequestException('SST is empty!');
         }
 
         return $sst;
@@ -267,7 +270,7 @@ class Request extends ActionMessage
     /**
      * Send request to auth service and get smt token.
      * @return string
-     * @throws Exception
+     * @throws RequestException
      */
     public function getSMTToken(): string
     {
@@ -285,14 +288,17 @@ class Request extends ActionMessage
         $response = $request->getResponse();
         $smt = '';
         if ($response->hasError()) {
-            throw new \Exception($response->getActionErrorMessage()->getMessage(), $response->getActionErrorMessage()->getCode());
+            throw new RequestException(
+                $response->getActionErrorMessage()->getMessage(),
+                $response->getActionErrorMessage()->getCode()
+            );
         } else {
             $result = $response->getActionResultMessage();
             $smt = $result->getData();
         }
 
         if (!$smt) {
-            throw new \Exception('SMT is empty!');
+            throw new RequestException('SMT is empty!');
         }
         return $smt;
     }
