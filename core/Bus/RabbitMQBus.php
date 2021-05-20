@@ -58,6 +58,7 @@ final class RabbitMQBus extends Bus
             throw  new Exception('Невозможно опубликовать ' . get_class($message));
         }
 
+        /* Additional actions before publish */
         switch ($message->getType()) {
             case MessageType::ACTION_ERROR:
             case MessageType::ACTION_RESULT:
@@ -77,8 +78,6 @@ final class RabbitMQBus extends Bus
                 /** @var ActionMessage $message */
                 $this->connection->getChannel()->queue_declare($message->getUuid());
                 break;
-            default:
-                throw new UnsupportedMessageTypeException();
         }
 
         $AMQPMessage = new AMQPMessage(

@@ -7,4 +7,6 @@ use Exception;
 class InitializeUserMasterTokenException extends Exception
 {
 
+    protected $code = 400;
+
 }

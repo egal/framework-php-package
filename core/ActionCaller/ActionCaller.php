@@ -3,8 +3,9 @@
 namespace Egal\Core\ActionCaller;
 
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Core\Exceptions\ActionCallException;
+use Egal\Core\Exceptions\NoAccessActionCallException;
 use Egal\Core\Session\Session;
-use Egal\Exception\ActionCallException;
 use Egal\Model\Metadata\ModelActionMetadata;
 use Egal\Model\ModelManager;
 use Exception;
@@ -52,7 +53,7 @@ class ActionCaller
     private function forceCall()
     {
         if (Session::isAuthEnabled() && !$this->isAccessedForCall()) {
-            throw new ActionCallException('Access denied!');
+            throw new NoAccessActionCallException();
         }
 
         return call_user_func_array(
@@ -160,7 +161,10 @@ class ActionCaller
                 } elseif ($reflectionParameter->allowsNull()) {
                     $newActionParameters[$newActionParameterKey] = null;
                 } else {
-                    throw new ActionCallException("Значение параметра $actionParameterKey обязательно! Значение по умолчанию или позволение null отсутствует!");
+                    throw new ActionCallException(
+                        "Parameter value $actionParameterKey necessarily!"
+                        . ' There is not null and no default value!'
+                    );
                 }
             } else {
                 $newActionParameters[$newActionParameterKey] = $this->actionParameters[$actionParameterKey];

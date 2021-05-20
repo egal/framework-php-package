@@ -2,7 +2,7 @@
 
 namespace Egal\Model\Filter;
 
-use Egal\Exception\FilterException;
+use Egal\Model\Exceptions\FilterException;
 
 /**
  * @package Egal\Model

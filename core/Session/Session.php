@@ -11,9 +11,8 @@ use Egal\Auth\Tokens\UserServiceToken;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
+use Egal\Core\Exceptions\TokenSignatureInvalidException;
 use Egal\Core\Messages\ActionMessage;
-use Egal\Exception\AuthException;
-use Egal\Exception\TokenExpiredAuthException;
 use Exception;
 use Firebase\JWT\SignatureInvalidException;
 
@@ -160,7 +159,6 @@ final class Session
 
     /**
      * @param UserServiceToken $userServiceToken
-     * @throws TokenExpiredAuthException
      */
     public static function setUserServiceToken(UserServiceToken $userServiceToken): void
     {

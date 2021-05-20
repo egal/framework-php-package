@@ -1,14 +1,15 @@
 <?php
 
-namespace Egal\Exception;
+namespace Egal\Model\Exceptions;
 
+use Exception;
 use Illuminate\Support\MessageBag;
 
 class ValidateException extends Exception
 {
 
-    protected const BASE_MESSAGE_LINE = 'Не пройдена валидация!';
-    protected const DEFAULT_CODE = 405;
+    protected $message = 'Не пройдена валидация!';
+    protected $code = 405;
 
     private MessageBag $messageBag;
 

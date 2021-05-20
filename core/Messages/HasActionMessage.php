@@ -25,6 +25,7 @@ trait HasActionMessage
 
     public function toArray(): array
     {
+        /** @noinspection PhpMultipleClassDeclarationsInspection */
         $result = parent::toArray();
         if (isset($this->actionMessage))  {
             $result['action_message'] = $this->actionMessage->toArray();

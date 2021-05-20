@@ -7,4 +7,6 @@ use Exception;
 class UserServiceTokenException extends Exception
 {
 
+    protected $code = 500;
+
 }
