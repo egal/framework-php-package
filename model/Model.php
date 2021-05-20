@@ -2,12 +2,11 @@
 
 namespace Egal\Model;
 
-use Egal\Exception\DeleteManyException;
-use Egal\Exception\FilterException;
-use Egal\Exception\NotFoundException;
-use Egal\Exception\OrderException;
-use Egal\Exception\UpdateException;
-use Egal\Exception\UpdateManyException;
+use Egal\Model\Exceptions\DeleteManyException;
+use Egal\Model\Exceptions\FilterException;
+use Egal\Model\Exceptions\NotFoundException;
+use Egal\Model\Exceptions\UpdateException;
+use Egal\Model\Exceptions\UpdateManyException;
 use Egal\Model\Filter\FilterPart;
 use Egal\Model\Order\Order;
 use Egal\Model\Traits\HasDefaultLimits;
@@ -172,9 +171,9 @@ abstract class Model extends EloquentModel
      *   ]
      * ]
      * </p>
-     * @throws FilterException
+     * @throws Exceptions\FilterException
+     * @throws Exceptions\OrderException
      * @throws ReflectionException
-     * @throws OrderException
      */
     public static function actionGetItems(
         ?array $pagination = null,
@@ -327,6 +326,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
+        /** @var Builder $builder */
         $builder = self::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 
@@ -415,6 +415,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
+        /** @var Builder $builder */
         $builder = self::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 

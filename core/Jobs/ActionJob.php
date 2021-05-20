@@ -4,13 +4,14 @@ namespace Egal\Core\Jobs;
 
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
-use Egal\Exception\ActionCallException;
+use Egal\Core\Exceptions\ActionCallException;
+use Egal\Core\Exceptions\InitializeMessageFromArrayException;
+use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
 use Egal\Model\ModelManager;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Queue\InteractsWithQueue;
@@ -34,9 +35,10 @@ class ActionJob extends Job
      * @param RabbitMQJob $rabbitMQJob
      * @param array $data
      * @throws ActionCallException
-     * @throws ReflectionException
      * @throws BindingResolutionException
-     * @throws Exception
+     * @throws InitializeMessageFromArrayException
+     * @throws ReflectionException
+     * @throws UndefinedTypeOfMessageException
      */
     public function handle(RabbitMQJob $rabbitMQJob, array $data): void
     {

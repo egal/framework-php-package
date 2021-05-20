@@ -2,7 +2,7 @@
 
 namespace Egal\Auth\Tokens;
 
-use Egal\Exception\TokenExpiredAuthException;
+use Egal\Auth\Exceptions\TokenExpiredException;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -40,14 +40,14 @@ abstract class Token
 
     /**
      * @return bool
-     * @throws TokenExpiredAuthException
+     * @throws TokenExpiredException
      */
     public function isAliveOrFail(): bool
     {
         if ($this->isAlive()) {
             return true;
         } else {
-            throw new TokenExpiredAuthException();
+            throw new TokenExpiredException();
         }
     }
 

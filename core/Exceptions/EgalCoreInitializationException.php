@@ -7,4 +7,6 @@ use Exception;
 class EgalCoreInitializationException extends Exception
 {
 
+    protected $code = 500;
+
 }

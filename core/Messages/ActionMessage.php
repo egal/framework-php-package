@@ -37,7 +37,8 @@ class ActionMessage extends Message
     /**
      * @param array $array
      * @return ActionMessage
-     * @throws Exception
+     * @throws InitializeMessageFromArrayException
+     * @throws UndefinedTypeOfMessageException
      */
     public static function fromArray(array $array): ActionMessage
     {

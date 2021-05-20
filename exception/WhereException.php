@@ -2,10 +2,15 @@
 
 namespace Egal\Exception;
 
+use Exception;
+
+/**
+ * @deprecated
+ */
 class WhereException extends Exception
 {
 
-    protected const MESSAGE_PREFIX_LINE = 'Ошибка поиска!';
-    protected const DEFAULT_CODE = 405;
+    protected $message = 'Ошибка поиска!';
+    protected $code = 405;
 
 }

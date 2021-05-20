@@ -7,4 +7,6 @@ use Exception;
 class UndefinedTypeOfMessageException extends Exception
 {
 
+    protected $code = 400;
+
 }

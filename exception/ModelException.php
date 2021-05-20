@@ -2,6 +2,11 @@
 
 namespace Egal\Exception;
 
+use Exception;
+
+/**
+ * @deprecated
+ */
 class ModelException extends Exception
 {
 

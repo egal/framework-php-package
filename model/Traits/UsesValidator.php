@@ -2,7 +2,7 @@
 
 namespace Egal\Model\Traits;
 
-use Egal\Exception\ValidateException;
+use Egal\Model\Exceptions\ValidateException;
 use Egal\Model\Model;
 use Illuminate\Support\Facades\Validator;
 use ReflectionException;

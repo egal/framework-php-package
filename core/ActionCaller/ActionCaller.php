@@ -3,8 +3,9 @@
 namespace Egal\Core\ActionCaller;
 
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Core\Exceptions\ActionCallException;
+use Egal\Core\Exceptions\NoAccessActionCallException;
 use Egal\Core\Session\Session;
-use Egal\Exception\ActionCallException;
 use Egal\Model\ModelManager;
 use Exception;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ class ActionCaller
     private function forceCall()
     {
         if (Session::isAuthEnabled() && !$this->isAccessedForCall()) {
-            throw new ActionCallException('No access!');
+            throw new NoAccessActionCallException();
         }
 
         return call_user_func_array(
