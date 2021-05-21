@@ -201,7 +201,7 @@ class Request extends ActionMessage
      */
     public function call(): Response
     {
-        if (!$this->disableAuth) {
+        if (!$this->disableAuth && !$this->isTokenExist()) {
             $this->setToken($this->getSSTToken());
         }
         if (!$this->isConnectionOpened) {
@@ -219,7 +219,7 @@ class Request extends ActionMessage
      */
     public function send()
     {
-        if (!$this->disableAuth) {
+        if (!$this->disableAuth && !$this->isTokenExist()) {
             $this->setToken($this->getSSTToken());
         }
         if (!$this->isConnectionOpened) {
@@ -233,7 +233,7 @@ class Request extends ActionMessage
      * Send request to auth service and get sst token.
      *
      * @return mixed
-     * @throws RequestException
+     * @throws RequestException|AMQPProtocolChannelException
      */
     public function getSSTToken()
     {
@@ -270,7 +270,7 @@ class Request extends ActionMessage
     /**
      * Send request to auth service and get smt token.
      * @return string
-     * @throws RequestException
+     * @throws RequestException|AMQPProtocolChannelException
      */
     public function getSMTToken(): string
     {

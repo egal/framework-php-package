@@ -3,6 +3,9 @@
 namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Auth\Exceptions\InitializeServiceServiceTokenException;
+use Egal\Auth\Exceptions\InitializeUserServiceTokenException;
+use Egal\Auth\Exceptions\TokenExpiredException;
 use Egal\Auth\Exceptions\UndefinedTokenTypeException;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
@@ -101,9 +104,9 @@ final class Session
      * @param ActionMessage $actionMessage
      * @throws TokenSignatureInvalidException
      * @throws UndefinedTokenTypeException
-     * @throws \Egal\Auth\Exceptions\InitializeServiceServiceTokenException
-     * @throws \Egal\Auth\Exceptions\InitializeUserServiceTokenException
-     * @throws \Egal\Auth\Exceptions\TokenExpiredException
+     * @throws InitializeServiceServiceTokenException
+     * @throws InitializeUserServiceTokenException
+     * @throws TokenExpiredException
      */
     public static function setActionMessage(ActionMessage $actionMessage): void
     {
@@ -121,10 +124,10 @@ final class Session
 
     /**
      * @param string $encodedToken
-     * @throws \Egal\Auth\Exceptions\InitializeServiceServiceTokenException
-     * @throws \Egal\Auth\Exceptions\InitializeUserServiceTokenException
+     * @throws InitializeServiceServiceTokenException
+     * @throws InitializeUserServiceTokenException
      * @throws UndefinedTokenTypeException
-     * @throws \Egal\Auth\Exceptions\TokenExpiredException
+     * @throws TokenExpiredException
      */
     private static function setToken(string $encodedToken): void
     {
@@ -144,7 +147,7 @@ final class Session
 
     /**
      * @param ServiceServiceToken $serviceServiceToken
-     * @throws \Egal\Auth\Exceptions\TokenExpiredException
+     * @throws TokenExpiredException
      */
     public static function setServiceServiceToken(ServiceServiceToken $serviceServiceToken): void
     {
@@ -155,7 +158,7 @@ final class Session
 
     /**
      * @param UserServiceToken $userServiceToken
-     * @throws \Egal\Auth\Exceptions\TokenExpiredException
+     * @throws TokenExpiredException
      */
     public static function setUserServiceToken(UserServiceToken $userServiceToken): void
     {

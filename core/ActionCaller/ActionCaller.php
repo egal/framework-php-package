@@ -104,6 +104,10 @@ class ActionCaller
      */
     private function isUserAccess(ModelActionMetadata $actionMetadata): bool
     {
+        if (!Session::isUserServiceTokenExists()) {
+            return false;
+        }
+
         $authStatus = Session::getAuthStatus();
         $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
 

@@ -42,10 +42,10 @@ class ServiceMasterToken extends Token
 
     /**
      * @param array $array
-     * @return Token
+     * @return ServiceMasterToken
      * @throws InitializeServiceMasterTokenException
      */
-    public static function fromArray(array $array): Token
+    public static function fromArray(array $array): ServiceMasterToken
     {
         foreach (['type', 'auth_identification'] as $index) {
             if (!array_key_exists($index, $array)) {

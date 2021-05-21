@@ -7,4 +7,6 @@ use Exception;
 class InitializeServiceServiceTokenException extends Exception
 {
 
+    protected $code = 400;
+
 }

@@ -6,6 +6,7 @@ use Egal\Auth\Accesses\PermissionAccess;
 use Egal\Auth\Accesses\RoleAccess;
 use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Model\Exceptions\ModelMetadataException;
 use Exception;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;
@@ -188,7 +189,7 @@ class ModelMetadata
             if ($modelReflectionClass->hasMethod($actionCurrentName)) {
                 $reflectionMethod = $modelReflectionClass->getMethod($actionCurrentName);
                 if (!$reflectionMethod->isStatic()) {
-                    throw new Exception('Все actions должны быть статичными методами!');
+                    throw new ModelMetadataException('All actions methods of the model must be static!');
                 }
                 $statusesAccess = [];
                 $servicesAccess = [];
@@ -300,7 +301,9 @@ class ModelMetadata
             return $this->actionsMetadata[$actionName];
         }
 
-        throw new Exception($actionName . ' не существует в модели ' . $this->modelClass . '!');
+        throw new ModelMetadataException(
+            $actionName . ' does not exist in the model' . $this->modelClass . '!'
+        );
     }
 
     public function databaseFieldExists(string $string): bool
