@@ -10,6 +10,7 @@ use Exception;
 class ModelException extends Exception
 {
 
-    protected const MESSAGE_PREFIX_LINE = 'Ошибка модели!';
+    protected $message = 'Ошибка модели!';
+    protected $code = 500;
 
 }

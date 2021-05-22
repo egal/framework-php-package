@@ -11,5 +11,6 @@ class UserNotIdentifiedAuthException extends Exception
 {
 
     protected $message = 'User not identified!';
+    protected $code = 500;
 
 }

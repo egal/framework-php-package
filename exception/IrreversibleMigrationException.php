@@ -10,6 +10,7 @@ use Exception;
 class IrreversibleMigrationException extends Exception
 {
 
-    protected const BASE_MESSAGE_LINE = 'Миграция необратима!';
+    protected $message = 'Миграция необратима!';
+    protected $code = 500;
 
 }

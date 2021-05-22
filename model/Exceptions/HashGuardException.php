@@ -8,5 +8,6 @@ class HashGuardException extends Exception
 {
 
     protected $message = 'Ошибка защиты целостности данных!';
+    protected $code = 500;
 
 }

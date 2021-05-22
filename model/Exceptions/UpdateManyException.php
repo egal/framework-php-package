@@ -8,5 +8,6 @@ class UpdateManyException extends Exception
 {
 
     protected $message = 'Ошибка множественного обновления сущностей!';
+    protected $code = 500;
 
 }
