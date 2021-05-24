@@ -107,8 +107,6 @@ abstract class Model extends EloquentModel
             ->with($withs)
             ->firstOrFail();
 
-        $item->fireModelEvent('got');
-
         return $item->toArray();
     }
 
@@ -182,11 +180,10 @@ abstract class Model extends EloquentModel
         array $order = []
     ): array
     {
-        /** @var Builder $builder */
-        $builder = self::query();
-        $builder->setOrderFromArray($order);
-        $builder->setFilterFromArray($filter);
-        $builder->setWithFromArray($withs);
+        $builder = self::query()
+            ->setOrderFromArray($order)
+            ->setFilterFromArray($filter)
+            ->setWithFromArray($withs);
 
         if (!is_null($pagination)) {
             $paginator = $builder->difficultPaginateFromArray($pagination);
@@ -213,12 +210,9 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreate(array $attributes = []): array
     {
-        $entity = new static();
-        $entity->needFireActionEvents();
-        $entity->fill($attributes);
+        $entity = (new static($attributes))
+            ->needFireActionEvents();
         $entity->save();
-        $entity->refresh();
-
         return $entity->toArray();
     }
 
@@ -257,7 +251,6 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification
      * @param array $attributes Associative array of attributes
      * @return array Updated entity as an associative array
-     * @throws NotFoundException
      * @throws UpdateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
@@ -273,14 +266,11 @@ abstract class Model extends EloquentModel
             }
         }
 
-        if (!($entity = static::query()->find($id))) {
-            throw new NotFoundException();
-        }
-
         /** @var Model $entity */
+        $entity = static::query()
+            ->findOrFail($id);
         $entity->needFireActionEvents();
-        $entity->fill($attributes);
-        $entity->save();
+        $entity->update($attributes);
 
         return $entity->toArray();
     }
@@ -333,7 +323,6 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        /** @var Builder $builder */
         $builder = self::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 
@@ -425,7 +414,6 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
-        /** @var Builder $builder */
         $builder = self::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 

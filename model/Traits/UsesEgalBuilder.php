@@ -2,6 +2,7 @@
 
 namespace Egal\Model\Traits;
 
+use Egal\Model\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Egal\Model\Builder as EgalBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -24,12 +25,9 @@ trait UsesEgalBuilder
         return new EgalBuilder($query);
     }
 
-    /**
-     * @return EloquentBuilder
-     * @noinspection PhpMissingReturnTypeInspection
-     */
-    public static function query()
+    public static function query(): Builder
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return parent::query();
     }
 
