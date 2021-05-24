@@ -47,11 +47,30 @@ final class Session
      */
     public static function getUserServiceToken(): UserServiceToken
     {
+        self::isUserServiceTokenExistsOrFail();
+        return self::getSingleton()->userServiceToken;
+    }
+
+    /**
+     * @return bool
+     * @throws CurrentSessionException
+     */
+    public static function isUserServiceTokenExistsOrFail(): bool
+    {
         if (!self::isUserServiceTokenExists()) {
             throw new CurrentSessionException('The current Session does not contain UST!');
         }
+        return true;
+    }
 
-        return self::getSingleton()->userServiceToken;
+    /**
+     * @return bool
+     * @throws CurrentSessionException
+     * @deprecated since v2.0.0, use {@see Session::isUserServiceTokenExistsOrFail()}.
+     */
+    public static function userServiceTokenExistsOrFail(): bool
+    {
+        return self::isUserServiceTokenExistsOrFail();
     }
 
     /**
@@ -73,13 +92,27 @@ final class Session
         return !is_null(self::getSingleton()->userServiceToken);
     }
 
+    /**
+     * @return ServiceServiceToken
+     * @throws CurrentSessionException
+     */
     public static function getServiceServiceToken(): ServiceServiceToken
+    {
+        self::isServiceServiceTokenExistsOrFail();
+        return self::getSingleton()->serviceServiceToken;
+    }
+
+    /**
+     * @return bool
+     * @throws CurrentSessionException
+     */
+    public static function isServiceServiceTokenExistsOrFail(): bool
     {
         if (!self::isServiceServiceTokenExists()) {
             throw new CurrentSessionException('The current Session does not contain SST!');
         }
 
-        return self::getSingleton()->serviceServiceToken;
+        return true;
     }
 
     public static function isServiceServiceTokenExists(): bool
@@ -93,11 +126,30 @@ final class Session
      */
     public static function getActionMessage(): ActionMessage
     {
+        self::isActionMessageExistsOrFail();
+        return self::getSingleton()->actionMessage;
+    }
+
+    /**
+     * @return bool
+     * @throws CurrentSessionException
+     */
+    public static function isActionMessageExistsOrFail(): bool
+    {
         if (!self::isActionMessageExists()) {
             throw new CurrentSessionException('The current Session does not contain ActionMessage!');
         }
+        return true;
+    }
 
-        return self::getSingleton()->actionMessage;
+    /**
+     * @return bool
+     * @throws CurrentSessionException
+     * @deprecated since v2.0.0, use {@see Session::isActionMessageExistsOrFail()}.
+     */
+    public static function actionMessageExistsOrFail(): bool
+    {
+        return self::isActionMessageExistsOrFail();
     }
 
     /**
