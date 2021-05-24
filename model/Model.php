@@ -214,6 +214,7 @@ abstract class Model extends EloquentModel
     public static function actionCreate(array $attributes = []): array
     {
         $entity = new static();
+        $entity->needFireActionEvents();
         $entity->fill($attributes);
         $entity->save();
         $entity->refresh();
@@ -234,6 +235,7 @@ abstract class Model extends EloquentModel
         $collection = new Collection();
         foreach ($objects as $attributes) {
             $entity = new static();
+            $entity->needFireActionEvents();
             $entity->fill($attributes);
             try {
                 $entity->save();
@@ -275,6 +277,8 @@ abstract class Model extends EloquentModel
             throw new NotFoundException();
         }
 
+        /** @var Model $entity */
+        $entity->needFireActionEvents();
         $entity->fill($attributes);
         $entity->save();
 
@@ -305,6 +309,9 @@ abstract class Model extends EloquentModel
                 DB::rollBack();
                 throw new UpdateManyException('Object not found with ' . $key . ' index!');
             }
+
+            /** @var Model $entity */
+            $entity->needFireActionEvents();
             $entity->fill($attributes);
             $entity->save();
             $collection->add($entity);
@@ -335,16 +342,14 @@ abstract class Model extends EloquentModel
 
         DB::beginTransaction();
         foreach ($entities as $key => $entity) {
-            /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
+            $entities[$key]->needFireActionEvents();
             $entities[$key]->fill($attributes);
             try {
-                /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
                 $entities[$key]->save();
             } catch (Exception $exception) {
                 DB::rollBack();
                 throw $exception;
             }
-            /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
             $entities[$key]->refresh();
         }
         DB::commit();
@@ -368,6 +373,9 @@ abstract class Model extends EloquentModel
         if (!$entity) {
             throw new NotFoundException();
         }
+
+        /** @var Model $entity */
+        $entity->needFireActionEvents();
         $entity->delete();
 
         return [
@@ -394,6 +402,8 @@ abstract class Model extends EloquentModel
                 throw new DeleteManyException('Object not found with index  ' . $id . '!');
             }
             try {
+                /** @var Model $entity */
+                $entity->needFireActionEvents();
                 $entity->delete();
             } catch (Exception $e) {
                 DB::rollBack();
@@ -426,6 +436,7 @@ abstract class Model extends EloquentModel
         /** @var Model[] $entities */
         foreach ($entities as $key => $entity) {
             try {
+                $entities[$key]->needFireActionEvents();
                 $entities[$key]->delete();
             } catch (Exception $exception) {
                 DB::rollBack();
