@@ -52,7 +52,7 @@ trait HasEvents
         return $this->needFireActionEvents;
     }
 
-    public function needFireActionEvents(): HasEvents
+    public function needFireActionEvents(): Model
     {
         $this->needFireActionEvents = true;
         return $this;
