@@ -4,6 +4,7 @@ namespace Egal\Model\Metadata;
 
 use Egal\Auth\Accesses\PermissionAccess;
 use Egal\Auth\Accesses\RoleAccess;
+use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Exception;
@@ -35,9 +36,6 @@ class ModelMetadata
      */
     protected array $actionsMetadata = [];
 
-    /**
-     * @throws ReflectionException
-     */
     public function toArray(): array
     {
         $result = [];
@@ -194,6 +192,7 @@ class ModelMetadata
                     throw new ModelMetadataException('All actions methods of the model must be static!');
                 }
                 $statusesAccess = [];
+                $servicesAccess = [];
                 $rolesAccess = [];
                 $permissionsAccess = [];
                 /** @var Generic $actionTag */
@@ -201,6 +200,9 @@ class ModelMetadata
                     switch ($actionTag->getName()) {
                         case StatusAccess::TAG:
                             $statusesAccess = explode(',', $actionTag->getDescription());
+                            break;
+                        case ServiceAccess::TAG:
+                            $servicesAccess = explode(',', $actionTag->getDescription());
                             break;
                         case RoleAccess::TAG:
                             $rolesAccess = explode(',', $actionTag->getDescription());
@@ -215,7 +217,8 @@ class ModelMetadata
                     $reflectionMethod->getParameters(),
                     $statusesAccess,
                     $rolesAccess,
-                    $permissionsAccess
+                    $permissionsAccess,
+                    $servicesAccess
                 ));
             }
         }
@@ -238,6 +241,7 @@ class ModelMetadata
             $statusesAccess = [];
             $rolesAccess = [];
             $permissionsAccess = [];
+            $servicesAccess = [];
 
             $docComment = $reflectionMethod->getDocComment();
             if ($docComment) {
@@ -247,6 +251,9 @@ class ModelMetadata
                     switch ($actionTag->getName()) {
                         case StatusAccess::TAG:
                             $statusesAccess = explode(',', $actionTag->getDescription());
+                            break;
+                        case ServiceAccess::TAG:
+                            $servicesAccess = explode(',', $actionTag->getDescription());
                             break;
                         case RoleAccess::TAG:
                             $rolesAccess = explode(',', $actionTag->getDescription());
@@ -263,7 +270,8 @@ class ModelMetadata
                 $reflectionMethod->getParameters(),
                 $statusesAccess,
                 $rolesAccess,
-                $permissionsAccess
+                $permissionsAccess,
+                $servicesAccess
             ));
         }
     }

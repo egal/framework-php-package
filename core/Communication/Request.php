@@ -26,10 +26,16 @@ class Request extends ActionMessage
 
     private bool $isConnectionOpened;
 
-    public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [], ?string $token = null)
+    private string $authServiceName;
+
+    private bool $disableAuth;
+
+    public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [], bool $disableAuth = false, string $authServiceName = 'auth')
     {
-        parent::__construct($serviceName, $modelName, $actionName, $parameters, $token);
+        parent::__construct($serviceName, $modelName, $actionName, $parameters);
         $this->isConnectionOpened = false;
+        $this->authServiceName = $authServiceName;
+        $this->disableAuth = $disableAuth;
     }
 
     /**
@@ -195,6 +201,9 @@ class Request extends ActionMessage
      */
     public function call(): Response
     {
+        if (!$this->disableAuth && !$this->isTokenExist()) {
+            $this->setToken($this->getSSTToken());
+        }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
         }
@@ -210,11 +219,88 @@ class Request extends ActionMessage
      */
     public function send()
     {
+        if (!$this->disableAuth && !$this->isTokenExist()) {
+            $this->setToken($this->getSSTToken());
+        }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
         }
         $this->publish();
         $this->closeConnection();
+    }
+
+    /**
+     * Send request to auth service and get sst token.
+     *
+     * @return mixed
+     * @throws RequestException|AMQPProtocolChannelException
+     */
+    public function getSSTToken()
+    {
+        $smt = $this->getSMTToken();
+        $request = new Request(
+            $this->authServiceName,
+            'Service',
+            'loginToService',
+            [
+                'service_name' => $this->serviceName,
+                'token' => $smt
+            ],
+            true
+        );
+        $request->call();
+        $response = $request->getResponse();
+        $sst = '';
+        if ($response->hasError()) {
+            throw new RequestException(
+                $response->getActionErrorMessage()->getMessage(),
+                $response->getActionErrorMessage()->getCode()
+            );
+        } else {
+            $result = $response->getActionResultMessage();
+            $sst = $result->getData();
+        }
+        if (!$sst) {
+            throw new RequestException('SST is empty!');
+        }
+
+        return $sst;
+    }
+
+    /**
+     * Send request to auth service and get smt token.
+     * @return string
+     * @throws RequestException|AMQPProtocolChannelException
+     */
+    public function getSMTToken(): string
+    {
+        $request = new Request(
+            $this->authServiceName,
+            'Service',
+            'login',
+            [
+                'service_name' => config('app.service_name'),
+                'key' => config('app.service_key')
+            ],
+            true
+        );
+        $request->call();
+        $response = $request->getResponse();
+        $smt = '';
+        if ($response->hasError()) {
+            throw new RequestException(
+                $response->getActionErrorMessage()->getMessage(),
+                $response->getActionErrorMessage()->getCode()
+            );
+        } else {
+            $result = $response->getActionResultMessage();
+            $smt = $result->getData();
+        }
+
+        if (!$smt) {
+            throw new RequestException('SMT is empty!');
+        }
+        return $smt;
     }
 
 }

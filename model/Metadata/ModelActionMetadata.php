@@ -4,7 +4,6 @@ namespace Egal\Model\Metadata;
 
 use Egal\Auth\Accesses\StatusAccess;
 use Illuminate\Support\Str;
-use ReflectionException;
 use ReflectionParameter;
 
 /**
@@ -28,6 +27,11 @@ class ModelActionMetadata
     /**
      * @var string[]
      */
+    protected array $servicesAccess = [];
+
+    /**
+     * @var string[]
+     */
     protected array $rolesAccess = [];
 
     /**
@@ -42,13 +46,14 @@ class ModelActionMetadata
 
     /**
      * @return array
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function toArray(): array
     {
         $result = [];
         $result['action_name'] = $this->actionName;
         $result['statuses_access'] = $this->statusesAccess;
+        $result['services_access'] = $this->servicesAccess;
         $result['roles_access'] = $this->rolesAccess;
         $result['permissions_access'] = $this->permissionsAccess;
 
@@ -68,19 +73,22 @@ class ModelActionMetadata
      * @param string[] $statusesAccess
      * @param string[] $rolesAccess
      * @param string[] $permissionsAccess
+     * @param array $servicesAccess
      */
     public function __construct(
         string $actionName,
         array $parameters,
         array $statusesAccess = [],
         array $rolesAccess = [],
-        array $permissionsAccess = []
+        array $permissionsAccess = [],
+        array $servicesAccess = []
     )
     {
         $this->actionName = ModelActionMetadata::getCurrentActionName($actionName);
         $this->parameters = $parameters;
         $this->rolesAccess = $rolesAccess;
         $this->permissionsAccess = $permissionsAccess;
+        $this->servicesAccess = $servicesAccess;
 
         if ($statusesAccess === [] && $this->rolesAccess === [] && $this->permissionsAccess === []) {
             $this->statusesAccess = [];
@@ -120,6 +128,14 @@ class ModelActionMetadata
     public function getStatusesAccess(): array
     {
         return $this->statusesAccess;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getServicesAccess(): array
+    {
+        return $this->servicesAccess;
     }
 
     /**

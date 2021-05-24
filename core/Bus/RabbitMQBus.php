@@ -10,6 +10,7 @@ use Egal\Core\Messages\EventMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
+use Egal\Core\Communication\Request;
 use Exception;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;

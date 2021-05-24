@@ -99,6 +99,11 @@ class ActionMessage extends Message
         return $this->token;
     }
 
+    public function setToken(string $token)
+    {
+        $this->token = $token;
+    }
+
     /**
      * @return string
      */

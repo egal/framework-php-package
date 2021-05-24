@@ -63,8 +63,18 @@ abstract class Token
      */
     public static function fromJWT(string $encodedJWT, string $key): Token
     {
-        $payload = (array)JWT::decode($encodedJWT, $key, ['HS256']);
+        $payload = static::decode($encodedJWT, $key);
         return static::fromArray($payload);
+    }
+
+    /**
+     * @param string $encodedJWT
+     * @param string $key
+     * @return array
+     */
+    public static function decode(string $encodedJWT, string $key): array
+    {
+        return (array)JWT::decode($encodedJWT, $key, ['HS256']);
     }
 
     #region getters and setters

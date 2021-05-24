@@ -6,6 +6,7 @@ use Egal\Auth\Accesses\StatusAccess;
 use Egal\Core\Exceptions\ActionCallException;
 use Egal\Core\Exceptions\NoAccessActionCallException;
 use Egal\Core\Session\Session;
+use Egal\Model\Metadata\ModelActionMetadata;
 use Egal\Model\ModelManager;
 use Exception;
 use Illuminate\Support\Str;
@@ -74,25 +75,71 @@ class ActionCaller
         $actionMetadata = $modelMetadata->getAction($this->actionName); # TODO: Убрать использование ReflectionMethod
 
         $authStatus = Session::getAuthStatus();
+        // For user and service we check if it guest
+        if ($authStatus === StatusAccess::GUEST) {
+            return in_array($authStatus, $actionMetadata->getStatusesAccess());
+        }
+
+        return $this->isServiceAccess($actionMetadata) || $this->isUserAccess($actionMetadata);
+    }
+
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws \Egal\Core\Exceptions\CurrentSessionException
+     */
+    private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
+    {
+        if (!Session::isServiceServiceTokenExists()) {
+            return false;
+        }
+        $serviceName = Session::getServiceServiceToken()->getServiceName();
+        return in_array($serviceName, $actionMetadata->getServicesAccess());
+    }
+
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws Exception
+     */
+    private function isUserAccess(ModelActionMetadata $actionMetadata): bool
+    {
+        if (!Session::isUserServiceTokenExists()) {
+            return false;
+        }
+
+        $authStatus = Session::getAuthStatus();
         $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
+
+        return $statusCheck
+            && $this->userHasRoles($actionMetadata)
+            && $this->userHasPermissions($actionMetadata);
+    }
+
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws Exception
+     */
+    private function userHasRoles(ModelActionMetadata $actionMetadata): bool
+    {
         $rolesAccess = $actionMetadata->getRolesAccess();
+
+        return $rolesAccess === []
+            || count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess)) > 0;
+    }
+
+    /**
+     * @param ModelActionMetadata $actionMetadata
+     * @return bool
+     * @throws Exception
+     */
+    private function userHasPermissions(ModelActionMetadata $actionMetadata): bool
+    {
         $permissionsAccess = $actionMetadata->getPermissionsAccess();
 
-        return (
-                $statusCheck
-                && $authStatus === StatusAccess::GUEST
-            )
-            || (
-                $statusCheck
-                && (
-                    $rolesAccess === []
-                    || count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess)) > 0
-                )
-                && (
-                    $permissionsAccess === []
-                    || count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess)) > 0
-                )
-            );
+        return $permissionsAccess === []
+            || count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess)) > 0;
     }
 
     /**
