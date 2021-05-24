@@ -103,19 +103,4 @@ trait HasEvents
         static::registerModelEvent('deleted.action', $callback);
     }
 
-    public static function restoringWithAction($callback)
-    {
-        static::registerModelEvent('restoring.action', $callback);
-    }
-
-    public static function restoredWithAction($callback)
-    {
-        static::registerModelEvent('restored.action', $callback);
-    }
-
-    public static function replicatingWithAction($callback)
-    {
-        static::registerModelEvent('replicating.action', $callback);
-    }
-
 }
