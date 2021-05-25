@@ -269,4 +269,13 @@ final class Builder extends EloquentBuilder
         return $this->model;
     }
 
+    /**
+     * @return $this
+     */
+    public function needFireModelActionEvents(): Builder
+    {
+        $this->model->needFireActionEvents();
+        return $this;
+    }
+
 }

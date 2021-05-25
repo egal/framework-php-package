@@ -58,6 +58,15 @@ trait HasEvents
         return $this;
     }
 
+    public function newInstance($attributes = [], $exists = false)
+    {
+        $instance = parent::newInstance($attributes, $exists);
+        if ($this->isNeedFireActionEvents()) {
+            $instance->needFireActionEvents();
+        }
+        return $instance;
+    }
+
     public static function retrievedWithAction($callback)
     {
         static::registerModelEvent('retrieved.action', $callback);

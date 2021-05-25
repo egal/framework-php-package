@@ -103,6 +103,7 @@ abstract class Model extends EloquentModel
     public static function actionGetItem($id, array $withs = []): array
     {
         $item = static::query()
+            ->needFireModelActionEvents()
             ->where('id', '=', $id)
             ->with($withs)
             ->firstOrFail();
@@ -181,6 +182,7 @@ abstract class Model extends EloquentModel
     ): array
     {
         $builder = self::query()
+            ->needFireModelActionEvents()
             ->setOrderFromArray($order)
             ->setFilterFromArray($filter)
             ->setWithFromArray($withs);
