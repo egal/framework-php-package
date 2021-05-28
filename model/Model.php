@@ -103,11 +103,10 @@ abstract class Model extends EloquentModel
     public static function actionGetItem($id, array $withs = []): array
     {
         $item = static::query()
+            ->needFireModelActionEvents()
             ->where('id', '=', $id)
             ->with($withs)
             ->firstOrFail();
-
-        $item->fireModelEvent('got');
 
         return $item->toArray();
     }
@@ -182,11 +181,11 @@ abstract class Model extends EloquentModel
         array $order = []
     ): array
     {
-        /** @var Builder $builder */
-        $builder = self::query();
-        $builder->setOrderFromArray($order);
-        $builder->setFilterFromArray($filter);
-        $builder->setWithFromArray($withs);
+        $builder = self::query()
+            ->needFireModelActionEvents()
+            ->setOrderFromArray($order)
+            ->setFilterFromArray($filter)
+            ->setWithFromArray($withs);
 
         if (!is_null($pagination)) {
             $paginator = $builder->difficultPaginateFromArray($pagination);
@@ -213,11 +212,9 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreate(array $attributes = []): array
     {
-        $entity = new static();
-        $entity->fill($attributes);
+        $entity = (new static($attributes))
+            ->needFireActionEvents();
         $entity->save();
-        $entity->refresh();
-
         return $entity->toArray();
     }
 
@@ -234,6 +231,7 @@ abstract class Model extends EloquentModel
         $collection = new Collection();
         foreach ($objects as $attributes) {
             $entity = new static();
+            $entity->needFireActionEvents();
             $entity->fill($attributes);
             try {
                 $entity->save();
@@ -255,7 +253,6 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification
      * @param array $attributes Associative array of attributes
      * @return array Updated entity as an associative array
-     * @throws NotFoundException
      * @throws UpdateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
@@ -271,12 +268,11 @@ abstract class Model extends EloquentModel
             }
         }
 
-        if (!($entity = static::query()->find($id))) {
-            throw new NotFoundException();
-        }
-
-        $entity->fill($attributes);
-        $entity->save();
+        /** @var Model $entity */
+        $entity = static::query()
+            ->findOrFail($id);
+        $entity->needFireActionEvents();
+        $entity->update($attributes);
 
         return $entity->toArray();
     }
@@ -305,6 +301,9 @@ abstract class Model extends EloquentModel
                 DB::rollBack();
                 throw new UpdateManyException('Object not found with ' . $key . ' index!');
             }
+
+            /** @var Model $entity */
+            $entity->needFireActionEvents();
             $entity->fill($attributes);
             $entity->save();
             $collection->add($entity);
@@ -326,7 +325,6 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        /** @var Builder $builder */
         $builder = self::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 
@@ -335,16 +333,14 @@ abstract class Model extends EloquentModel
 
         DB::beginTransaction();
         foreach ($entities as $key => $entity) {
-            /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
+            $entities[$key]->needFireActionEvents();
             $entities[$key]->fill($attributes);
             try {
-                /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
                 $entities[$key]->save();
             } catch (Exception $exception) {
                 DB::rollBack();
                 throw $exception;
             }
-            /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
             $entities[$key]->refresh();
         }
         DB::commit();
@@ -368,6 +364,9 @@ abstract class Model extends EloquentModel
         if (!$entity) {
             throw new NotFoundException();
         }
+
+        /** @var Model $entity */
+        $entity->needFireActionEvents();
         $entity->delete();
 
         return [
@@ -394,6 +393,8 @@ abstract class Model extends EloquentModel
                 throw new DeleteManyException('Object not found with index  ' . $id . '!');
             }
             try {
+                /** @var Model $entity */
+                $entity->needFireActionEvents();
                 $entity->delete();
             } catch (Exception $e) {
                 DB::rollBack();
@@ -415,7 +416,6 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
-        /** @var Builder $builder */
         $builder = self::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 
@@ -426,6 +426,7 @@ abstract class Model extends EloquentModel
         /** @var Model[] $entities */
         foreach ($entities as $key => $entity) {
             try {
+                $entities[$key]->needFireActionEvents();
                 $entities[$key]->delete();
             } catch (Exception $exception) {
                 DB::rollBack();
