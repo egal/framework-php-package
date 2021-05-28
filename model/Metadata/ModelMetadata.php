@@ -290,6 +290,35 @@ class ModelMetadata
     }
 
     /**
+     * @param array $validationRules
+     * @return $this
+     */
+    public function setValidationRules(array $validationRules): self
+    {
+        $this->validationRules = $validationRules;
+        return $this;
+    }
+
+    /**
+     * @param string $propertyName
+     * @param string ...$validationRules
+     * @return $this
+     */
+    public function addValidationRules(string $propertyName, string ...$validationRules): ModelMetadata
+    {
+        if (isset($this->validationRules[$propertyName])) {
+            $this->validationRules[$propertyName] = array_merge(
+                $this->validationRules[$propertyName],
+                $validationRules
+            );
+        } else {
+            $this->validationRules[$propertyName] = $validationRules;
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string $actionName
      * @return ModelActionMetadata
      * @throws Exception
