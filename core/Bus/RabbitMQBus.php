@@ -19,7 +19,7 @@ use PhpAmqpLib\Wire\AMQPTable;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
-final class RabbitMQBus extends Bus
+class RabbitMQBus extends Bus
 {
 
     private RabbitMQConnector $connector;
