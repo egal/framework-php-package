@@ -5,7 +5,6 @@
  <a href="https://packagist.org/packages/egal/framework"><img src="https://poser.pugx.org/egal/framework/v/unstable"></a>
  <a href="https://packagist.org/packages/egal/framework"><img src="https://poser.pugx.org/egal/framework/downloads"></a>
  <a href="https://packagist.org/packages/egal/framework"><img src="https://poser.pugx.org/egal/framework/license"></a>
- <a href="https://packagist.org/packages/egal/framework"><img src="https://img.shields.io/github/last-commit/smartworldteam/egal-framework-php-package"></a>
 </p>
 
 ## Новости
