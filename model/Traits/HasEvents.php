@@ -12,60 +12,7 @@ use Egal\Model\Model;
 trait HasEvents
 {
 
-    /**
-     * Запустить событие пользовательской модели для данного события.
-     *
-     * @param string $event
-     * @param string $method
-     * @return mixed|null
-     * @noinspection PhpUnused
-     */
-    protected function fireCustomModelEvent($event, $method)
-    {
-        $result = parent::fireCustomModelEvent($event, $method);
-        if (
-            isset($this->dispatchesEvents[$event])
-            && is_subclass_of($this->dispatchesEvents[$event], GlobalEvent::class)
-        ) {
-            (new $this->dispatchesEvents[$event]($this))->publish();
-        }
-        return $result;
-    }
-
-    protected function fireModelEvent($event, $halt = true)
-    {
-        if ($this->isNeedFireActionEvents()) {
-            $this->fireActionEvent($event, $halt);
-        }
-        parent::fireModelEvent($event, $halt);
-    }
-
-    protected function fireActionEvent($event, $halt = true)
-    {
-        parent::fireModelEvent($event . '.action', $halt);
-    }
-
     private bool $needFireActionEvents = false;
-
-    public function isNeedFireActionEvents(): bool
-    {
-        return $this->needFireActionEvents;
-    }
-
-    public function needFireActionEvents(): self
-    {
-        $this->needFireActionEvents = true;
-        return $this;
-    }
-
-    public function newInstance($attributes = [], $exists = false)
-    {
-        $instance = parent::newInstance($attributes, $exists);
-        if ($this->isNeedFireActionEvents()) {
-            $instance->needFireActionEvents();
-        }
-        return $instance;
-    }
 
     public static function retrievedWithAction($callback)
     {
@@ -110,6 +57,59 @@ trait HasEvents
     public static function deletedWithAction($callback)
     {
         static::registerModelEvent('deleted.action', $callback);
+    }
+
+    public function newInstance($attributes = [], $exists = false)
+    {
+        $instance = parent::newInstance($attributes, $exists);
+        if ($this->isNeedFireActionEvents()) {
+            $instance->needFireActionEvents();
+        }
+        return $instance;
+    }
+
+    public function needFireActionEvents(): self
+    {
+        $this->needFireActionEvents = true;
+        return $this;
+    }
+
+    /**
+     * Запустить событие пользовательской модели для данного события.
+     *
+     * @param string $event
+     * @param string $method
+     * @return mixed|null
+     * @noinspection PhpUnused
+     */
+    protected function fireCustomModelEvent($event, $method)
+    {
+        $result = parent::fireCustomModelEvent($event, $method);
+        if (
+            isset($this->dispatchesEvents[$event])
+            && is_subclass_of($this->dispatchesEvents[$event], GlobalEvent::class)
+        ) {
+            (new $this->dispatchesEvents[$event]($this))->publish();
+        }
+        return $result;
+    }
+
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if ($this->isNeedFireActionEvents()) {
+            $this->fireActionEvent($event, $halt);
+        }
+        parent::fireModelEvent($event, $halt);
+    }
+
+    public function isNeedFireActionEvents(): bool
+    {
+        return $this->needFireActionEvents;
+    }
+
+    protected function fireActionEvent($event, $halt = true)
+    {
+        parent::fireModelEvent($event . '.action', $halt);
     }
 
 }
