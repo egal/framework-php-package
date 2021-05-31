@@ -36,6 +36,10 @@ class ModelMetadata
      */
     protected array $actionsMetadata = [];
 
+    /**
+     * @return array
+     * @throws ReflectionException
+     */
     public function toArray(): array
     {
         $result = [];
