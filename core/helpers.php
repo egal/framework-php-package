@@ -65,8 +65,30 @@ if (!function_exists('words_to_separated_lover_case')) {
      *
      * @param mixed ...$words
      * @return false|string
+     * @deprecated since v2.0.0, use {@see words_to_separated_lower_case()}.
      */
     function words_to_separated_lover_case(...$words)
+    {
+        return words_to_separated_lower_case(...$words);
+    }
+
+}
+
+if (!function_exists('words_to_separated_lower_case')) {
+
+    /**
+     * Преобразования слов в Snake case
+     *
+     * Пример:
+     * $res = words_to_snake_case(1, 2, 3, 4);
+     * var_dump($res);
+     * Вывод:
+     * string(1_2_3_4)
+     *
+     * @param mixed ...$words
+     * @return false|string
+     */
+    function words_to_separated_lower_case(...$words)
     {
         $result = '';
         foreach ($words as $word) {
