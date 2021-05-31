@@ -301,18 +301,18 @@ class ModelMetadata
 
     /**
      * @param string $propertyName
-     * @param string ...$validationRules
+     * @param string ...$propertyValidationRules
      * @return $this
      */
-    public function addValidationRules(string $propertyName, string ...$validationRules): ModelMetadata
+    public function addValidationRules(string $propertyName, string ...$propertyValidationRules): ModelMetadata
     {
         if (isset($this->validationRules[$propertyName])) {
             $this->validationRules[$propertyName] = array_merge(
                 $this->validationRules[$propertyName],
-                $validationRules
+                $propertyValidationRules
             );
         } else {
-            $this->validationRules[$propertyName] = $validationRules;
+            $this->validationRules[$propertyName] = $propertyValidationRules;
         }
 
         return $this;
