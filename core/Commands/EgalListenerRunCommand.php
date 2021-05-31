@@ -28,7 +28,7 @@ class EgalListenerRunCommand extends Command
      */
     public function handle(): void
     {
-        $listenerName = words_to_separated_lover_case(config('app.service_name'), 'listener' . '#' . getmypid());
+        $listenerName = words_to_separated_lower_case(config('app.service_name'), 'listener' . '#' . getmypid());
         cli_set_process_title($listenerName);
 
         Bus::getInstance()->constructEnvironment();

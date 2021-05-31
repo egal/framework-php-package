@@ -35,7 +35,7 @@ class EgalRunCommand extends Command
     public function handle(): void
     {
         // Называем master текущий процесс
-        $masterProcessName = words_to_separated_lover_case(config('app.service_name'), 'master');
+        $masterProcessName = words_to_separated_lower_case(config('app.service_name'), 'master');
         cli_set_process_title($masterProcessName);
 
         $this->startNewListeners();
