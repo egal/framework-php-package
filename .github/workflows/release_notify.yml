@@ -1,0 +1,44 @@
+name: Release notify
+on:
+  release:
+    types:
+      - created
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configuration message
+        id: message-metadata
+        run: |
+          # Configuring message variables
+          VERSION="${GITHUB_REF##*/}"
+          REPOSITORY_NAME="${GITHUB_REPOSITORY}"
+          REPOSITORY_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+          RELEASE_URL="${REPOSITORY_URL}/releases/tag/${GITHUB_REF##*/}"
+          CHANGELOG_URL="${REPOSITORY_URL}/blob/main/CHANGELOG.md"
+
+          # Substitution message variables to message
+          BODY=$(curl --silent -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/smartworldteam/art/main/stubs/messages/release.html)
+          # BODY=$(curl --silent -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/smartworldteam/art/main/stubs/messages/release.md)
+          BODY="${BODY/\$REPOSITORY_NAME/$REPOSITORY_NAME}"
+          BODY="${BODY/\$REPOSITORY_URL/$REPOSITORY_URL}"
+          BODY="${BODY/\$RELEASE_URL/$RELEASE_URL}"
+          BODY="${BODY/\$VERSION/$VERSION}"
+          BODY="${BODY/\$CHANGELOG_URL/$CHANGELOG_URL}"
+          BODY="${BODY//'%'/'%25'}"
+          BODY="${BODY//$'\n'/'%0A'}"
+          BODY="${BODY//$'\r'/'%0D'}"
+          echo "${BODY}"
+
+          # Set output `body`
+          echo "::set-output name=body::$BODY"
+
+      - uses: actions/checkout@master
+      - name: Send message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ${{ steps.message-metadata.outputs.body }}
+          format: html
