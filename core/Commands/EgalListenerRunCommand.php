@@ -5,6 +5,7 @@ namespace Egal\Core\Commands;
 use Egal\Core\Bus\Bus;
 use Egal\Core\Bus\RabbitMQBus;
 use Egal\Core\Exceptions\QueueProcessingException;
+use Egal\Core\Exceptions\UnsupportedBusException;
 use Egal\Core\Traits\PcntlSignal;
 use Exception;
 use Illuminate\Console\Command;
@@ -33,15 +34,21 @@ class EgalListenerRunCommand extends Command
 
         Bus::getInstance()->constructEnvironment();
 
-        switch (get_class(Bus::getInstance())) {
-            case RabbitMQBus::class:
-                $this->listenRabbitMQQueue();
-                break;
+        $listenMethodName = 'listen'
+            . str_replace(get_class_short_name(Bus::class),
+                '',
+                get_class_short_name(Bus::getInstance())
+            )
+            . 'Queue';
+        if (!method_exists($this, $listenMethodName)) {
+            throw new UnsupportedBusException();
         }
+        $this->$listenMethodName();
     }
 
     /**
      * @throws Exception
+     * @noinspection PhpUnusedPrivateMethodInspection
      */
     private function listenRabbitMQQueue()
     {
