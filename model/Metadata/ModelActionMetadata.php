@@ -2,8 +2,12 @@
 
 namespace Egal\Model\Metadata;
 
-use Egal\Auth\Accesses\StatusAccess;
+use Egal\Auth\Accesses\PermissionAccess;
+use Egal\Auth\Accesses\RoleAccess;
+use Egal\Auth\Accesses\ServiceAccess;
+use Egal\Model\Exceptions\ModelActionMetadataException;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\DocBlock\Tags\Generic as RefGenericTag;
 use ReflectionParameter;
 
 /**
@@ -68,38 +72,6 @@ class ModelActionMetadata
     }
 
     /**
-     * @param string $actionName
-     * @param ReflectionParameter[] $parameters
-     * @param string[] $statusesAccess
-     * @param string[] $rolesAccess
-     * @param string[] $permissionsAccess
-     * @param array $servicesAccess
-     */
-    public function __construct(
-        string $actionName,
-        array $parameters,
-        array $statusesAccess = [],
-        array $rolesAccess = [],
-        array $permissionsAccess = [],
-        array $servicesAccess = []
-    )
-    {
-        $this->actionName = ModelActionMetadata::getCurrentActionName($actionName);
-        $this->parameters = $parameters;
-        $this->rolesAccess = $rolesAccess;
-        $this->permissionsAccess = $permissionsAccess;
-        $this->servicesAccess = $servicesAccess;
-
-        if ($statusesAccess === [] && $this->rolesAccess === [] && $this->permissionsAccess === []) {
-            $this->statusesAccess = [];
-        } elseif ($statusesAccess === [] && ($this->rolesAccess !== [] || $this->permissionsAccess !== [])) {
-            $this->statusesAccess = [StatusAccess::LOGGED];
-        } else {
-            $this->statusesAccess = $statusesAccess;
-        }
-    }
-
-    /**
      * Получение корректного названия метода у модели.
      *
      * @param string $actionName
@@ -160,6 +132,44 @@ class ModelActionMetadata
     public function getParameters(): array
     {
         return $this->parameters;
+    }
+
+    private const ROLES_ACCESS_TAG_NAME = 'roles-access';
+    private const SERVICES_ACCESS_TAG_NAME = 'services-access';
+    private const STATUSES_ACCESS_TAG_NAME = 'statuses-access';
+    private const PERMISSIONS_ACCESS_TAG_NAME = 'permissions-access';
+
+    private const AND_TAG_SEPARATOR = ',';
+    private const OR_TAG_SEPARATOR = '|';
+
+    public function supplementFromTag(RefGenericTag $tag)
+    {
+        switch ($tag->getName()) {
+            case self::STATUSES_ACCESS_TAG_NAME:
+            case self::SERVICES_ACCESS_TAG_NAME:
+                if (str_contains($tag->getDescription(), self::AND_TAG_SEPARATOR)) {
+                    throw new ModelActionMetadataException(
+                        'Services and Statuses accesses don\'t supported AND operator!'
+                    );
+                }
+                $this->{Str::snake($tag->getName())} = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
+                break;
+            case self::ROLES_ACCESS_TAG_NAME:
+            case self::PERMISSIONS_ACCESS_TAG_NAME:
+                $rawOrValues = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
+                foreach ($rawOrValues as $rawOrValue) {
+                    $this->{Str::snake($tag->getName())}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
+                }
+                break;
+        }
+    }
+
+    /**
+     * @param string $actionName
+     */
+    public function setActionName(string $actionName): void
+    {
+        $this->actionName = $actionName;
     }
 
 }
