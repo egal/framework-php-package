@@ -2,12 +2,10 @@
 
 namespace Egal\Model\Metadata;
 
-use Egal\Auth\Accesses\PermissionAccess;
-use Egal\Auth\Accesses\RoleAccess;
-use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Model\Exceptions\ModelActionMetadataException;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic as RefGenericTag;
+use ReflectionException;
 use ReflectionParameter;
 
 /**
@@ -50,7 +48,7 @@ class ModelActionMetadata
 
     /**
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function toArray(): array
     {
@@ -142,6 +140,10 @@ class ModelActionMetadata
     private const AND_TAG_SEPARATOR = ',';
     private const OR_TAG_SEPARATOR = '|';
 
+    /**
+     * @param RefGenericTag $tag
+     * @throws ModelActionMetadataException
+     */
     public function supplementFromTag(RefGenericTag $tag)
     {
         switch ($tag->getName()) {
@@ -152,13 +154,12 @@ class ModelActionMetadata
                         'Services and Statuses accesses don\'t supported AND operator!'
                     );
                 }
-                $this->{Str::snake($tag->getName())} = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
+                $this->{Str::camel($tag->getName())} = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
                 break;
             case self::ROLES_ACCESS_TAG_NAME:
             case self::PERMISSIONS_ACCESS_TAG_NAME:
-                $rawOrValues = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
-                foreach ($rawOrValues as $rawOrValue) {
-                    $this->{Str::snake($tag->getName())}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
+                foreach (explode(self::OR_TAG_SEPARATOR, $tag->getDescription()) as $rawOrValue) {
+                    $this->{Str::camel($tag->getName())}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
                 }
                 break;
         }
