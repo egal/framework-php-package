@@ -2,8 +2,8 @@
 
 namespace Egal\Model\Traits;
 
-use Egal\Model\ModelManager;
 use Egal\Model\Metadata\ModelMetadata;
+use Egal\Model\ModelManager;
 use ReflectionException;
 
 /**
@@ -25,9 +25,32 @@ trait UsesModelMetadata
      * @return array
      * @throws ReflectionException
      */
-    public function getValidationRules(): array
+    protected function getValidationRules(): array
     {
         return $this->getModelMetadata()->getValidationRules();
+    }
+
+    /**
+     * @param string[] $validationRules
+     * @return $this
+     * @throws ReflectionException
+     */
+    protected function setValidationRules(array $validationRules): self
+    {
+        $this->getModelMetadata()->setValidationRules($validationRules);
+        return $this;
+    }
+
+    /**
+     * @param string $propertyName
+     * @param string ...$validationRules
+     * @return $this
+     * @throws ReflectionException
+     */
+    protected function addValidationRules(string $propertyName, string ...$validationRules): self
+    {
+        $this->getModelMetadata()->addValidationRules($propertyName, ...$validationRules);
+        return $this;
     }
 
 }
