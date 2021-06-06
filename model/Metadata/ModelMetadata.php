@@ -193,6 +193,7 @@ class ModelMetadata
 
                 $modelActionMetadata = new ModelActionMetadata();
                 $modelActionMetadata->setActionName($actionName);
+                $modelActionMetadata->setParameters($reflectionMethod->getParameters());
                 /** @var Generic $actionTag */
                 foreach ($tag->getDescription()->getTags() as $actionTag) {
                     $modelActionMetadata->supplementFromTag($actionTag);
@@ -207,11 +208,6 @@ class ModelMetadata
         if (!isset($this->actionsMetadata[$modelActionMetadata->getActionName()])) {
             $this->actionsMetadata[$modelActionMetadata->getActionName()] = $modelActionMetadata;
         }
-    }
-
-    protected function hasActionMetadata(string $actionName): bool
-    {
-        return isset($this->actionsMetadata[ModelActionMetadata::getCurrentActionName($actionName)]);
     }
 
     /**
@@ -232,13 +228,9 @@ class ModelMetadata
         if (isset($this->actionsMetadata[$actionName])) {
             return $this->actionsMetadata[$actionName];
         }
-        $actionName = ModelActionMetadata::getCurrentActionName($actionName);
-        if ($this->hasActionMetadata($actionName)) {
-            return $this->actionsMetadata[$actionName];
-        }
 
         throw new ModelMetadataException(
-            $actionName . ' does not exist in the model' . $this->modelClass . '!'
+            $actionName . ' does not exist in the model ' . $this->modelClass . '!'
         );
     }
 

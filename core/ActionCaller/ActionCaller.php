@@ -7,50 +7,42 @@ use Egal\Core\Exceptions\ActionCallException;
 use Egal\Core\Exceptions\NoAccessActionCallException;
 use Egal\Core\Session\Session;
 use Egal\Model\Metadata\ModelActionMetadata;
+use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\ModelManager;
-use Exception;
 use Illuminate\Support\Str;
-use ReflectionException;
 
+/**
+ * Class ActionCaller
+ * @package Egal\Core\ActionCaller
+ */
 class ActionCaller
 {
 
     protected array $actionParameters = [];
-    private string $modelClass;
-    private string $actionName;
+    private ModelMetadata $modelMetadata;
+    private ModelActionMetadata $modelActionMetadata;
 
     /**
-     * @param string $modelClass
+     * ActionCaller constructor.
+     * @param string $modelName
      * @param string $actionName
      * @param array $actionParameters
-     * @return mixed
-     * @throws ActionCallException
-     * @throws ReflectionException
+     * @throws \Exception
      */
-    public static function call(string $modelClass, string $actionName, array $actionParameters = [])
+    public function __construct(string $modelName, string $actionName, array $actionParameters = [])
     {
-        return (new static($modelClass, $actionName, $actionParameters))->forceCall();
-    }
-
-    /**
-     * @param string $modelClass
-     * @param string $actionName
-     * @param array $actionParameters
-     */
-    public function __construct(string $modelClass, string $actionName, array $actionParameters = [])
-    {
-        $this->modelClass = $modelClass;
-        $this->actionName = $actionName;
+        $this->modelMetadata = ModelManager::getModelMetadata($modelName);
+        $this->modelActionMetadata = $this->modelMetadata->getAction($actionName);
         $this->actionParameters = $actionParameters;
     }
 
     /**
      * @return mixed
-     * @throws ReflectionException
-     * @throws Exception
-     * @throws ActionCallException
+     * @throws \ReflectionException
+     * @throws \Exception
+     * @throws \Egal\Core\Exceptions\ActionCallException
      */
-    private function forceCall()
+    public function call()
     {
         if (Session::isAuthEnabled() && !$this->isAccessedForCall()) {
             throw new NoAccessActionCallException();
@@ -58,8 +50,8 @@ class ActionCaller
 
         return call_user_func_array(
             [
-                $this->modelClass,
-                $this->actionName
+                $this->modelMetadata->getModelClass(),
+                $this->modelActionMetadata->getActionMethodName()
             ],
             $this->getValidActionParameters()
         );
@@ -67,95 +59,98 @@ class ActionCaller
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
     private function isAccessedForCall(): bool
     {
-        $modelMetadata = ModelManager::getModelMetadata($this->modelClass); # TODO: Убрать использование ReflectionClass
-        $actionMetadata = $modelMetadata->getAction($this->actionName); # TODO: Убрать использование ReflectionMethod
-
         $authStatus = Session::getAuthStatus();
         // For user and service we check if it guest
         if ($authStatus === StatusAccess::GUEST) {
-            return in_array($authStatus, $actionMetadata->getStatusesAccess());
+            return in_array($authStatus, $this->modelActionMetadata->getStatusesAccess());
         }
 
-        return $this->isServiceAccess($actionMetadata) || $this->isUserAccess($actionMetadata);
+        return $this->isServiceAccess() || $this->isUserAccess();
     }
 
     /**
-     * @param ModelActionMetadata $actionMetadata
      * @return bool
      * @throws \Egal\Core\Exceptions\CurrentSessionException
      */
-    private function isServiceAccess(ModelActionMetadata $actionMetadata): bool
+    private function isServiceAccess(): bool
     {
         if (!Session::isServiceServiceTokenExists()) {
             return false;
         }
         $serviceName = Session::getServiceServiceToken()->getServiceName();
-        return in_array($serviceName, $actionMetadata->getServicesAccess());
+        return in_array($serviceName, $this->modelActionMetadata->getServicesAccess());
     }
 
     /**
-     * @param ModelActionMetadata $actionMetadata
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
-    private function isUserAccess(ModelActionMetadata $actionMetadata): bool
+    private function isUserAccess(): bool
     {
         if (!Session::isUserServiceTokenExists()) {
             return false;
         }
 
-        $authStatus = Session::getAuthStatus();
-        $statusCheck = in_array($authStatus, $actionMetadata->getStatusesAccess());
-
-        return $statusCheck
-            && $this->userHasRoles($actionMetadata)
-            && $this->userHasPermissions($actionMetadata);
+        return in_array(Session::getAuthStatus(), $this->modelActionMetadata->getStatusesAccess())
+            && $this->userHasAccessWithCurrentRoles()
+            && $this->userHasAccessWithCurrentPermissions();
     }
 
     /**
-     * @param ModelActionMetadata $actionMetadata
      * @return bool
-     * @throws Exception
+     * @throws \Exception
+     * TODO: Переименовать
      */
-    private function userHasRoles(ModelActionMetadata $actionMetadata): bool
+    private function userHasAccessWithCurrentRoles(): bool
     {
-        $rolesAccess = $actionMetadata->getRolesAccess();
-
-        return $rolesAccess === []
-            || count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess)) > 0;
+        if (count($this->modelActionMetadata->getRolesAccess()) === 0) {
+            return true;
+        }
+        foreach ($this->modelActionMetadata->getRolesAccess() as $rolesAccess) {
+            if (
+                count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess))
+                === count($rolesAccess)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * @param ModelActionMetadata $actionMetadata
      * @return bool
-     * @throws Exception
+     * @throws \Exception
+     * TODO: Переименовать
      */
-    private function userHasPermissions(ModelActionMetadata $actionMetadata): bool
+    private function userHasAccessWithCurrentPermissions(): bool
     {
-        $permissionsAccess = $actionMetadata->getPermissionsAccess();
-
-        return $permissionsAccess === []
-            || count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess)) > 0;
+        if (count($this->modelActionMetadata->getPermissionsAccess()) === 0) {
+            return true;
+        }
+        foreach ($this->modelActionMetadata->getPermissionsAccess() as $permissionsAccess) {
+            if (
+                count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess))
+                === count($permissionsAccess)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * @return array
      * @throws ActionCallException
-     * @throws ReflectionException
-     * @throws Exception
+     * @throws \ReflectionException
      */
     private function getValidActionParameters(): array
     {
         $newActionParameters = [];
-        $reflectionParameters = ModelManager::getModelMetadata($this->modelClass)
-            ->getAction($this->actionName)
-            ->getParameters();
-
-        foreach ($reflectionParameters as $reflectionParameter) {
+        foreach ($this->modelActionMetadata->getParameters() as $reflectionParameter) {
             $actionParameterKey = Str::snake($reflectionParameter->getName());
             $newActionParameterKey = $reflectionParameter->getPosition();
 
