@@ -14,7 +14,13 @@ use ReflectionParameter;
 class ModelActionMetadata
 {
 
-    public const PREFIX = 'action';
+    public const METHOD_NAME_PREFIX = 'action';
+    private const ROLES_ACCESS_TAG_NAME = 'roles-access';
+    private const SERVICES_ACCESS_TAG_NAME = 'services-access';
+    private const STATUSES_ACCESS_TAG_NAME = 'statuses-access';
+    private const PERMISSIONS_ACCESS_TAG_NAME = 'permissions-access';
+    private const AND_TAG_SEPARATOR = ',';
+    private const OR_TAG_SEPARATOR = '|';
 
     /**
      * @var string
@@ -79,10 +85,10 @@ class ModelActionMetadata
      */
     public static function getCurrentActionName(string $actionName): string
     {
-        if (str_contains($actionName, ModelActionMetadata::PREFIX)) {
+        if (str_contains($actionName, ModelActionMetadata::METHOD_NAME_PREFIX)) {
             return $actionName;
         } else {
-            return ModelActionMetadata::PREFIX . ucwords($actionName);
+            return ModelActionMetadata::METHOD_NAME_PREFIX . ucwords($actionName);
         }
     }
 
@@ -143,14 +149,6 @@ class ModelActionMetadata
     {
         return $this->parameters;
     }
-
-    private const ROLES_ACCESS_TAG_NAME = 'roles-access';
-    private const SERVICES_ACCESS_TAG_NAME = 'services-access';
-    private const STATUSES_ACCESS_TAG_NAME = 'statuses-access';
-    private const PERMISSIONS_ACCESS_TAG_NAME = 'permissions-access';
-
-    private const AND_TAG_SEPARATOR = ',';
-    private const OR_TAG_SEPARATOR = '|';
 
     /**
      * @param RefGenericTag $tag
