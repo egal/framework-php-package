@@ -38,9 +38,7 @@ class ModelManager
 
     /**
      * @statuses-access guest,logged
-     * @noinspection PhpUnused
-     *
-     * TODO: Сделать доступным для всех
+     * TODO: Сделать доступным для вызова
      */
     public static function actionGetAllModelsMetadata(): array
     {
