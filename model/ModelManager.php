@@ -3,6 +3,7 @@
 namespace Egal\Model;
 
 use Egal\Core\Exceptions\ModelNotFoundException;
+use Egal\Model\Exceptions\LoadModelImpossiblyException;
 use Egal\Model\Metadata\ModelMetadata;
 use Exception;
 use ReflectionException;
@@ -97,6 +98,21 @@ class ModelManager
         }
 
         $this->modelsMetadata['ModelManager'] = new ModelMetadata(ModelManager::class);
+    }
+
+    /**
+     * @param string $class
+     * @throws \Egal\Model\Exceptions\LoadModelImpossiblyException
+     * @throws \ReflectionException
+     */
+    public static function loadModel(string $class): void
+    {
+        $instance = static::getInstance();
+        $classShortName = get_class_short_name($class);
+        if (isset($instance->modelsMetadata[$classShortName])) {
+            throw new LoadModelImpossiblyException();
+        }
+        $instance->modelsMetadata[$classShortName] = new ModelMetadata($class);
     }
 
     /**
