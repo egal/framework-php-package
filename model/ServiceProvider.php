@@ -25,6 +25,10 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     protected array $commands = [];
 
+    /**
+     * @throws \Egal\Model\Exceptions\LoadModelImpossiblyException
+     * @throws \ReflectionException
+     */
     public function register(): void
     {
         if ($this->app->runningInConsole()) {
@@ -34,6 +38,8 @@ class ServiceProvider extends IlluminateServiceProvider
         $this->app->singleton(ModelManager::class, function (): ModelManager {
             return new ModelManager();
         });
+
+        ModelManager::loadModel(ModelManager::class);
 
         $this->commands([]);
     }

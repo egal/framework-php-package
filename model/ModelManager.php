@@ -96,8 +96,6 @@ class ModelManager
             $class = $modelsNamespace . $class;
             $this->modelsMetadata[$classShortName] = new ModelMetadata($class);
         }
-
-        $this->modelsMetadata['ModelManager'] = new ModelMetadata(ModelManager::class);
     }
 
     /**
