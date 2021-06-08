@@ -6,7 +6,6 @@ use Egal\Auth\Accesses\StatusAccess;
 use Egal\Model\Exceptions\ModelActionMetadataException;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic as RefGenericTag;
-use ReflectionException;
 use ReflectionParameter;
 
 /**
@@ -49,7 +48,7 @@ class ModelActionMetadata
 
     /**
      * @return array
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function toArray(): array
     {
