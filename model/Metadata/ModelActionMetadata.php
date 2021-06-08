@@ -176,9 +176,9 @@ class ModelActionMetadata
                         );
                     }
                 }
-            $this->statusesAccess[] = StatusAccess::LOGGED;
-            $this->statusesAccess = array_unique($this->statusesAccess);
-            break;
+                $this->statusesAccess[] = StatusAccess::LOGGED;
+                $this->statusesAccess = array_unique($this->statusesAccess);
+                break;
         }
     }
 
