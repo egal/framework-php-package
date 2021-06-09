@@ -7,7 +7,6 @@ namespace Egal\Core\Commands;
 use Egal\Core\Traits\PcntlSignal;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Process\Process;
 
 class EgalRunCommand extends Command
@@ -20,6 +19,7 @@ class EgalRunCommand extends Command
     protected $signature = 'egal:run
                             {--l|listeners=1 : Количество обработчиков очереди}
                             {--s|sync-code-base : Вкрлючение автоматического рестарта слушателей, при обновлении кодовой базы}
+                            {--listener-consume-sleep= : Кол-во миллисекунд задержки между выборками сообщений из очереди}
                            ';
 
     protected $description = 'Запуск сервиса';
@@ -59,7 +59,8 @@ class EgalRunCommand extends Command
     public function startNewListener()
     {
         $artisan = base_path('artisan');
-        $command = "php $artisan egal:listener:run";
+        $sleep = $this->option('listener-consume-sleep');
+        $command = "php $artisan egal:listener:run --consume-sleep $sleep";
         $process = Process::fromShellCommandline($command);
         $process->start();
         $this->listeners[] = $process;

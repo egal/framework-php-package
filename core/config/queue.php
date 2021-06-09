@@ -35,6 +35,9 @@ return [
                     'exchange' => 'amq.topic',
                     'exchange_type' => 'topic',
                 ],
+                'consume' => [
+                    'sleep' => env('RABBITMQ_CONSUME_SLEEP_MILLISECONDS', 10)
+                ]
             ],
 
             /*
