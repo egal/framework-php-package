@@ -19,6 +19,7 @@ class EgalListenerRunCommand extends Command
     protected $signature = 'egal:listener:run
                                 {--p|prefetch-count=1 : По сколько сообщений делается выборка из очереди}
                                 {--m|listening-method=consume : Способ получения сообщений}
+                                {--consume-sleep= : Кол-во миллисекунд задержки между выборками сообщений из очереди}
                            ';
 
     protected $description = 'Запуск слушателя очереди сервиса';
@@ -53,7 +54,8 @@ class EgalListenerRunCommand extends Command
                 Artisan::call('rabbitmq:consume', [
                     '--queue' => $bus->queueName,
                     '--prefetch-count' => $this->option('prefetch-count'),
-                    '--sleep' => 0,
+                    '--sleep' => ($this->option('consume-sleep')
+                            ?? config('queue.connections.rabbitmq.options.consume.sleep')) / 1000,
                     '--timeout' => 0,
                 ]);
                 break;
