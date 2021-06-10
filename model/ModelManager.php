@@ -3,9 +3,9 @@
 namespace Egal\Model;
 
 use Egal\Core\Exceptions\ModelNotFoundException;
+use Egal\Model\Exceptions\LoadModelImpossiblyException;
 use Egal\Model\Metadata\ModelMetadata;
 use Exception;
-use ReflectionClass;
 use ReflectionException;
 
 /**
@@ -39,7 +39,7 @@ class ModelManager
 
     /**
      * @statuses-access guest,logged
-     * @throws ReflectionException
+     * TODO: Сделать доступным для вызова
      */
     public static function actionGetAllModelsMetadata(): array
     {
@@ -55,14 +55,12 @@ class ModelManager
      *
      * @param string $model Название модели либо короткое название модели.
      * @return ModelMetadata
-     * @throws ReflectionException
      * @throws Exception
      */
     public static function getModelMetadata(string $model): ModelMetadata
     {
         if (class_exists($model)) {
-            $reflectionClass = new ReflectionClass($model);
-            return ModelManager::getInstance()->modelsMetadata[$reflectionClass->getShortName()];
+            return ModelManager::getInstance()->modelsMetadata[get_class_short_name($model)];
         } elseif (isset(ModelManager::getInstance()->modelsMetadata[$model])) {
             return ModelManager::getInstance()->modelsMetadata[$model];
         } else {
@@ -98,8 +96,21 @@ class ModelManager
             $class = $modelsNamespace . $class;
             $this->modelsMetadata[$classShortName] = new ModelMetadata($class);
         }
+    }
 
-        $this->modelsMetadata['ModelManager'] = new ModelMetadata(ModelManager::class);
+    /**
+     * @param string $class
+     * @throws \Egal\Model\Exceptions\LoadModelImpossiblyException
+     * @throws \ReflectionException
+     */
+    public static function loadModel(string $class): void
+    {
+        $instance = static::getInstance();
+        $classShortName = get_class_short_name($class);
+        if (isset($instance->modelsMetadata[$classShortName])) {
+            throw new LoadModelImpossiblyException();
+        }
+        $instance->modelsMetadata[$classShortName] = new ModelMetadata($class);
     }
 
     /**

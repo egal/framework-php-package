@@ -11,21 +11,28 @@ use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
-use Egal\Model\ModelManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use ReflectionException;
 
+/**
+ * Class ActionJob
+ * @package Egal\Core\Jobs
+ */
 class ActionJob extends Job
 {
 
-    use InteractsWithQueue,
-        Queueable,
-        SerializesModels;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public const MODEL_NAMESPACE = '\App\Models\\';
+
+    /**
+     * @deprecated
+     */
     public const MODEL_ACTION_PREFIX = 'action';
 
     private ActionMessage $actionMessage;
@@ -48,22 +55,30 @@ class ActionJob extends Job
         $this->publishMessageStartProcessing();
         $this->configureActionMessageResult();
 
-        $result = ActionCaller::call(
-            ModelManager::getModelMetadata($this->getModelClassName())->getModelClass(),
-            $this->getActionFullName(),
+        $result = (new ActionCaller(
+            $this->actionMessage->getModelName(),
+            $this->actionMessage->getActionName(),
             $this->actionMessage->getParameters()
-        );
+        ))->call();
 
         $this->actionResultMessage->setData($result);
         Bus::getInstance()->publishMessage($this->actionResultMessage);
         Session::unsetActionMessage();
     }
 
+    /**
+     * @return string
+     * @deprecated
+     */
     private function getModelClassName(): string
     {
         return $this->actionMessage->getModelName();
     }
 
+    /**
+     * @return string
+     * @deprecated
+     */
     private function getActionFullName(): string
     {
         return self::MODEL_ACTION_PREFIX . ucwords($this->actionMessage->getActionName());

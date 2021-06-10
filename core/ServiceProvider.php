@@ -52,6 +52,10 @@ class ServiceProvider extends IlluminateServiceProvider
                 $this->app->register('Egal\Validation\ServiceProvider');
             }
 
+            if (class_exists('Egal\Model\ServiceProvider')) {
+                $this->app->register('Egal\Model\ServiceProvider');
+            }
+
             $this->commands([
                 EgalRunCommand::class,
                 EgalListenerRunCommand::class,

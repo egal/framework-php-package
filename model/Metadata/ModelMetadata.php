@@ -74,7 +74,6 @@ class ModelMetadata
             $this->scanProperties($docBlock);
             $this->scanActionsFromClassDocBlock($modelReflectionClass, $docBlock);
         }
-        $this->scanActionsFromReflectionClass($modelReflectionClass);
         $this->databaseFields = array_keys($this->validationRules);
     }
 
@@ -195,35 +194,15 @@ class ModelMetadata
                 if (!$reflectionMethod->isStatic()) {
                     throw new ModelMetadataException('All actions methods of the model must be static!');
                 }
-                $statusesAccess = [];
-                $servicesAccess = [];
-                $rolesAccess = [];
-                $permissionsAccess = [];
+
+                $modelActionMetadata = new ModelActionMetadata();
+                $modelActionMetadata->setActionName($actionName);
+                $modelActionMetadata->setParameters($reflectionMethod->getParameters());
                 /** @var Generic $actionTag */
                 foreach ($tag->getDescription()->getTags() as $actionTag) {
-                    switch ($actionTag->getName()) {
-                        case StatusAccess::TAG:
-                            $statusesAccess = explode(',', $actionTag->getDescription());
-                            break;
-                        case ServiceAccess::TAG:
-                            $servicesAccess = explode(',', $actionTag->getDescription());
-                            break;
-                        case RoleAccess::TAG:
-                            $rolesAccess = explode(',', $actionTag->getDescription());
-                            break;
-                        case PermissionAccess::TAG:
-                            $permissionsAccess = explode(',', $actionTag->getDescription());
-                            break;
-                    }
+                    $modelActionMetadata->supplementFromTag($actionTag);
                 }
-                $this->addActionMetadata(new ModelActionMetadata(
-                    $actionCurrentName,
-                    $reflectionMethod->getParameters(),
-                    $statusesAccess,
-                    $rolesAccess,
-                    $permissionsAccess,
-                    $servicesAccess
-                ));
+                $this->addActionMetadata($modelActionMetadata);
             }
         }
     }
@@ -233,56 +212,6 @@ class ModelMetadata
         if (!isset($this->actionsMetadata[$modelActionMetadata->getActionName()])) {
             $this->actionsMetadata[$modelActionMetadata->getActionName()] = $modelActionMetadata;
         }
-    }
-
-    protected function scanActionsFromReflectionClass(ReflectionClass $reflectionClass): void
-    {
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_STATIC) as $reflectionMethod) {
-            $actionName = $reflectionMethod->getName();
-            if (!str_contains($actionName, ModelActionMetadata::PREFIX)) continue;
-            if ($this->hasActionMetadata($actionName)) continue;
-
-            $statusesAccess = [];
-            $rolesAccess = [];
-            $permissionsAccess = [];
-            $servicesAccess = [];
-
-            $docComment = $reflectionMethod->getDocComment();
-            if ($docComment) {
-                $docBlock = DocBlockFactory::createInstance()->create($docComment);
-                /** @var Generic $actionTag */
-                foreach ($docBlock->getTags() as $actionTag) {
-                    switch ($actionTag->getName()) {
-                        case StatusAccess::TAG:
-                            $statusesAccess = explode(',', $actionTag->getDescription());
-                            break;
-                        case ServiceAccess::TAG:
-                            $servicesAccess = explode(',', $actionTag->getDescription());
-                            break;
-                        case RoleAccess::TAG:
-                            $rolesAccess = explode(',', $actionTag->getDescription());
-                            break;
-                        case PermissionAccess::TAG:
-                            $permissionsAccess = explode(',', $actionTag->getDescription());
-                            break;
-                    }
-                }
-            }
-
-            $this->addActionMetadata(new ModelActionMetadata(
-                $actionName,
-                $reflectionMethod->getParameters(),
-                $statusesAccess,
-                $rolesAccess,
-                $permissionsAccess,
-                $servicesAccess
-            ));
-        }
-    }
-
-    protected function hasActionMetadata(string $actionName): bool
-    {
-        return isset($this->actionsMetadata[ModelActionMetadata::getCurrentActionName($actionName)]);
     }
 
     /**
@@ -329,13 +258,12 @@ class ModelMetadata
      */
     public function getAction(string $actionName): ModelActionMetadata
     {
-        $actionName = ModelActionMetadata::getCurrentActionName($actionName);
-        if ($this->hasActionMetadata($actionName)) {
+        if (isset($this->actionsMetadata[$actionName])) {
             return $this->actionsMetadata[$actionName];
         }
 
         throw new ModelMetadataException(
-            $actionName . ' does not exist in the model' . $this->modelClass . '!'
+            $actionName . ' does not exist in the model ' . $this->modelClass . '!'
         );
     }
 
