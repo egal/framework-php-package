@@ -19,7 +19,6 @@ class EgalRunCommand extends Command
     protected $signature = 'egal:run
                             {--l|listeners=1 : Количество обработчиков очереди}
                             {--s|sync-code-base : Вкрлючение автоматического рестарта слушателей, при обновлении кодовой базы}
-                            {--listener-consume-sleep= : Кол-во миллисекунд задержки между выборками сообщений из очереди}
                            ';
 
     protected $description = 'Запуск сервиса';
@@ -89,7 +88,7 @@ class EgalRunCommand extends Command
 
         $newBasePathShaSum = $getBasePathCurrentShaSum();
         if ($this->basePathShaSum !== $newBasePathShaSum) {
-            $this->warn('Кодавая база обновлена!');
+            $this->warn('Code base updated!');
             $this->restartListeners();
             $this->basePathShaSum = $newBasePathShaSum;
         }
@@ -99,7 +98,7 @@ class EgalRunCommand extends Command
     {
         foreach ($this->listeners as $key => $listener) {
             if (!$listener->isRunning()) {
-                $this->warn('Умер Listener!');
+                $this->warn('Listener is dead!');
                 unset($this->listeners[$key]);
                 $this->startNewListener();
             }
@@ -115,7 +114,7 @@ class EgalRunCommand extends Command
     public function stopListeners()
     {
         foreach ($this->listeners as $key => $listener) {
-            $this->warn('Убиваем Listener! ' . $this->listeners[$key]->getPid());
+            $this->warn('Killing Listener! ' . $this->listeners[$key]->getPid());
             $this->listeners[$key]->stop();
             unset($this->listeners[$key]);
         }
@@ -123,7 +122,7 @@ class EgalRunCommand extends Command
 
     public function stopCommand()
     {
-        $this->info('Останавливаем демона!');
+        $this->info('Stopping daemon!');
         $this->stopListeners();
         exit;
     }
