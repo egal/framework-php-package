@@ -70,22 +70,26 @@ class UserServiceToken extends Token
         }
     }
 
-    public function addRole(string $role): void
+    public function addRole(string $role): self
     {
         if (!isset($this->authInformation['roles'])) {
             $this->authInformation['roles'] = [];
         }
         $this->authInformation['roles'][] = $role;
         $this->authInformation['roles'] = array_unique($this->authInformation['roles']);
+
+        return $this;
     }
 
-    public function addPermission(string $permission): void
+    public function addPermission(string $permission): self
     {
         if (!isset($this->authInformation['permissions'])) {
             $this->authInformation['permissions'] = [];
         }
         $this->authInformation['permissions'][] = $permission;
         $this->authInformation['permissions'] = array_unique($this->authInformation['permissions']);
+
+        return $this;
     }
 
     public function getUid(): string
