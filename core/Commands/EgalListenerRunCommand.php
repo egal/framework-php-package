@@ -18,7 +18,7 @@ class EgalListenerRunCommand extends Command
 
     protected $signature = 'egal:listener:run';
 
-    protected $description = 'Запуск слушателя очереди сервиса';
+    protected $description = 'Start service queue listener';
 
     /**
      * @throws Exception

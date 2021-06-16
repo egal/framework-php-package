@@ -11,17 +11,16 @@ use Symfony\Component\Process\Process;
 
 class EgalRunCommand extends Command
 {
-
-    # TODO: При деструкте, перекидывать всю очередь в Exchange
+    # TODO: In case of destruction, throw the entire queue in Exchange
 
     use PcntlSignal;
 
     protected $signature = 'egal:run
-                            {--l|listeners=1 : Количество обработчиков очереди}
-                            {--s|sync-code-base : Вкрлючение автоматического рестарта слушателей, при обновлении кодовой базы}
+                            {--l|listeners=1 : Number of queue handlers}
+                            {--s|sync-code-base : Enabling automatic restart of listeners when updating the codebase}
                            ';
 
-    protected $description = 'Запуск сервиса';
+    protected $description = 'Start service';
 
     /**
      * @var Process[]
@@ -42,7 +41,7 @@ class EgalRunCommand extends Command
         while (true) {
             usleep(150000);
             if ($this->option('sync-code-base')) {
-                $this->line('Синхронизация кодовой базы работает не стабильно! Функционал отключён!');
+                $this->line('Codebase sync is not stable! The functionality is disabled!');
             }
             $this->restartDeadListeners();
         }
@@ -58,12 +57,11 @@ class EgalRunCommand extends Command
     public function startNewListener()
     {
         $artisan = base_path('artisan');
-        $sleep = $this->option('listener-consume-sleep');
-        $command = "php $artisan egal:listener:run --consume-sleep $sleep";
+        $command = "php $artisan egal:listener:run";
         $process = Process::fromShellCommandline($command);
         $process->start();
         $this->listeners[] = $process;
-        $this->info('Запущен новый Listener!');
+        $this->info('Start new Listener!');
     }
 
     public function syncCodeBase()
@@ -126,5 +124,4 @@ class EgalRunCommand extends Command
         $this->stopListeners();
         exit;
     }
-
 }
