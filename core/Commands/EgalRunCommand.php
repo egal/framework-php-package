@@ -11,18 +11,16 @@ use Symfony\Component\Process\Process;
 
 class EgalRunCommand extends Command
 {
-
-    # TODO: При деструкте, перекидывать всю очередь в Exchange
+    # TODO: In case of destruction, throw the entire queue in Exchange
 
     use PcntlSignal;
 
     protected $signature = 'egal:run
-                            {--l|listeners=1 : Количество обработчиков очереди}
-                            {--s|sync-code-base : Вкрлючение автоматического рестарта слушателей, при обновлении кодовой базы}
-                            {--listener-consume-sleep= : Кол-во миллисекунд задержки между выборками сообщений из очереди}
+                            {--l|listeners=1 : Number of queue handlers}
+                            {--s|sync-code-base : Enabling automatic restart of listeners when updating the codebase}
                            ';
 
-    protected $description = 'Запуск сервиса';
+    protected $description = 'Start service';
 
     /**
      * @var Process[]
@@ -43,7 +41,7 @@ class EgalRunCommand extends Command
         while (true) {
             usleep(150000);
             if ($this->option('sync-code-base')) {
-                $this->line('Синхронизация кодовой базы работает не стабильно! Функционал отключён!');
+                $this->line('Codebase sync is not stable! The functionality is disabled!');
             }
             $this->restartDeadListeners();
         }
@@ -59,12 +57,11 @@ class EgalRunCommand extends Command
     public function startNewListener()
     {
         $artisan = base_path('artisan');
-        $sleep = $this->option('listener-consume-sleep');
-        $command = "php $artisan egal:listener:run --consume-sleep $sleep";
+        $command = "php $artisan egal:listener:run";
         $process = Process::fromShellCommandline($command);
         $process->start();
         $this->listeners[] = $process;
-        $this->info('Запущен новый Listener!');
+        $this->info('Start new Listener!');
     }
 
     public function syncCodeBase()
@@ -89,7 +86,7 @@ class EgalRunCommand extends Command
 
         $newBasePathShaSum = $getBasePathCurrentShaSum();
         if ($this->basePathShaSum !== $newBasePathShaSum) {
-            $this->warn('Кодавая база обновлена!');
+            $this->warn('Code base updated!');
             $this->restartListeners();
             $this->basePathShaSum = $newBasePathShaSum;
         }
@@ -99,7 +96,7 @@ class EgalRunCommand extends Command
     {
         foreach ($this->listeners as $key => $listener) {
             if (!$listener->isRunning()) {
-                $this->warn('Умер Listener!');
+                $this->warn('Listener is dead!');
                 unset($this->listeners[$key]);
                 $this->startNewListener();
             }
@@ -115,7 +112,7 @@ class EgalRunCommand extends Command
     public function stopListeners()
     {
         foreach ($this->listeners as $key => $listener) {
-            $this->warn('Убиваем Listener! ' . $this->listeners[$key]->getPid());
+            $this->warn('Killing Listener! ' . $this->listeners[$key]->getPid());
             $this->listeners[$key]->stop();
             unset($this->listeners[$key]);
         }
@@ -123,9 +120,8 @@ class EgalRunCommand extends Command
 
     public function stopCommand()
     {
-        $this->info('Останавливаем демона!');
+        $this->info('Stopping daemon!');
         $this->stopListeners();
         exit;
     }
-
 }

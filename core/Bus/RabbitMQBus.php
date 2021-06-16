@@ -12,6 +12,7 @@ use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Communication\Request;
 use Exception;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -181,6 +182,16 @@ class RabbitMQBus extends Bus
     public function destructEnvironment(): void
     {
         $this->connection->deleteQueue($this->queueName);
+    }
+
+    public function listenQueue(): void
+    {
+        Artisan::call('rabbitmq:consume', [
+            '--queue' => $this->queueName,
+            '--prefetch-count' => 1, # TODO: Разобраться сколько надо prefetch-count по стандарту
+            '--sleep' => (config('queue.connections.rabbitmq.options.consume.sleep')) / 1000,
+            '--timeout' => 0,
+        ]);
     }
 
 }
