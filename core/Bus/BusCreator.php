@@ -7,21 +7,19 @@ use Exception;
 
 class BusCreator
 {
-
     /**
      * @return Bus
      * @throws Exception
      */
     public static function createBus(): Bus
     {
-        $defaultConnection = config('queue.default');
-        $driver = config("queue.connections.$defaultConnection.driver");
+        $defaultConnection = config('bus.default');
+        $driver = config("bus.connections.$defaultConnection.driver");
         switch ($driver) {
             case 'rabbitmq':
                 return new RabbitMQBus();
             default:
-                throw new BusCreatorException("Unsupported queue driver type - $driver!");
+                throw new BusCreatorException("Unsupported bus driver type - $driver!");
         }
     }
-
 }

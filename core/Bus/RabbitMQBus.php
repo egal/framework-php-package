@@ -2,7 +2,11 @@
 
 namespace Egal\Core\Bus;
 
+use Egal\Core\Exceptions\EventProcessingException;
+use Egal\Core\Exceptions\QueueProcessingException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
+use Egal\Core\Handlers\ActionHandler;
+use Egal\Core\Handlers\EventHandler;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -10,22 +14,26 @@ use Egal\Core\Messages\EventMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
-use Egal\Core\Communication\Request;
 use Exception;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
+use PhpAmqpLib\Channel\AMQPChannel;
+use Throwable;
 
 class RabbitMQBus extends Bus
 {
+    private AbstractConnection $connection;
+    private AMQPChannel $channel;
 
-    private RabbitMQConnector $connector;
-    private RabbitMQQueue $connection;
-    public string $queueName;
+    private string $queueName;
+    public int $prefetchSize = 0;
+    public int $prefetchCount = 1;
 
     /**
      * RabbitMQBus constructor.
@@ -33,17 +41,24 @@ class RabbitMQBus extends Bus
      */
     public function __construct()
     {
-        $this->connector = new RabbitMQConnector(app('events'));
-        $this->connection = $this->connector->connect(config('queue.connections.rabbitmq'));
-    }
+        $host = config('bus.connections.rabbitmq.host');
+        $connectionClass = config('bus.connections.rabbitmq.connection');
 
-    /**
-     * @return RabbitMQQueue
-     * @noinspection PhpUnusedPrivateMethodInspection
-     */
-    private static function getConnection(): RabbitMQQueue
-    {
-        return (app(Bus::class))->connection;
+        if (!$host) {
+            throw new Exception('RabbitMQ configuration error.');
+        }
+
+        if (!$connectionClass || !($connectionClass instanceof AbstractConnection)) {
+            $connectionClass = AMQPLazyConnection::class;
+        }
+
+        $this->connection = new $connectionClass(
+            $host['host'],
+            $host['port'],
+            $host['user'],
+            $host['password']
+        );
+        $this->channel = $this->connection->channel();
     }
 
     /**
@@ -52,11 +67,11 @@ class RabbitMQBus extends Bus
      */
     public function publishMessage(Message $message): void
     {
-        if (
-            !($routingKey = $this->getRoutingKey($message))
-            || !($exchange = $this->getExchange($message))
-        ) {
-            throw  new Exception('Невозможно опубликовать ' . get_class($message));
+        $routingKey = $this->getRoutingKey($message);
+        $exchange = $this->getExchange($message);
+
+        if (!$routingKey || !$exchange) {
+            throw new Exception('Unable to publish ' . get_class($message));
         }
 
         /* Additional actions before publish */
@@ -65,11 +80,11 @@ class RabbitMQBus extends Bus
             case MessageType::ACTION_RESULT:
             case MessageType::START_PROCESSING:
                 /** @var ActionErrorMessage|ActionResultMessage|StartProcessingMessage $message */
-                $this->connection->getChannel()->queue_declare(
+                $this->channel->queue_declare(
                     $message->getActionMessage()->getUuid(),
                     true
                 );
-                $this->connection->getChannel()->queue_bind(
+                $this->channel->queue_bind(
                     $message->getActionMessage()->getUuid(),
                     'amq.direct',
                     $message->getActionMessage()->getUuid()
@@ -77,7 +92,7 @@ class RabbitMQBus extends Bus
                 break;
             case MessageType::ACTION:
                 /** @var ActionMessage $message */
-                $this->connection->getChannel()->queue_declare($message->getUuid());
+                $this->channel->queue_declare($message->getUuid());
                 break;
         }
 
@@ -89,7 +104,7 @@ class RabbitMQBus extends Bus
             ]
         );
 
-        $this->connection->getChannel()->basic_publish($AMQPMessage, $exchange, $routingKey);
+        $this->channel->basic_publish($AMQPMessage, $exchange, $routingKey);
     }
 
     /**
@@ -113,7 +128,9 @@ class RabbitMQBus extends Bus
     }
 
     /**
-     * @throws Exception
+     * @param Message $message
+     * @return string
+     * @throws UnsupportedMessageTypeException
      */
     protected function getRoutingKey(Message $message): string
     {
@@ -150,26 +167,40 @@ class RabbitMQBus extends Bus
         $processUuid = Str::uuid()->toString();
         $this->queueName = words_to_dot_case(config('app.service_name'), $processUuid, 'queue');
         $exchangeBalancerName = words_to_dot_case(config('app.service_name'), 'balancer', 'exchange');
+        $arguments = [];
 
-        $this->connection->declareQueue($this->queueName, true, true);
-        $this->connection->declareExchange(
-            $exchangeBalancerName,
-            'x-consistent-hash',
+        $this->channel->queue_declare(
+            $this->queueName,
+            false,
             true,
             false,
-            ['hash-header' => 'hash-on']
+            true,
+            false,
+            new AMQPTable($arguments)
         );
-        $this->connection->bindQueue($this->queueName, $exchangeBalancerName, '100');
 
-        // Привязываем actions и balancer
-        $this->connection->getChannel()->exchange_bind(
+        $this->channel->exchange_declare(
+            $exchangeBalancerName,
+            'x-consistent-hash',
+            false,
+            true,
+            false,
+            false,
+            true,
+            new AMQPTable(['hash-header' => 'hash-on'])
+        );
+
+        $this->channel->queue_bind($this->queueName, $exchangeBalancerName, '100');
+
+        // Bind actions and balancer
+        $this->channel->exchange_bind(
             $exchangeBalancerName,
             'amq.topic',
             words_to_dot_case(config('app.service_name'), '*', '*', 'action')
         );
 
-        // Привязываем events и balancer
-        $this->connection->getChannel()->exchange_bind(
+        // Bind events and balancer
+        $this->channel->exchange_bind(
             $exchangeBalancerName,
             'amq.topic',
             words_to_dot_case('*', '*', '*', '*', 'event')
@@ -177,21 +208,86 @@ class RabbitMQBus extends Bus
     }
 
     /**
-     * @throws AMQPProtocolChannelException
+     * @throws Exception
      */
     public function destructEnvironment(): void
     {
-        $this->connection->deleteQueue($this->queueName);
+        $this->channel->queue_delete($this->queueName, true, true);
+        $this->channel->close();
+        $this->connection->close();
     }
 
     public function listenQueue(): void
     {
-        Artisan::call('rabbitmq:consume', [
-            '--queue' => $this->queueName,
-            '--prefetch-count' => 1, # TODO: Разобраться сколько надо prefetch-count по стандарту
-            '--sleep' => (config('queue.connections.rabbitmq.options.consume.sleep')) / 1000,
-            '--timeout' => 0,
-        ]);
+        $this->channel->basic_qos(
+            $this->prefetchSize,
+            $this->prefetchCount,
+            null
+        );
+
+        $this->channel->basic_consume(
+            $this->queueName,
+            $this->consumerTag(),
+            false,
+            false,
+            false,
+            false,
+            function (AMQPMessage $message) {
+                $this->processMessage($message);
+            }
+        );
+
+        while ($this->channel->is_consuming()) {
+            try {
+                $this->channel->wait();
+            } catch (AMQPRuntimeException $exception) {
+                Log::error($exception->getMessage());
+            } catch (Exception | Throwable $exception) {
+                Log::error($exception->getMessage());
+            }
+        }
     }
 
+    protected function consumerTag(): string
+    {
+        return Str::slug(config('app.name', 'egal'), '_') . '_' . getmypid();
+    }
+
+    /**
+     * @param AMQPMessage $message
+     * @throws EventProcessingException
+     * @throws QueueProcessingException
+     * @throws \Egal\Auth\Exceptions\InitializeServiceServiceTokenException
+     * @throws \Egal\Auth\Exceptions\InitializeUserServiceTokenException
+     * @throws \Egal\Auth\Exceptions\TokenExpiredException
+     * @throws \Egal\Auth\Exceptions\UndefinedTokenTypeException
+     * @throws \Egal\Core\Exceptions\ActionCallException
+     * @throws \Egal\Core\Exceptions\EventHandlingException
+     * @throws \Egal\Core\Exceptions\InitializeMessageFromArrayException
+     * @throws \Egal\Core\Exceptions\TokenSignatureInvalidException
+     * @throws \Egal\Core\Exceptions\UndefinedTypeOfMessageException
+     * @throws \ReflectionException
+     */
+    protected function processMessage(AMQPMessage $message)
+    {
+        $payload = json_decode($message->getBody(), true);
+
+        if (!isset($payload['type'])) {
+            throw new QueueProcessingException();
+        }
+
+        switch ($payload['type']) {
+            case MessageType::ACTION:
+                (new ActionHandler())->handle($payload);
+                break;
+            case MessageType::EVENT:
+                if (!isset($payload['data'])) {
+                    throw new EventProcessingException('Error processing event! ' . json_encode($payload));
+                }
+                (new EventHandler())->handle($payload);
+                break;
+            default:
+                throw new QueueProcessingException('Error processing queue message! ' . json_encode($payload));
+        }
+    }
 }

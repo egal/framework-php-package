@@ -15,7 +15,6 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
-
     /**
      * Указывает, отложена ли загрузка провайдера.
      *
@@ -97,6 +96,9 @@ class ServiceProvider extends IlluminateServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/config/queue.php', 'queue'
         );
-    }
 
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/bus.php', 'bus'
+        );
+    }
 }

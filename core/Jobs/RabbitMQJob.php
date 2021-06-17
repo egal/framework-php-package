@@ -10,7 +10,6 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Jobs\RabbitMQJob as BaseRabbitM
 
 class RabbitMQJob extends BaseRabbitMQJob
 {
-
     /**
      * @return array
      * @throws Exception
@@ -44,5 +43,4 @@ class RabbitMQJob extends BaseRabbitMQJob
                 throw new QueueProcessingException('Error processing queue message! ' . json_encode($payload));
         }
     }
-
 }
