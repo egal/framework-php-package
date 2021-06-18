@@ -24,4 +24,6 @@ abstract class Bus
 
     abstract public function listenQueue(): void;
 
+    abstract public function getConnection();
+
 }

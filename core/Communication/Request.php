@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Communication;
 
+use Egal\Core\Bus\Bus;
 use Egal\Core\Exceptions\RequestException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
@@ -11,8 +12,7 @@ use Egal\Core\Messages\StartProcessingMessage;
 use Exception;
 use Illuminate\Support\Carbon;
 use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
-use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use PhpAmqpLib\Exception\AMQPProtocolChannelException as AMQPProtocolChannelExceptionAlias;
 
 class Request extends ActionMessage
 {
@@ -61,25 +61,8 @@ class Request extends ActionMessage
     public function openConnection()
     {
         $this->isConnectionNotOpenedOrFail();
-
-        $host = config('bus.connections.rabbitmq.host');
-        $connectionClass = config('bus.connections.rabbitmq.connection');
-
-        if (!$host) {
-            throw new Exception('RabbitMQ configuration error.');
-        }
-
-        if (!$connectionClass || !($connectionClass instanceof AbstractConnection)) {
-            $connectionClass = AMQPLazyConnection::class;
-        }
-
-        $this->connection = new $connectionClass(
-            $host['host'],
-            $host['port'],
-            $host['user'],
-            $host['password']
-        );
-
+        Bus::getInstance()->connect();
+        $this->connection = Bus::getInstance()->getConnection();
         $this->isConnectionOpened = true;
     }
 
@@ -95,20 +78,13 @@ class Request extends ActionMessage
         $this->openConnection();
     }
 
-    /**
-     * @throws AMQPProtocolChannelException
-     * @throws Exception
-     */
     public function closeConnection()
     {
-        $this->connection->channel()->queue_delete($this->uuid, true, true);
-        $this->connection->channel()->close();
-        $this->connection->close();
+        Bus::getInstance()->destructEnvironment();
         $this->isConnectionOpened = false;
     }
 
     /**
-     * @throws AMQPProtocolChannelException
      * @throws Exception
      */
     public function waitReplyMessages()
@@ -209,7 +185,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
+     * @throws AMQPProtocolChannelExceptionAlias
      * @throws Exception
      */
     public function call(): Response
@@ -227,7 +203,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
+     * @throws AMQPProtocolChannelExceptionAlias
      * @throws Exception
      */
     public function send()
@@ -246,7 +222,7 @@ class Request extends ActionMessage
      * Send request to auth service and get sst token.
      *
      * @return mixed
-     * @throws RequestException|AMQPProtocolChannelException
+     * @throws RequestException|AMQPProtocolChannelExceptionAlias
      */
     public function getSSTToken()
     {
@@ -283,7 +259,7 @@ class Request extends ActionMessage
     /**
      * Send request to auth service and get smt token.
      * @return string
-     * @throws RequestException|AMQPProtocolChannelException
+     * @throws RequestException|AMQPProtocolChannelExceptionAlias
      */
     public function getSMTToken(): string
     {

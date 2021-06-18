@@ -41,6 +41,12 @@ class RabbitMQBus extends Bus
      */
     public function __construct()
     {
+        $this->connect();
+        $this->channel = $this->connection->channel();
+    }
+
+    public function connect()
+    {
         $host = config('bus.connections.rabbitmq.host');
         $connectionClass = config('bus.connections.rabbitmq.connection');
 
@@ -58,7 +64,11 @@ class RabbitMQBus extends Bus
             $host['user'],
             $host['password']
         );
-        $this->channel = $this->connection->channel();
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     /**
