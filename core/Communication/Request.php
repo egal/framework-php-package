@@ -80,7 +80,9 @@ class Request extends ActionMessage
 
     public function closeConnection()
     {
-        Bus::getInstance()->destructEnvironment();
+        $this->connection->channel()->queue_delete($this->uuid, true, true);
+        $this->connection->channel()->close();
+        $this->connection->close();
         $this->isConnectionOpened = false;
     }
 
