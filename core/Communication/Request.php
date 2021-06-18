@@ -10,19 +10,15 @@ use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Exception;
 use Illuminate\Support\Carbon;
+use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 class Request extends ActionMessage
 {
-
     public Response $response;
 
-    /**
-     * @var RabbitMQQueue
-     */
-    public RabbitMQQueue $connection;
+    public AbstractConnection $connection;
 
     private bool $isConnectionOpened;
 
@@ -65,8 +61,25 @@ class Request extends ActionMessage
     public function openConnection()
     {
         $this->isConnectionNotOpenedOrFail();
-        $connector = new RabbitMQConnector(app('events'));
-        $this->connection = $connector->connect(config('queue.connections.rabbitmq'));
+
+        $host = config('bus.connections.rabbitmq.host');
+        $connectionClass = config('bus.connections.rabbitmq.connection');
+
+        if (!$host) {
+            throw new Exception('RabbitMQ configuration error.');
+        }
+
+        if (!$connectionClass || !($connectionClass instanceof AbstractConnection)) {
+            $connectionClass = AMQPLazyConnection::class;
+        }
+
+        $this->connection = new $connectionClass(
+            $host['host'],
+            $host['port'],
+            $host['user'],
+            $host['password']
+        );
+
         $this->isConnectionOpened = true;
     }
 
@@ -88,8 +101,8 @@ class Request extends ActionMessage
      */
     public function closeConnection()
     {
-        $this->connection->deleteQueue($this->uuid);
-        $this->connection->getChannel()->close();
+        $this->connection->channel()->queue_delete($this->uuid, true, true);
+        $this->connection->channel()->close();
         $this->connection->close();
         $this->isConnectionOpened = false;
     }
@@ -161,7 +174,7 @@ class Request extends ActionMessage
      */
     private function collectRabbitMessageIntoResponse()
     {
-        $result = $this->connection->getChannel()->basic_get($this->uuid);
+        $result = $this->connection->channel()->basic_get($this->uuid);
         if (is_null($result)) {
             return;
         }
@@ -302,5 +315,4 @@ class Request extends ActionMessage
         }
         return $smt;
     }
-
 }

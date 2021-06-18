@@ -239,12 +239,14 @@ class RabbitMQBus extends Bus
 
         while ($this->channel->is_consuming()) {
             try {
-                $this->channel->wait();
+                $this->channel->wait(null, true);
             } catch (AMQPRuntimeException $exception) {
                 Log::error($exception->getMessage());
             } catch (Exception | Throwable $exception) {
                 Log::error($exception->getMessage());
             }
+
+            usleep(150000);
         }
     }
 
@@ -289,5 +291,7 @@ class RabbitMQBus extends Bus
             default:
                 throw new QueueProcessingException('Error processing queue message! ' . json_encode($payload));
         }
+
+        $message->ack();
     }
 }

@@ -8,6 +8,8 @@ return [
 
         'rabbitmq' => [
 
+            'driver' => 'rabbitmq',
+
             'connection' => PhpAmqpLib\Connection\AMQPLazyConnection::class,
 
             'host' => [
