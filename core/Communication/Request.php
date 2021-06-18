@@ -18,7 +18,7 @@ class Request extends ActionMessage
 {
     public Response $response;
 
-    public AbstractConnection $connection;
+    private AbstractConnection $connection;
 
     private bool $isConnectionOpened;
 
@@ -152,7 +152,12 @@ class Request extends ActionMessage
      */
     private function collectRabbitMessageIntoResponse()
     {
-        $result = $this->connection->channel()->basic_get($this->uuid);
+        $result = null;
+        try {
+            $result = $this->connection->channel()->basic_get($this->uuid);
+        } catch (\Exception $exception) {
+            $this->connection->reconnect();
+        }
         if (is_null($result)) {
             return;
         }

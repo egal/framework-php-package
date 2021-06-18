@@ -15,11 +15,10 @@ use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
-use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use PhpAmqpLib\Exception\AMQPConnectionClosedException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
@@ -250,10 +249,13 @@ class RabbitMQBus extends Bus
         while ($this->channel->is_consuming()) {
             try {
                 $this->channel->wait(null, true);
+            } catch (AMQPConnectionClosedException $exception) {
+                $this->connection->reconnect();
+                throw $exception;
             } catch (AMQPRuntimeException $exception) {
-                Log::error($exception->getMessage());
+                throw $exception;
             } catch (Exception | Throwable $exception) {
-                Log::error($exception->getMessage());
+                throw $exception;
             }
 
             usleep(150000);
