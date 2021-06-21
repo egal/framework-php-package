@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/smartworldteam/art/main/logo.svg" height="150"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/egal/art/main/logo.svg" height="150"></p>
 <h1 align="center">Egal | Egal/Framework PHP Package</h1>
 <p align="center">
  <a href="https://packagist.org/packages/egal/framework"><img src="https://poser.pugx.org/egal/framework/v"></a>
@@ -17,7 +17,7 @@
 ## Документация
 
 С подробной документацией по продукту можно ознакомиться
-[здесь](https://smartworldteam.github.io/egal-docs/#/).
+[здесь](https://egal.github.io/egal-docs/#/).
 
 
 ## Поддержка
@@ -27,7 +27,7 @@
 Задать вопрос:
 
 [![](https://img.shields.io/badge/Chat%20on-Telegram-blue)](https://t.me/joinchat/n175xzBrCUswMWU6)
-[![](https://img.shields.io/badge/Mail%20to-egal%40smartworld.team-red)](mailto:egal@smartworld.team)
+[![](https://img.shields.io/badge/Mail%20to-egal%40sputnikfund.ru-red)](mailto:egal@sputnikfund.ru)
 
 
 ## Экосистема
@@ -43,16 +43,16 @@
 | [Interface Service]          |          [![Interface Service Status]][Interface Service Status URL]          | Сервис Egal экосистемы, предназначенный для управления метаданными интерфейсов |
 | [Postgres]                   |                   [![Postgres Status]][Postgres Status URL]                   | Надстроенная Система управления базами данных PostgreSQL для Egal экосистемы   |
 
-[Docs]: https://github.com/smartworldteam/egal-docs
-[Egal/Framework PHP Package]: https://github.com/smartworldteam/egal-framework-php-package
-[Egal/Framework NPM Package]:https://github.com/smartworldteam/egal-framework-npm-package
-[Egal/Egal PHP Project]:https://github.com/smartworldteam/egal-egal-php-project
-[Web Service]:https://github.com/smartworldteam/egal-web-service
-[Auth Service]:https://github.com/smartworldteam/egal-auth-service
-[Interface Service]: https://github.com/smartworldteam/egal-interface-service
-[Postgres]: https://github.com/smartworldteam/postgres
+[Docs]: https://github.com/egal/egal-docs
+[Egal/Framework PHP Package]: https://github.com/egal/egal-framework-php-package
+[Egal/Framework NPM Package]:https://github.com/egal/egal-framework-npm-package
+[Egal/Egal PHP Project]:https://github.com/egal/egal-egal-php-project
+[Web Service]:https://github.com/egal/egal-web-service
+[Auth Service]:https://github.com/egal/egal-auth-service
+[Interface Service]: https://github.com/egal/egal-interface-service
+[Postgres]: https://github.com/egal/postgres
 
-[Docs Status]: https://img.shields.io/website?url=https%3A%2F%2Fsmartworldteam.github.io%2Fegal-docs%2F%23%2F
+[Docs Status]: https://img.shields.io/website?url=https%3A%2F%2Fegal.github.io%2Fegal-docs%2F%23%2F
 [Egal/Framework PHP Package Status]: https://img.shields.io/packagist/v/egal/framework?include_prereleases
 [Egal/Framework NPM Package Status]: https://img.shields.io/npm/v/@egalteam/framework
 [Egal/Egal PHP Project Status]: https://img.shields.io/packagist/v/egal/egal?include_prereleases
@@ -61,7 +61,7 @@
 [Interface Service Status]: https://img.shields.io/docker/v/egalbox/interface-service?label=dockerhub
 [Postgres Status]: https://img.shields.io/docker/v/egalbox/postgres?label=dockerhub
 
-[Docs Status URL]: https://smartworldteam.github.io/egal-docs/
+[Docs Status URL]: https://egal.github.io/egal-docs/
 [Egal/Framework PHP Package Status URL]: https://packagist.org/packages/egal/framework
 [Egal/Framework NPM Package Status URL]: https://www.npmjs.com/package/@egalteam/egal
 [Egal/Egal PHP Project Status URL]: https://packagist.org/packages/egal/egal
@@ -69,13 +69,4 @@
 [Auth Service Status URL]: https://hub.docker.com/r/egalbox/auth-service
 [Interface Service Status URL]: https://hub.docker.com/r/egalbox/interface-service
 [Postgres Status URL]: https://hub.docker.com/r/egalbox/postgres
-
-
-## Разработчик
-
-<p align="center"><a href="https://smartworld.team/"><img src="https://raw.githubusercontent.com/smartworldteam/art/main/smartworld/logo.svg" width="150"></a></p>
-
-Компания ООО "Умный Мир" (Smart World) занимается разработкой IT
-продуктов, а также предоставляет команды опытных IT-специалистов для
-Ваших проектов. Мы решаем самые сложные задачи быстро и без проблем!
 
