@@ -130,7 +130,11 @@ class Request extends ActionMessage
 
     private function setResponseStatusCode()
     {
-        if (!$this->response->getActionResultMessage() && !$this->response->getStartProcessingMessage()) {
+        if (
+            !$this->response->getStartProcessingMessage()
+            && !$this->response->getActionResultMessage()
+            && !$this->response->getActionErrorMessage()
+        ) {
             $this->response->setStatusCode(500);
             $this->response->setErrorMessage('Service not responding!');
         } elseif (
