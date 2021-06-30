@@ -3,6 +3,7 @@
 namespace Egal\Model;
 
 use Egal\Model\Exceptions\DeleteManyException;
+use Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\NotFoundException;
 use Egal\Model\Exceptions\UpdateException;
@@ -44,17 +45,19 @@ use ReflectionException;
 abstract class Model extends EloquentModel
 {
 
-    use HasDefaultLimits,
-        Pagination,
-        HasEvents,
-        UsesEgalBuilder,
-        UsesValidator,
-        XssGuardable,
-        HashGuardable,
-        UsesModelMetadata;
+    use HasDefaultLimits;
+    use HasEvents;
+    use HashGuardable;
+    use Pagination;
+    use UsesEgalBuilder;
+    use UsesModelMetadata;
+    use UsesValidator;
+    use XssGuardable;
 
     /**
      * Стандартное значение количества элементов на странице при пагинации.
+     *
+     * @var int
      */
     protected $perPage = 10;
 
@@ -87,6 +90,7 @@ abstract class Model extends EloquentModel
      * Retrieving Model Metadata
      *
      * @throws ReflectionException
+     * @throws Exception
      */
     public static function actionGetMetadata(): array
     {
@@ -227,10 +231,12 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreateMany(array $objects = []): array
     {
-        DB::beginTransaction();
+        $instance = new static();
+        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
+        DB::beginTransaction();
         foreach ($objects as $attributes) {
-            $entity = new static();
+            $entity = $instance->newInstance();
             $entity->needFireActionEvents();
             $entity->fill($attributes);
             try {
@@ -283,20 +289,21 @@ abstract class Model extends EloquentModel
      * @param array $objects Array of updatable objects (objects must contain an identification key)
      * @return array
      * @throws UpdateManyException
+     * @throws ExceedingTheLimitCountEntitiesForManipulationException
      */
     public static function actionUpdateMany(array $objects = []): array
     {
-        DB::beginTransaction();
         $collection = new Collection();
-        $modelObject = new static();
+        $instance = new static();
+        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
 
+        DB::beginTransaction();
         foreach ($objects as $key => $attributes) {
-            if (!isset($attributes[$modelObject->getKeyName()])) {
+            if (!isset($attributes[$instance->getKeyName()])) {
                 DB::rollBack();
                 throw new UpdateManyException('Object not specified index ' . $key . '!');
             }
-            $entity = static::query()
-                ->find($attributes[$modelObject->getKeyName()]);
+            $entity = static::query()->find($attributes[$instance->getKeyName()]);
             if (!$entity) {
                 DB::rollBack();
                 throw new UpdateManyException('Object not found with ' . $key . ' index!');
@@ -308,8 +315,8 @@ abstract class Model extends EloquentModel
             $entity->save();
             $collection->add($entity);
         }
-
         DB::commit();
+
         return $collection->toArray();
     }
 
@@ -321,15 +328,16 @@ abstract class Model extends EloquentModel
      * @return array
      * @throws FilterException
      * @throws Exception
-     * @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        $builder = self::query();
+        $builder = static::query();
         $filter == [] ?: $builder->setFilter(FilterPart::fromArray($filter));
 
-        /** @var Model[] $entities */
+        /** @var Model[]|Collection $entities */
         $entities = $builder->get();
+
+        (new static())->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
 
         DB::beginTransaction();
         foreach ($entities as $key => $entity) {
@@ -359,8 +367,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDelete($id): array
     {
-        $entity = static::query()
-            ->find($id);
+        $entity = static::query()->find($id);
         if (!$entity) {
             throw new NotFoundException();
         }
@@ -384,6 +391,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteMany($ids): ?bool
     {
+        (new static())->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
+
         DB::beginTransaction();
         foreach ($ids as $id) {
             $entity = static::query()
@@ -421,6 +430,7 @@ abstract class Model extends EloquentModel
 
         $entities = $builder->get();
         $entitiesCount = $entities->count();
+        (new static())->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entitiesCount);
 
         DB::beginTransaction();
         /** @var Model[] $entities */
