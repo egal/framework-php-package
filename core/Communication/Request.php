@@ -3,6 +3,7 @@
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\RequestException;
+use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -14,6 +15,10 @@ use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
+/**
+ * Class Request
+ * @package Egal\Core\Communication
+ */
 class Request extends ActionMessage
 {
 
@@ -71,7 +76,7 @@ class Request extends ActionMessage
     /**
      * @throws Exception
      */
-    public function reopenConnection()
+    public function reopenConnection(): void
     {
         if ($this->isConnectionOpened) {
             $this->connection->close();
@@ -192,6 +197,10 @@ class Request extends ActionMessage
         return $this->response;
     }
 
+    /**
+     * @param $key
+     * @return array
+     */
     public function getParameter($key): array
     {
         return $this->parameters[$key];
@@ -204,7 +213,7 @@ class Request extends ActionMessage
     public function call(): Response
     {
         if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
-            $this->setToken($this->getServiceServiceToken());
+            $this->authorizeService();
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -222,7 +231,7 @@ class Request extends ActionMessage
     public function send()
     {
         if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
-            $this->setToken($this->getServiceServiceToken());
+            $this->authorizeService();
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -232,50 +241,13 @@ class Request extends ActionMessage
     }
 
     /**
-     * Send request to auth service and get sst token.
-     *
-     * @return mixed
-     * @throws RequestException|AMQPProtocolChannelException
+     * @throws AMQPProtocolChannelException
+     * @throws ResponseException
      */
-    public function getServiceServiceToken()
+    private function authorizeService()
     {
-        $smt = $this->getServiceMasterToken();
-        $request = new Request(
-            $this->authServiceName,
-            'Service',
-            'loginToService',
-            [
-                'service_name' => $this->serviceName,
-                'token' => $smt
-            ]
-        );
-        $request->call();
-        $response = $request->getResponse();
-        $sst = '';
-        if ($response->hasError()) {
-            throw new RequestException(
-                $response->getActionErrorMessage()->getMessage(),
-                $response->getActionErrorMessage()->getCode()
-            );
-        } else {
-            $result = $response->getActionResultMessage();
-            $sst = $result->getData();
-        }
-        if (!$sst) {
-            throw new RequestException('SST is empty!');
-        }
-
-        return $sst;
-    }
-
-    /**
-     * Send request to auth service and get smt token.
-     * @return string
-     * @throws RequestException|AMQPProtocolChannelException
-     */
-    public function getServiceMasterToken(): string
-    {
-        $request = new Request(
+        // Service Master Token (SMT) getting block
+        $serviceMasterTokenRequest = new Request(
             $this->authServiceName,
             'Service',
             'login',
@@ -284,23 +256,25 @@ class Request extends ActionMessage
                 'key' => config('app.service_key')
             ]
         );
-        $request->call();
-        $response = $request->getResponse();
-        $smt = '';
-        if ($response->hasError()) {
-            throw new RequestException(
-                $response->getActionErrorMessage()->getMessage(),
-                $response->getActionErrorMessage()->getCode()
-            );
-        } else {
-            $result = $response->getActionResultMessage();
-            $smt = $result->getData();
-        }
+        $serviceMasterTokenResponse = $serviceMasterTokenRequest->call();
+        $serviceMasterTokenResponse->throwActionErrorMessageIfExists();
+        $serviceMasterToken = $serviceMasterTokenResponse->getActionResultMessage()->getData();
 
-        if (!$smt) {
-            throw new RequestException('SMT is empty!');
-        }
-        return $smt;
+        // Service Service Token (SST) getting block
+        $serviceServiceTokenRequest = new Request(
+            $this->authServiceName,
+            'Service',
+            'loginToService',
+            [
+                'service_name' => $this->serviceName,
+                'token' => $serviceMasterToken
+            ]
+        );
+        $serviceServiceTokenResponse = $serviceServiceTokenRequest->call();
+        $serviceServiceTokenResponse->throwActionErrorMessageIfExists();
+        $serviceServiceToken = $serviceServiceTokenResponse->getActionResultMessage()->getData();
+
+        $this->setToken($serviceServiceToken);
     }
 
     /**
