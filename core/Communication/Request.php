@@ -26,16 +26,14 @@ class Request extends ActionMessage
 
     private bool $isConnectionOpened;
 
-    private string $authServiceName;
+    private string $authServiceName = 'auth';
 
-    private bool $disableAuth;
+    private bool $disableAuth = false;
 
-    public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [], bool $disableAuth = false, string $authServiceName = 'auth')
+    public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
         $this->isConnectionOpened = false;
-        $this->authServiceName = $authServiceName;
-        $this->disableAuth = $disableAuth;
     }
 
     /**
@@ -206,7 +204,7 @@ class Request extends ActionMessage
     public function call(): Response
     {
         if (!$this->disableAuth && !$this->isTokenExist()) {
-            $this->setToken($this->getSSTToken());
+            $this->setToken($this->getServiceServiceToken());
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -224,7 +222,7 @@ class Request extends ActionMessage
     public function send()
     {
         if (!$this->disableAuth && !$this->isTokenExist()) {
-            $this->setToken($this->getSSTToken());
+            $this->setToken($this->getServiceServiceToken());
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -239,9 +237,9 @@ class Request extends ActionMessage
      * @return mixed
      * @throws RequestException|AMQPProtocolChannelException
      */
-    public function getSSTToken()
+    public function getServiceServiceToken()
     {
-        $smt = $this->getSMTToken();
+        $smt = $this->getServiceMasterToken();
         $request = new Request(
             $this->authServiceName,
             'Service',
@@ -276,7 +274,7 @@ class Request extends ActionMessage
      * @return string
      * @throws RequestException|AMQPProtocolChannelException
      */
-    public function getSMTToken(): string
+    public function getServiceMasterToken(): string
     {
         $request = new Request(
             $this->authServiceName,
@@ -305,6 +303,22 @@ class Request extends ActionMessage
             throw new RequestException('SMT is empty!');
         }
         return $smt;
+    }
+
+    /**
+     * @param string $authServiceName
+     */
+    public function setAuthServiceName(string $authServiceName): void
+    {
+        $this->authServiceName = $authServiceName;
+    }
+
+    /**
+     * @param bool $disableAuth
+     */
+    public function setDisableAuth(bool $disableAuth): void
+    {
+        $this->disableAuth = $disableAuth;
     }
 
 }
