@@ -28,7 +28,7 @@ class Request extends ActionMessage
 
     private string $authServiceName = 'auth';
 
-    private bool $disableAuth = false;
+    private string $userServiceToken;
 
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
@@ -203,8 +203,12 @@ class Request extends ActionMessage
      */
     public function call(): Response
     {
-        if (!$this->disableAuth && !$this->isTokenExist()) {
-            $this->setToken($this->getServiceServiceToken());
+        if (!$this->isTokenExist()) {
+            if (isset($this->userServiceToken)) {
+                $this->setToken($this->userServiceToken);
+            }else {
+                $this->setToken($this->getServiceServiceToken());
+            }
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -221,8 +225,12 @@ class Request extends ActionMessage
      */
     public function send()
     {
-        if (!$this->disableAuth && !$this->isTokenExist()) {
-            $this->setToken($this->getServiceServiceToken());
+        if (!$this->isTokenExist()) {
+            if (isset($this->userServiceToken)) {
+                $this->setToken($this->userServiceToken);
+            }else {
+                $this->setToken($this->getServiceServiceToken());
+            }
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -247,8 +255,7 @@ class Request extends ActionMessage
             [
                 'service_name' => $this->serviceName,
                 'token' => $smt
-            ],
-            true
+            ]
         );
         $request->call();
         $response = $request->getResponse();
@@ -283,8 +290,7 @@ class Request extends ActionMessage
             [
                 'service_name' => config('app.service_name'),
                 'key' => config('app.service_key')
-            ],
-            true
+            ]
         );
         $request->call();
         $response = $request->getResponse();
@@ -314,11 +320,11 @@ class Request extends ActionMessage
     }
 
     /**
-     * @param bool $disableAuth
+     * @param string $userServiceToken
      */
-    public function setDisableAuth(bool $disableAuth): void
+    public function setUserServiceToken(string $userServiceToken): void
     {
-        $this->disableAuth = $disableAuth;
+        $this->userServiceToken = $userServiceToken;
     }
 
 }
