@@ -28,7 +28,7 @@ class Request extends ActionMessage
 
     private string $authServiceName = 'auth';
 
-    private string $userServiceToken;
+    private bool $serviceAuthorization = true;
 
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
@@ -203,12 +203,8 @@ class Request extends ActionMessage
      */
     public function call(): Response
     {
-        if (!$this->isTokenExist()) {
-            if (isset($this->userServiceToken)) {
-                $this->setToken($this->userServiceToken);
-            }else {
-                $this->setToken($this->getServiceServiceToken());
-            }
+        if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
+            $this->setToken($this->getServiceServiceToken());
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -225,12 +221,8 @@ class Request extends ActionMessage
      */
     public function send()
     {
-        if (!$this->isTokenExist()) {
-            if (isset($this->userServiceToken)) {
-                $this->setToken($this->userServiceToken);
-            }else {
-                $this->setToken($this->getServiceServiceToken());
-            }
+        if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
+            $this->setToken($this->getServiceServiceToken());
         }
         if (!$this->isConnectionOpened) {
             $this->openConnection();
@@ -319,12 +311,19 @@ class Request extends ActionMessage
         $this->authServiceName = $authServiceName;
     }
 
-    /**
-     * @param string $userServiceToken
-     */
-    public function setUserServiceToken(string $userServiceToken): void
+    public function disableServiceAuthorization(): void
     {
-        $this->userServiceToken = $userServiceToken;
+        $this->serviceAuthorization = false;
+    }
+
+    public function enableServiceAuthorization(): void
+    {
+        $this->serviceAuthorization = true;
+    }
+
+    public function isServiceAuthorizationEnabled(): bool
+    {
+        return $this->serviceAuthorization;
     }
 
 }
