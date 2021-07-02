@@ -2,11 +2,16 @@
 
 namespace Egal\Core\Communication;
 
+use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\StartProcessingMessage;
 
+/**
+ * Class Response
+ * @package Egal\Core\Communication
+ */
 class Response
 {
 
@@ -113,9 +118,22 @@ class Response
         $this->actionErrorMessage = $actionErrorMessage;
     }
 
-    public function hasError(): bool
+    public function isActionErrorMessageExists(): bool
     {
         return isset($this->actionErrorMessage);
+    }
+
+    /**
+     * @throws ResponseException
+     */
+    public function throwActionErrorMessageIfExists()
+    {
+        if ($this->isActionErrorMessageExists()) {
+            throw new ResponseException(
+                $this->getActionErrorMessage()->getMessage(),
+                $this->getActionErrorMessage()->getCode()
+            );
+        }
     }
 
 }
