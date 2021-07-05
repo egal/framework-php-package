@@ -25,14 +25,6 @@ class Pagination
     }
 
     /**
-     * @param int|null $perPage
-     */
-    public function setPerPage(?int $perPage): void
-    {
-        $this->perPage = $perPage;
-    }
-
-    /**
      * @return int|null
      */
     public function getPage(): ?int
@@ -41,12 +33,23 @@ class Pagination
     }
 
     /**
-     * @param int|null $page
+     * @param int|null $perPage
+     * @return Pagination
      */
-    public function setPage(?int $page): void
+    public function setPerPage(?int $perPage): Pagination
     {
-        $this->page = $page;
+        $this->perPage = $perPage;
+        return $this;
     }
 
+    /**
+     * @param int|null $page
+     * @return Pagination
+     */
+    public function setPage(?int $page): Pagination
+    {
+        $this->page = $page;
+        return $this;
+    }
 
 }
