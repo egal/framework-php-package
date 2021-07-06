@@ -109,7 +109,7 @@ class Request extends ActionMessage
         $this->response->setActionMessage($this);
 
         $startedAt = Carbon::now('UTC');
-        $mustDieAt = (clone $startedAt)->addSeconds(10);
+        $mustDieAt = (clone $startedAt)->addSeconds(config('app.wait_reply_message_ttl'));
 
         try {
             while (Carbon::now('UTC') < $mustDieAt) {

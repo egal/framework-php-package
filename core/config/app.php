@@ -131,4 +131,15 @@ return [
 
     'service_key' => env('APP_SERVICE_KEY', env('APP_KEY')),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Wait reply message ttl
+    |--------------------------------------------------------------------------
+    |
+    | Using for configure waiting response time from microservice.
+    | Measured in seconds.
+    |
+    */
+
+    'wait_reply_message_ttl' => env('WAIT_REPLY_MESSAGE_TTL', 10),
 ];
