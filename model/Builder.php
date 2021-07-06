@@ -264,7 +264,7 @@ class Builder extends EloquentBuilder
      *
      * @return Model
      *
-     * TODO: Строго типизированное возвращаемое значение (описание не через класс) ругается при использовании @see Mockery
+     * TODO: Strongly typed return value (non-class description) swears when used @see Mockery
      */
     public function getModel()
     {
