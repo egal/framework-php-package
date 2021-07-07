@@ -248,7 +248,7 @@ class Request extends ActionMessage
     private function authorizeService()
     {
         if ($this->isTokenExist()) {
-            throw new RequestException('Token already exists.');
+            throw new RequestException('Token already exists! Service autorization is imposible!');
         }
 
         // Service Master Token (SMT) getting block
