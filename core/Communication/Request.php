@@ -212,7 +212,7 @@ class Request extends ActionMessage
      */
     public function call(): Response
     {
-        if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
+        if ($this->isServiceAuthorizationEnabled()) {
             $this->authorizeService();
         }
         if (!$this->isConnectionOpened) {
@@ -230,7 +230,7 @@ class Request extends ActionMessage
      */
     public function send()
     {
-        if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
+        if ($this->isServiceAuthorizationEnabled()) {
             $this->authorizeService();
         }
         if (!$this->isConnectionOpened) {
@@ -243,9 +243,14 @@ class Request extends ActionMessage
     /**
      * @throws AMQPProtocolChannelException
      * @throws ResponseException
+     * @throws RequestException
      */
     private function authorizeService()
     {
+        if ($this->isTokenExist()) {
+            throw new RequestException('Token already exists! Service autorization is imposible!');
+        }
+
         // Service Master Token (SMT) getting block
         $serviceMasterTokenRequest = new Request(
             $this->authServiceName,
@@ -256,6 +261,8 @@ class Request extends ActionMessage
                 'key' => config('app.service_key')
             ]
         );
+
+        $serviceMasterTokenRequest->disableServiceAuthorization();
         $serviceMasterTokenResponse = $serviceMasterTokenRequest->call();
         $serviceMasterTokenResponse->throwActionErrorMessageIfExists();
         $serviceMasterToken = $serviceMasterTokenResponse->getActionResultMessage()->getData();
@@ -270,6 +277,8 @@ class Request extends ActionMessage
                 'token' => $serviceMasterToken
             ]
         );
+
+        $serviceServiceTokenRequest->disableServiceAuthorization();
         $serviceServiceTokenResponse = $serviceServiceTokenRequest->call();
         $serviceServiceTokenResponse->throwActionErrorMessageIfExists();
         $serviceServiceToken = $serviceServiceTokenResponse->getActionResultMessage()->getData();
