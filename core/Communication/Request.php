@@ -243,6 +243,7 @@ class Request extends ActionMessage
     /**
      * @throws AMQPProtocolChannelException
      * @throws ResponseException
+     * @throws RequestException
      */
     private function authorizeService()
     {
