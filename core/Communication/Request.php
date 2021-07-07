@@ -212,7 +212,7 @@ class Request extends ActionMessage
      */
     public function call(): Response
     {
-        if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
+        if ($this->isServiceAuthorizationEnabled() && !$this->isTokenExist()) {
             $this->authorizeService();
         }
         if (!$this->isConnectionOpened) {
@@ -230,7 +230,7 @@ class Request extends ActionMessage
      */
     public function send()
     {
-        if (!$this->isTokenExist() && $this->isServiceAuthorizationEnabled()) {
+        if ($this->isServiceAuthorizationEnabled() && !$this->isTokenExist()) {
             $this->authorizeService();
         }
         if (!$this->isConnectionOpened) {
@@ -256,6 +256,8 @@ class Request extends ActionMessage
                 'key' => config('app.service_key')
             ]
         );
+
+        $serviceMasterTokenRequest->disableServiceAuthorization();
         $serviceMasterTokenResponse = $serviceMasterTokenRequest->call();
         $serviceMasterTokenResponse->throwActionErrorMessageIfExists();
         $serviceMasterToken = $serviceMasterTokenResponse->getActionResultMessage()->getData();
@@ -270,6 +272,8 @@ class Request extends ActionMessage
                 'token' => $serviceMasterToken
             ]
         );
+
+        $serviceServiceTokenRequest->disableServiceAuthorization();
         $serviceServiceTokenResponse = $serviceServiceTokenRequest->call();
         $serviceServiceTokenResponse->throwActionErrorMessageIfExists();
         $serviceServiceToken = $serviceServiceTokenResponse->getActionResultMessage()->getData();
