@@ -25,7 +25,7 @@ use ReflectionMethod;
  *
  * @package Egal\Model
  */
-final class Builder extends EloquentBuilder
+class Builder extends EloquentBuilder
 {
 
     /**
@@ -263,8 +263,10 @@ final class Builder extends EloquentBuilder
      * Get the model instance being queried.
      *
      * @return Model
+     *
+     * TODO: Strongly typed return value (non-class description) swears when used @see Mockery
      */
-    public function getModel(): Model
+    public function getModel()
     {
         return $this->model;
     }

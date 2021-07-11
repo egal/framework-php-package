@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+
+#  postgres:
+#    image: postgres
+
+#  rabbitmq:
+#    image: rabbitmq
+
+  phpunit:
+    image: php:7.4.16-cli-buster
+    volumes:
+    - ./:/data:delegated
+    working_dir: /data
+    entrypoint: vendor/bin/phpunit
+#    depends_on:
+#      - postgres
+#      - rabbitmq
