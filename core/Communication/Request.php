@@ -13,7 +13,7 @@ use Egal\Core\Messages\StartProcessingMessage;
 use Exception;
 use Illuminate\Support\Carbon;
 use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Exception\AMQPProtocolChannelException as AMQPProtocolChannelExceptionAlias;
+use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 
 /**
  * Class Request
@@ -203,7 +203,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelExceptionAlias
+     * @throws AMQPProtocolChannelException
      * @throws Exception
      */
     public function call(): Response
@@ -221,7 +221,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelExceptionAlias
+     * @throws AMQPProtocolChannelException
      * @throws Exception
      */
     public function send()
