@@ -44,14 +44,14 @@ use ReflectionException;
 abstract class Model extends EloquentModel
 {
 
-    use HasDefaultLimits,
-        Pagination,
-        HasEvents,
-        UsesEgalBuilder,
-        UsesValidator,
-        XssGuardable,
-        HashGuardable,
-        UsesModelMetadata;
+    use HasDefaultLimits;
+    use HasEvents;
+    use HashGuardable;
+    use Pagination;
+    use UsesEgalBuilder;
+    use UsesModelMetadata;
+    use UsesValidator;
+    use XssGuardable;
 
     /**
      * Стандартное значение количества элементов на странице при пагинации.
