@@ -167,12 +167,6 @@ trait AwsFileStoring
         return config('filesystems.disks.' . $this->getDiskName() . '.visibility');
     }
 
-    public function __call($name, $arguments)
-    {
-
-        parent::__call($name, $arguments);
-    }
-
     protected function mutateAttribute($key, $value)
     {
         if (
