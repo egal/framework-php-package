@@ -21,7 +21,7 @@ trait HasDefaultLimits
      * Предназначено для защиты от высоких нагрузок на систему.
      * При изменении данного параметра, вся ответственность по производительности лежи на разработчике.
      */
-    protected int $maxCountEntitiesCanToManipulateWithAction = 10;
+    protected int $maxCountEntitiesToProcess = 10;
 
     /**
      * @return int
@@ -34,14 +34,14 @@ trait HasDefaultLimits
     /**
      * @return int
      */
-    public function getMaxCountEntitiesCanToManipulateWithAction(): int
+    public function getMaxCountEntitiesToProcess(): int
     {
-        return $this->maxCountEntitiesCanToManipulateWithAction;
+        return $this->maxCountEntitiesToProcess;
     }
 
     public function isLessThanMaxCountEntitiesCanToManipulateWithAction(int $count): bool
     {
-        return $count < $this->getMaxCountEntitiesCanToManipulateWithAction();
+        return $count < $this->getMaxCountEntitiesToProcess();
     }
 
     public function isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(int $count): bool
