@@ -1,0 +1,63 @@
+name: Tests
+
+on:
+  pull_request: { }
+
+jobs:
+  PHPUnit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Composer
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --workdir "/app" \
+            --volume "${PWD}:/app" \
+            composer install \
+              --dev \
+              --ignore-platform-reqs \
+              --no-interaction
+      - name: Run a PHPUnit
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --workdir "/data" \
+            --volume "${PWD}:/data:delegated" \
+            --entrypoint "vendor/bin/phpunit" \
+            "php:7.4.16-cli-buster"
+  PHPCS:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Diff files Metadata
+        id: diff-files-metadata
+        run: |
+          WORKDIR='/data'
+          GIT_DIFF="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '(.php)$')"
+          for i in $(echo "${GIT_DIFF[@]}" | tr " " "\n"); do
+              FILES="${FILE} ${WORKDIR}/${i}"
+          done
+          echo "::set-output name=files::$FILES"
+          echo "::set-output name=workdir::$WORKDIR"
+      - name: Install Composer
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --workdir "/app" \
+            --volume "${PWD}:/app" \
+            composer install \
+              --dev \
+              --ignore-platform-reqs \
+              --no-interaction
+      - name: Run a PHPCS
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --workdir "${{ steps.diff-files-metadata.outputs.workdir }}" \
+            --volume "${PWD}:/data:delegated" \
+            --entrypoint "vendor/bin/phpcs" \
+            "php:7.4.16-cli-buster" \
+            ${{ steps.diff-files-metadata.outputs.files }}
