@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\ActionCaller;
 
 use Egal\Auth\Accesses\StatusAccess;
@@ -12,21 +14,33 @@ use Egal\Model\ModelManager;
 use Illuminate\Support\Str;
 
 /**
- * Class ActionCaller
- * @package Egal\Core\ActionCaller
+ * Class ActionCaller.
+ *
+ * Designed to call Actions on Models.
  */
 class ActionCaller
 {
 
+    /**
+     * Parameters of the called action.
+     *
+     * @var mixed
+     */
     protected array $actionParameters = [];
+
+    /**
+     * Model Metadata for which Action is called.
+     */
     private ModelMetadata $modelMetadata;
+
+    /**
+     * Model Action Metadata for which Action is called.
+     */
     private ModelActionMetadata $modelActionMetadata;
 
     /**
      * ActionCaller constructor.
-     * @param string $modelName
-     * @param string $actionName
-     * @param array $actionParameters
+     *
      * @throws \Exception
      */
     public function __construct(string $modelName, string $actionName, array $actionParameters = [])
@@ -37,10 +51,12 @@ class ActionCaller
     }
 
     /**
-     * @return mixed
-     * @throws \ReflectionException
-     * @throws \Exception
-     * @throws \Egal\Core\Exceptions\ActionCallException
+     * Calling action.
+     *
+     * If not available to call, an {@see \Egal\Core\Exceptions\NoAccessActionCallException} is thrown.
+     *
+     * @return mixed Result of action execution.
+     * @throws \Exception|\ReflectionException|\Egal\Core\Exceptions\ActionCallException|\Egal\Core\Exceptions\NoAccessActionCallException
      */
     public function call()
     {
@@ -51,20 +67,22 @@ class ActionCaller
         return call_user_func_array(
             [
                 $this->modelMetadata->getModelClass(),
-                $this->modelActionMetadata->getActionMethodName()
+                $this->modelActionMetadata->getActionMethodName(),
             ],
             $this->getValidActionParameters()
         );
     }
 
     /**
-     * @return bool
+     * Checks if the action call is available for current session.
+     *
      * @throws \Exception
      */
     private function isAccessedForCall(): bool
     {
         $authStatus = Session::getAuthStatus();
-        // For user and service we check if it guest
+
+        // For user and service we check if it guest.
         if ($authStatus === StatusAccess::GUEST) {
             return in_array($authStatus, $this->modelActionMetadata->getStatusesAccess());
         }
@@ -73,7 +91,8 @@ class ActionCaller
     }
 
     /**
-     * @return bool
+     * Checks if the action call is available for calling service.
+     *
      * @throws \Egal\Core\Exceptions\CurrentSessionException
      */
     private function isServiceAccess(): bool
@@ -81,12 +100,15 @@ class ActionCaller
         if (!Session::isServiceServiceTokenExists()) {
             return false;
         }
+
         $serviceName = Session::getServiceServiceToken()->getServiceName();
+
         return in_array($serviceName, $this->modelActionMetadata->getServicesAccess());
     }
 
     /**
-     * @return bool
+     * Checks if the action call is available for calling user.
+     *
      * @throws \Exception
      */
     private function isUserAccess(): bool
@@ -101,55 +123,63 @@ class ActionCaller
     }
 
     /**
-     * @return bool
+     * Checks if the action call is available for calling user with current roles.
+     *
      * @throws \Exception
-     * TODO: Переименовать
+     * TODO: Переименовать!
      */
     private function userHasAccessWithCurrentRoles(): bool
     {
         if (count($this->modelActionMetadata->getRolesAccess()) === 0) {
             return true;
         }
+
         foreach ($this->modelActionMetadata->getRolesAccess() as $rolesAccess) {
-            if (
-                count(array_intersect(Session::getUserServiceToken()->getRoles(), $rolesAccess))
-                === count($rolesAccess)
-            ) {
+            $userRoles = Session::getUserServiceToken()->getRoles();
+
+            if (count(array_intersect($userRoles, $rolesAccess)) === count($rolesAccess)) {
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * @return bool
+     * Checks if the action call is available for calling user with current permissions.
+     *
      * @throws \Exception
-     * TODO: Переименовать
+     * TODO: Переименовать!
      */
     private function userHasAccessWithCurrentPermissions(): bool
     {
         if (count($this->modelActionMetadata->getPermissionsAccess()) === 0) {
             return true;
         }
+
         foreach ($this->modelActionMetadata->getPermissionsAccess() as $permissionsAccess) {
-            if (
-                count(array_intersect(Session::getUserServiceToken()->getPermissions(), $permissionsAccess))
-                === count($permissionsAccess)
-            ) {
+            $userPermissions = Session::getUserServiceToken()->getPermissions();
+
+            if (count(array_intersect($userPermissions, $permissionsAccess)) === count($permissionsAccess)) {
                 return true;
             }
         }
+
         return false;
     }
 
     /**
+     * Формирует из {@see \Egal\Core\ActionCaller\ActionCaller::modelActionMetadata} валидные параметры.
+     *
+     * If it is impossible to generate valid parameters, an exception is thrown.
+     *
      * @return array
-     * @throws ActionCallException
-     * @throws \ReflectionException
+     * @throws \ReflectionException|\Egal\Core\Exceptions\ActionCallException
      */
     private function getValidActionParameters(): array
     {
         $newActionParameters = [];
+
         foreach ($this->modelActionMetadata->getParameters() as $reflectionParameter) {
             $actionParameterKey = Str::snake($reflectionParameter->getName());
             $newActionParameterKey = $reflectionParameter->getPosition();
@@ -160,15 +190,13 @@ class ActionCaller
                 } elseif ($reflectionParameter->allowsNull()) {
                     $newActionParameters[$newActionParameterKey] = null;
                 } else {
-                    throw new ActionCallException(
-                        "Parameter value $actionParameterKey necessarily!"
-                        . ' There is not null and no default value!'
-                    );
+                    throw new ActionCallException('Parameter value ' . $actionParameterKey . ' necessarily!');
                 }
             } else {
                 $newActionParameters[$newActionParameterKey] = $this->actionParameters[$actionParameterKey];
             }
         }
+
         return $newActionParameters;
     }
 

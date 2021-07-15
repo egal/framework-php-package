@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+
+#  postgres:
+#    image: postgres
+
+#  rabbitmq:
+#    image: rabbitmq
