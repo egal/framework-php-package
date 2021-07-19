@@ -182,7 +182,7 @@ abstract class Model extends EloquentModel
             ->setFilterFromArray($filter)
             ->setWithFromArray($withs);
 
-        if (!isset($pagination)) {
+        if (isset($pagination)) {
             $paginator = $builder->difficultPaginateFromArray($pagination);
             $result = [
                 'current_page' => $paginator->currentPage(),
@@ -376,7 +376,7 @@ abstract class Model extends EloquentModel
         $entity->needFireActionEvents();
         $entity->delete();
 
-        return ['message' => 'Сущность удалена!'];
+        return ['message' => 'Entity deleted!'];
     }
 
     /**
@@ -446,7 +446,7 @@ abstract class Model extends EloquentModel
 
         DB::commit();
 
-        return ['message' => 'Removed entities!'];
+        return ['message' => 'Entities has been removed!'];
     }
 
 }
