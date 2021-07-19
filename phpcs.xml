@@ -4,7 +4,25 @@
     <rule ref="PSR2">
         <exclude name="PSR2.Classes.ClassDeclaration.CloseBraceAfterBody"/>
     </rule>
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
+    </rule>
+
+    <rule ref="Generic.Commenting.DocComment.NonParamGroup">
+        <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
+        <properties>
+            <property name="maxLinesLength" value="30" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Files.FunctionLength">
+        <properties>
+            <property name="maxLinesLength" value="30" />
+        </properties>
+    </rule>
+
     <rule ref="Squiz">
         <exclude name="Squiz.WhiteSpace.FunctionClosingBraceSpace.SpacingBeforeClose"/>
         <exclude name="Squiz.Files.FileExtension.ClassFound"/>
@@ -25,6 +43,18 @@
         <exclude name="Squiz.ControlStructures.ElseIfDeclaration.NotAllowed"/>
         <exclude name="Squiz.Strings.ConcatenationSpacing.PaddingFound"/>
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
+        <exclude name="Squiz.Commenting.VariableComment.IncorrectVarType"/>
+        <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NoBrackets"/>
+        <exclude name="Squiz.PHP.DisallowInlineIf.Found"/>
+        <exclude name="Squiz.Commenting.BlockComment.WrongStart"/>
+        <exclude name="Squiz.Commenting.InlineComment.DocBlock"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectParamVarName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+        <exclude name="Squiz.Commenting.LongConditionClosingComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.DoubleArrowNotAligned"/>
+        <exclude name="Squiz.WhiteSpace.ObjectOperatorSpacing.Before"/>
     </rule>
     <rule ref="SlevomatCodingStandard">
         <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses.UselessParentheses"/>
@@ -37,9 +67,16 @@
         <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
         <exclude name="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall.MissingTrailingComma"/>
         <exclude name="SlevomatCodingStandard.Functions.StrictCall.StrictParameterMissing"/>
+        <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
+        <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint"/>
+        <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
     </rule>
-    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
-        <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>model/Model.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
@@ -49,6 +86,9 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>*Exception.php</exclude-pattern>
     </rule>
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
