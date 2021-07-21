@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Communication;
 
+use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
 use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Messages\ActionErrorMessage;
@@ -133,31 +134,34 @@ class Request extends ActionMessage
 
     private function setResponseStatusCode()
     {
-        if (
-            !$this->response->getStartProcessingMessage()
-            && !$this->response->getActionResultMessage()
-            && !$this->response->getActionErrorMessage()
-        ) {
-            $this->response->setStatusCode(500);
-            $this->response->setErrorMessage('Service not responding!');
-        } elseif (
-            !$this->response->getActionResultMessage()
-            && $this->response->getStartProcessingMessage()
-            && !$this->response->getActionErrorMessage()
-        ) {
-            $this->response->setStatusCode(500);
-            $this->response->setErrorMessage(
-                'The service responded, but did not process the request within the allotted time!'
-            );
-        } elseif (
-            !$this->response->getActionResultMessage()
-            && $this->response->getStartProcessingMessage()
-            && $this->response->getActionErrorMessage()
-        ) {
-            $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
-            $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
-        } else {
-            $this->response->setStatusCode(200);
+        switch ([
+            !is_null($this->response->getStartProcessingMessage()),
+            !is_null($this->response->getActionErrorMessage()),
+            !is_null($this->response->getActionResultMessage()),
+        ]) {
+            case [true, false, true]:
+                $this->response->setStatusCode(200);
+                break;
+            case [true, true, false]:
+                $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
+                $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
+                break;
+            case [true, false, false]:
+                $this->response->setStatusCode(500);
+                $this->response->setErrorMessage(
+                    'The service responded, but did not process the request within the allotted time!'
+                );
+                break;
+            case [false, false, false]:
+                $this->response->setStatusCode(500);
+                $this->response->setErrorMessage('Service not responding!');
+                break;
+            case [false, true, true]:
+            case [false, true, false]:
+            case [false, false, true]:
+            case [true, true, true]:
+            default:
+                throw new ImpossibilityDeterminingStatusOfResponseException();
         }
     }
 
