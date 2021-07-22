@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
@@ -18,24 +20,42 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 /**
  * Class Request
- * @package Egal\Core\Communication
  */
 class Request extends ActionMessage
 {
 
+    /**
+     * Response of Request.
+     *
+     * Exhibited after {@see \Egal\Core\Communication\Request::call()}
+     */
     public Response $response;
 
     /**
-     * @var RabbitMQQueue
+     * Connection to RabbitMQ queue.
      */
     public RabbitMQQueue $connection;
 
+    /**
+     * Mark connection is opened or not.
+     */
     private bool $isConnectionOpened;
 
+    /**
+     * Auth service name.
+     */
     private string $authServiceName = 'auth';
 
+    /**
+     * Mark is need service authorization or not.
+     */
     private bool $serviceAuthorization = true;
 
+    /**
+     * Request constructor.
+     *
+     * @param mixed[] $parameters
+     */
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
@@ -43,28 +63,39 @@ class Request extends ActionMessage
     }
 
     /**
-     * @return void
-     * @throws RequestException
+     * Setter for {@see Request::$authServiceName}.
      */
-    private function isConnectionNotOpenedOrFail(): void
+    public function setAuthServiceName(string $authServiceName): void
     {
-        if ($this->isConnectionOpened) {
-            throw new RequestException('The connection is already open!');
-        }
+        $this->authServiceName = $authServiceName;
     }
 
     /**
-     * @throws RequestException
+     * Disable service authorization.
      */
-    private function isConnectionOpenedOrFail(): void
+    public function disableServiceAuthorization(): void
     {
-        if (!$this->isConnectionOpened) {
-            throw new RequestException('The connection not open!');
-        }
+        $this->serviceAuthorization = false;
     }
 
     /**
-     * @throws Exception
+     * Enable service authorization.
+     */
+    public function enableServiceAuthorization(): void
+    {
+        $this->serviceAuthorization = true;
+    }
+
+    /**
+     * Is service authorization enabled.
+     */
+    public function isServiceAuthorizationEnabled(): bool
+    {
+        return $this->serviceAuthorization;
+    }
+
+    /**
+     * @throws \Egal\Core\Exceptions\RequestException|\Exception
      */
     public function openConnection()
     {
@@ -75,7 +106,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws Exception
+     * @throws \Egal\Core\Exceptions\RequestException|\Exception
      */
     public function reopenConnection(): void
     {
@@ -87,8 +118,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
-     * @throws Exception
+     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Exception
      */
     public function closeConnection()
     {
@@ -99,8 +129,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
-     * @throws Exception
+     * @throws \Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
     public function waitReplyMessages()
     {
@@ -132,69 +161,8 @@ class Request extends ActionMessage
         $this->setResponseStatusCode();
     }
 
-    private function setResponseStatusCode()
-    {
-        switch ([
-            !is_null($this->response->getStartProcessingMessage()),
-            !is_null($this->response->getActionErrorMessage()),
-            !is_null($this->response->getActionResultMessage()),
-        ]) {
-            case [true, false, true]:
-                $this->response->setStatusCode(200);
-                break;
-            case [true, true, false]:
-                $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
-                $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
-                break;
-            case [true, false, false]:
-                $this->response->setStatusCode(500);
-                $this->response->setErrorMessage(
-                    'The service responded, but did not process the request within the allotted time!'
-                );
-                break;
-            case [false, false, false]:
-                $this->response->setStatusCode(500);
-                $this->response->setErrorMessage('Service not responding!');
-                break;
-            case [false, true, true]:
-            case [false, true, false]:
-            case [false, false, true]:
-            case [true, true, true]:
-            default:
-                throw new ImpossibilityDeterminingStatusOfResponseException();
-        }
-    }
-
     /**
-     * Gets data from rabbit channel and sets it into response
-     *
-     * @throws Exception
-     */
-    private function collectRabbitMessageIntoResponse()
-    {
-        $result = $this->connection->getChannel()->basic_get($this->uuid);
-        if (is_null($result)) {
-            return;
-        }
-        $bodyArray = json_decode($result->getBody(), true);
-
-        if (array_key_exists('type', $bodyArray)) {
-            switch ($bodyArray['type']) {
-                case MessageType::START_PROCESSING:
-                    $this->response->setStartProcessingMessage(StartProcessingMessage::fromArray($bodyArray));
-                    break;
-                case MessageType::ACTION_RESULT:
-                    $this->response->setActionResultMessage(ActionResultMessage::fromArray($bodyArray));
-                    break;
-                case MessageType::ACTION_ERROR:
-                    $this->response->setActionErrorMessage(ActionErrorMessage::fromArray($bodyArray));
-                    break;
-            }
-        }
-    }
-
-    /**
-     * @return Response
+     * Getter for {@see \Egal\Core\Communication\Request::$response}
      */
     public function getResponse(): Response
     {
@@ -202,8 +170,8 @@ class Request extends ActionMessage
     }
 
     /**
-     * @param $key
-     * @return array
+     * @param mixed $key
+     * @return mixed[]
      */
     public function getParameter($key): array
     {
@@ -211,8 +179,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
-     * @throws Exception
+     * @throws \Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\PhpAmqpLib\Exception\AMQPProtocolChannelException
      */
     public function call(): Response
     {
@@ -229,8 +196,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
-     * @throws Exception
+     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
     public function send()
     {
@@ -245,9 +211,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws AMQPProtocolChannelException
-     * @throws ResponseException
-     * @throws RequestException
+     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
     private function authorizeService()
     {
@@ -291,26 +255,87 @@ class Request extends ActionMessage
     }
 
     /**
-     * @param string $authServiceName
+     * @throws \Egal\Core\Exceptions\RequestException
      */
-    public function setAuthServiceName(string $authServiceName): void
+    private function isConnectionNotOpenedOrFail(): void
     {
-        $this->authServiceName = $authServiceName;
+        if ($this->isConnectionOpened) {
+            throw new RequestException('The connection is already open!');
+        }
     }
 
-    public function disableServiceAuthorization(): void
+    /**
+     * @throws \Egal\Core\Exceptions\RequestException
+     */
+    private function isConnectionOpenedOrFail(): void
     {
-        $this->serviceAuthorization = false;
+        if (!$this->isConnectionOpened) {
+            throw new RequestException('The connection not open!');
+        }
     }
 
-    public function enableServiceAuthorization(): void
+    /**
+     * @throws \Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     */
+    private function setResponseStatusCode()
     {
-        $this->serviceAuthorization = true;
+        switch ([
+            !is_null($this->response->getStartProcessingMessage()),
+            !is_null($this->response->getActionErrorMessage()),
+            !is_null($this->response->getActionResultMessage()),
+        ]) {
+            case [true, false, true]:
+                $this->response->setStatusCode(200);
+                break;
+            case [true, true, false]:
+                $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
+                $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
+                break;
+            case [true, false, false]:
+                $this->response->setStatusCode(500);
+                $this->response->setErrorMessage(
+                    'The service responded, but did not process the request within the allotted time!'
+                );
+                break;
+            case [false, false, false]:
+                $this->response->setStatusCode(500);
+                $this->response->setErrorMessage('Service not responding!');
+                break;
+            case [false, true, true]:
+            case [false, true, false]:
+            case [false, false, true]:
+            case [true, true, true]:
+            default:
+                throw new ImpossibilityDeterminingStatusOfResponseException();
+        }
     }
 
-    public function isServiceAuthorizationEnabled(): bool
+    /**
+     * Gets data from rabbit channel and sets it into response
+     *
+     * @throws \Exception
+     */
+    private function collectRabbitMessageIntoResponse()
     {
-        return $this->serviceAuthorization;
+        $result = $this->connection->getChannel()->basic_get($this->uuid);
+        if (is_null($result)) {
+            return;
+        }
+        $bodyArray = json_decode($result->getBody(), true);
+
+        if (array_key_exists('type', $bodyArray)) {
+            switch ($bodyArray['type']) {
+                case MessageType::START_PROCESSING:
+                    $this->response->setStartProcessingMessage(StartProcessingMessage::fromArray($bodyArray));
+                    break;
+                case MessageType::ACTION_RESULT:
+                    $this->response->setActionResultMessage(ActionResultMessage::fromArray($bodyArray));
+                    break;
+                case MessageType::ACTION_ERROR:
+                    $this->response->setActionErrorMessage(ActionErrorMessage::fromArray($bodyArray));
+                    break;
+            }
+        }
     }
 
 }
