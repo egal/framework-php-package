@@ -18,11 +18,9 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         shift # past value
         ;;
-    *) # unknown option
-        echo "Unknown parameter '$1'!"
-        echo
-        help
-        exit 1
+    *)
+        COMMAND_ADDITIONAL_LINE="${COMMAND_ADDITIONAL_LINE} ${1}"
+        shift # past argument
         ;;
     esac
 done
@@ -35,4 +33,4 @@ docker run -it --rm \
     --workdir "/data" \
     --volume "${PWD}:/data:delegated" \
     "${IMAGE}" \
-    "vendor/bin/phpunit";
+    "vendor/bin/phpunit" ${COMMAND_ADDITIONAL_LINE};
