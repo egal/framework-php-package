@@ -6,7 +6,6 @@ namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
-use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -14,7 +13,6 @@ use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Exception;
 use Illuminate\Support\Carbon;
-use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
@@ -59,6 +57,7 @@ class Request extends ActionMessage
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
+
         $this->isConnectionOpened = false;
     }
 
@@ -97,7 +96,7 @@ class Request extends ActionMessage
     /**
      * @throws \Egal\Core\Exceptions\RequestException|\Exception
      */
-    public function openConnection()
+    public function openConnection(): void
     {
         $this->isConnectionNotOpenedOrFail();
         $connector = new RabbitMQConnector(app('events'));
@@ -114,13 +113,14 @@ class Request extends ActionMessage
             $this->connection->close();
             $this->isConnectionOpened = false;
         }
+
         $this->openConnection();
     }
 
     /**
      * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Exception
      */
-    public function closeConnection()
+    public function closeConnection(): void
     {
         $this->connection->deleteQueue($this->uuid);
         $this->connection->getChannel()->close();
@@ -131,7 +131,7 @@ class Request extends ActionMessage
     /**
      * @throws \Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
-    public function waitReplyMessages()
+    public function waitReplyMessages(): void
     {
         $this->isConnectionOpenedOrFail();
 
@@ -148,13 +148,16 @@ class Request extends ActionMessage
                 if ($this->response->getActionResultMessage()) {
                     break;
                 }
+
                 if ($this->response->getActionErrorMessage()) {
                     break;
                 }
+
                 usleep(100);
             }
         } catch (Exception $exception) {
             $this->closeConnection();
+
             throw $exception;
         }
 
@@ -186,26 +189,31 @@ class Request extends ActionMessage
         if ($this->isServiceAuthorizationEnabled()) {
             $this->authorizeService();
         }
+
         if (!$this->isConnectionOpened) {
             $this->openConnection();
         }
+
         $this->publish();
         $this->waitReplyMessages();
         $this->closeConnection();
+
         return $this->response;
     }
 
     /**
      * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
-    public function send()
+    public function send(): void
     {
         if ($this->isServiceAuthorizationEnabled()) {
             $this->authorizeService();
         }
+
         if (!$this->isConnectionOpened) {
             $this->openConnection();
         }
+
         $this->publish();
         $this->closeConnection();
     }
@@ -213,7 +221,7 @@ class Request extends ActionMessage
     /**
      * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
-    private function authorizeService()
+    private function authorizeService(): void
     {
         if ($this->isTokenExist()) {
             throw new RequestException('Token already exists! Service autorization is imposible!');
@@ -226,7 +234,7 @@ class Request extends ActionMessage
             'login',
             [
                 'service_name' => config('app.service_name'),
-                'key' => config('app.service_key')
+                'key' => config('app.service_key'),
             ]
         );
 
@@ -242,7 +250,7 @@ class Request extends ActionMessage
             'loginToService',
             [
                 'service_name' => $this->serviceName,
-                'token' => $serviceMasterToken
+                'token' => $serviceMasterToken,
             ]
         );
 
@@ -277,7 +285,7 @@ class Request extends ActionMessage
     /**
      * @throws \Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
-    private function setResponseStatusCode()
+    private function setResponseStatusCode(): void
     {
         switch ([
             !is_null($this->response->getStartProcessingMessage()),
@@ -315,12 +323,14 @@ class Request extends ActionMessage
      *
      * @throws \Exception
      */
-    private function collectRabbitMessageIntoResponse()
+    private function collectRabbitMessageIntoResponse(): void
     {
         $result = $this->connection->getChannel()->basic_get($this->uuid);
+
         if (is_null($result)) {
             return;
         }
+
         $bodyArray = json_decode($result->getBody(), true);
 
         if (array_key_exists('type', $bodyArray)) {
