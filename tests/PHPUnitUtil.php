@@ -31,4 +31,12 @@ class PHPUnitUtil
         return $reflection->getValue($object);
     }
 
+    public static function setProperty(object $object, string $propertyName, $propertyValue)
+    {
+        $refClass = new ReflectionClass($object);
+        $refProperty = $refClass->getProperty($propertyName);
+        $refProperty->setAccessible(true);
+        $refProperty->setValue($object, $propertyValue);
+    }
+
 }

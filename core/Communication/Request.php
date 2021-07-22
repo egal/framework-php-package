@@ -6,6 +6,8 @@ namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
+use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
+use Egal\Core\Exceptions\UnsupportedMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -27,12 +29,12 @@ class Request extends ActionMessage
      *
      * Exhibited after {@see \Egal\Core\Communication\Request::call()}
      */
-    public Response $response;
+    private Response $response;
 
     /**
      * Connection to RabbitMQ queue.
      */
-    public RabbitMQQueue $connection;
+    private RabbitMQQueue $connection;
 
     /**
      * Mark connection is opened or not.
@@ -219,7 +221,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException
      */
     private function authorizeService(): void
     {
@@ -227,7 +229,6 @@ class Request extends ActionMessage
             throw new RequestException('Token already exists! Service autorization is imposible!');
         }
 
-        // Service Master Token (SMT) getting block
         $serviceMasterTokenRequest = new Request(
             $this->authServiceName,
             'Service',
@@ -237,23 +238,17 @@ class Request extends ActionMessage
                 'key' => config('app.service_key'),
             ]
         );
-
         $serviceMasterTokenRequest->disableServiceAuthorization();
         $serviceMasterTokenResponse = $serviceMasterTokenRequest->call();
         $serviceMasterTokenResponse->throwActionErrorMessageIfExists();
         $serviceMasterToken = $serviceMasterTokenResponse->getActionResultMessage()->getData();
 
-        // Service Service Token (SST) getting block
         $serviceServiceTokenRequest = new Request(
             $this->authServiceName,
             'Service',
             'loginToService',
-            [
-                'service_name' => $this->serviceName,
-                'token' => $serviceMasterToken,
-            ]
+            ['service_name' => $this->serviceName, 'token' => $serviceMasterToken]
         );
-
         $serviceServiceTokenRequest->disableServiceAuthorization();
         $serviceServiceTokenResponse = $serviceServiceTokenRequest->call();
         $serviceServiceTokenResponse->throwActionErrorMessageIfExists();
@@ -287,11 +282,11 @@ class Request extends ActionMessage
      */
     private function setResponseStatusCode(): void
     {
-        switch ([
-            !is_null($this->response->getStartProcessingMessage()),
-            !is_null($this->response->getActionErrorMessage()),
-            !is_null($this->response->getActionResultMessage()),
-        ]) {
+        $startProcessingMessage = $this->response->getStartProcessingMessage();
+        $actionErrorMessage = $this->response->getActionErrorMessage();
+        $actionResultMessage = $this->response->getActionResultMessage();
+
+        switch ([$startProcessingMessage !== null, $actionErrorMessage !== null, $actionResultMessage !== null]) {
             case [true, false, true]:
                 $this->response->setStatusCode(200);
                 break;
@@ -321,30 +316,35 @@ class Request extends ActionMessage
     /**
      * Gets data from rabbit channel and sets it into response
      *
-     * @throws \Exception
+     * @throws \Egal\Core\Exceptions\UnableDetermineMessageTypeException
+     * @throws \Exception|\Egal\Core\Exceptions\UnsupportedMessageTypeException
      */
     private function collectRabbitMessageIntoResponse(): void
     {
         $result = $this->connection->getChannel()->basic_get($this->uuid);
 
-        if (is_null($result)) {
+        if ($result === null) {
             return;
         }
 
         $bodyArray = json_decode($result->getBody(), true);
 
-        if (array_key_exists('type', $bodyArray)) {
-            switch ($bodyArray['type']) {
-                case MessageType::START_PROCESSING:
-                    $this->response->setStartProcessingMessage(StartProcessingMessage::fromArray($bodyArray));
-                    break;
-                case MessageType::ACTION_RESULT:
-                    $this->response->setActionResultMessage(ActionResultMessage::fromArray($bodyArray));
-                    break;
-                case MessageType::ACTION_ERROR:
-                    $this->response->setActionErrorMessage(ActionErrorMessage::fromArray($bodyArray));
-                    break;
-            }
+        if (!array_key_exists('type', $bodyArray)) {
+            throw new UnableDetermineMessageTypeException();
+        }
+
+        switch ($bodyArray['type']) {
+            case MessageType::START_PROCESSING:
+                $this->response->setStartProcessingMessage(StartProcessingMessage::fromArray($bodyArray));
+                break;
+            case MessageType::ACTION_RESULT:
+                $this->response->setActionResultMessage(ActionResultMessage::fromArray($bodyArray));
+                break;
+            case MessageType::ACTION_ERROR:
+                $this->response->setActionErrorMessage(ActionErrorMessage::fromArray($bodyArray));
+                break;
+            default:
+                throw new UnsupportedMessageTypeException();
         }
     }
 

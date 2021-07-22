@@ -43,35 +43,36 @@ class CommunicationRequestTest extends TestCase
         ?int $expectedCode,
         bool $expectDefinitionOfResponseStatusException
     ) {
-        /** @var Request|\Mockery\MockInterface|\Mockery\LegacyMockInterface $request */
-        $request = m::mock(Request::class . '[*]', ['service', 'model', 'action', []]);
-        $request->response = new Response();
+        $request = new Request('service', 'model', 'action', []);
+        $response = new Response();
 
         if ($startProcessingMessageExists) {
             $startProcessingMessage = m::mock(StartProcessingMessage::class);
-            $request->response->setStartProcessingMessage($startProcessingMessage);
+            $response->setStartProcessingMessage($startProcessingMessage);
         }
 
         if ($actionErrorMessageExists) {
             $actionErrorMessage = m::mock(ActionErrorMessage::class);
             $actionErrorMessage->shouldReceive('getMessage')->andReturn('foo');
             $actionErrorMessage->shouldReceive('getCode')->andReturn($actionErrorMessageCode);
-            $request->response->setActionErrorMessage($actionErrorMessage);
+            $response->setActionErrorMessage($actionErrorMessage);
         }
 
         if ($actionResultMessageExists) {
             $actionResultMessage = m::mock(ActionResultMessage::class);
-            $request->response->setActionResultMessage($actionResultMessage);
+            $response->setActionResultMessage($actionResultMessage);
         }
 
         if ($expectDefinitionOfResponseStatusException) {
             $this->expectException(ImpossibilityDeterminingStatusOfResponseException::class);
         }
 
+        PHPUnitUtil::setProperty($request, 'response', $response);
+
         PHPUnitUtil::callMethod($request, 'setResponseStatusCode');
 
         if ($expectedCode) {
-            $this->assertEquals($expectedCode, $request->response->getStatusCode());
+            $this->assertEquals($expectedCode, $request->getResponse()->getStatusCode());
         }
     }
 
