@@ -10,8 +10,6 @@ help() {
     echo
 }
 
-COMMAND_ADDITIONAL_LINE="-p"
-
 while [[ $# -gt 0 ]]; do
     key="$1"
 
@@ -32,16 +30,14 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+COMMAND_ADDITIONAL_LINE="-p"
+
 if [ -z "${IMAGE}" ]; then
     IMAGE="php:7.4.16-cli-buster"
 fi
 
 if [ -z "${DIFFS}" ]; then
     DIFFS=FALSE
-fi
-
-if [ -n "${REPORT}" ]; then
-    COMMAND_ADDITIONAL_LINE="${COMMAND_ADDITIONAL_LINE} --report=${REPORT}"
 fi
 
 WORKDIR='/data'
@@ -58,8 +54,8 @@ fi
 docker run -it --rm \
     --user "$(id -u):$(id -g)" \
     --workdir "${WORKDIR}" \
-    --entrypoint "vendor/bin/phpcs" \
+    --entrypoint "vendor/bin/phpcbf" \
     --volume "${PWD}:${WORKDIR}" \
     "${IMAGE}" \
-    ${COMMAND_ADDITIONAL_LINE} \
+    "${COMMAND_ADDITIONAL_LINE}" \
     ${FILE}
