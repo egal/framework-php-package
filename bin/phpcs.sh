@@ -47,7 +47,7 @@ fi
 WORKDIR='/data'
 
 if [ $DIFFS == TRUE ]; then
-    TEMP="$(git diff --name-only main | grep -E '(.php)$')"
+    TEMP="$(git diff --name-only --diff-filter=dr main | grep -E '(.php)$')"
     for i in $(echo "${TEMP[@]}" | tr " " "\n"); do
         FILE="${FILE} ${WORKDIR}/${i}"
     done

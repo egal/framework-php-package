@@ -1,26 +1,17 @@
 <?xml version="1.0"?>
 <ruleset name="egal/framework">
     <rule ref="PSR1"/>
+
     <rule ref="PSR2">
         <exclude name="PSR2.Classes.ClassDeclaration.CloseBraceAfterBody"/>
     </rule>
+
     <rule ref="PSR12">
         <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
     </rule>
 
     <rule ref="Generic.Commenting.DocComment.NonParamGroup">
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
-        <properties>
-            <property name="maxLinesLength" value="30" />
-        </properties>
-    </rule>
-    <rule ref="SlevomatCodingStandard.Files.FunctionLength">
-        <properties>
-            <property name="maxLinesLength" value="30" />
-        </properties>
     </rule>
 
     <rule ref="Squiz">
@@ -58,11 +49,17 @@
         <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
         <exclude name="Squiz.Arrays.ArrayDeclaration.DoubleArrowNotAligned"/>
         <exclude name="Squiz.WhiteSpace.ObjectOperatorSpacing.Before"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.WhiteSpace.FunctionSpacing.BeforeFirst"/>
         <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.BreakIndent"/>
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingAfterBreak"/>
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingBeforeBreak"/>
     </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
+        <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+    </rule>
+
     <rule ref="SlevomatCodingStandard">
         <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses.UselessParentheses"/>
         <exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName.NoMatchBetweenTypeNameAndFileName"/>
@@ -110,6 +107,16 @@
             </property>
         </properties>
     </rule>
+    <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
+        <properties>
+            <property name="maxLinesLength" value="30" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Files.FunctionLength">
+        <properties>
+            <property name="maxLinesLength" value="30" />
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Model.php</exclude-pattern>
     </rule>
@@ -122,12 +129,17 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
     </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
         <exclude-pattern>*Exception.php</exclude-pattern>
     </rule>
+
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/stubs/*</exclude-pattern>
+
     <arg name="report" value="summary"/>
     <arg name="report-xml" value=".phpcs.results.xml"/>
 </ruleset>

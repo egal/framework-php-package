@@ -12,8 +12,9 @@ use Egal\Model\Filter\FilterPart;
 use Egal\Model\Traits\HasDefaultLimits;
 use Egal\Model\Traits\HasEvents;
 use Egal\Model\Traits\HashGuardable;
+use Egal\Model\Traits\InstanceForAction;
 use Egal\Model\Traits\Pagination;
-use Egal\Model\Traits\UsesEgalBuilder;
+use Egal\Model\Traits\UsesBuilder;
 use Egal\Model\Traits\UsesModelMetadata;
 use Egal\Model\Traits\UsesValidator;
 use Egal\Model\Traits\XssGuardable;
@@ -47,10 +48,11 @@ abstract class Model extends EloquentModel
     use HasEvents;
     use HashGuardable;
     use Pagination;
-    use UsesEgalBuilder;
+    use UsesBuilder;
     use UsesModelMetadata;
     use UsesValidator;
     use XssGuardable;
+    use InstanceForAction;
 
     /**
      * The default number of models to return for pagination.
@@ -107,7 +109,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionGetItem($id, array $withs = []): array
     {
-        $item = static::query()
+        $item = static::newInstanceForAction()
+            ->newQuery()
             ->needFireModelActionEvents()
             ->where('id', '=', $id)
             ->with($withs)
@@ -176,7 +179,8 @@ abstract class Model extends EloquentModel
         array $filter = [],
         array $order = []
     ): array {
-        $builder = self::query()
+        $builder = static::newInstanceForAction()
+            ->newQuery()
             ->needFireModelActionEvents()
             ->setOrderFromArray($order)
             ->setFilterFromArray($filter)
@@ -207,7 +211,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreate(array $attributes = []): array
     {
-        $entity = new static($attributes);
+        $entity = static::newInstanceForAction();
+        $entity->fill($attributes);
         $entity->needFireActionEvents();
         $entity->save();
 
@@ -223,7 +228,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreateMany(array $objects = []): array
     {
-        $instance = new static();
+        $instance = static::newInstanceForAction();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
         DB::beginTransaction();
@@ -271,7 +276,7 @@ abstract class Model extends EloquentModel
         }
 
         /** @var \Egal\Model\Model $entity */
-        $entity = static::query()->findOrFail($id);
+        $entity = static::newInstanceForAction()->newQuery()->findOrFail($id);
         $entity->needFireActionEvents();
         $entity->update($attributes);
 
@@ -288,7 +293,7 @@ abstract class Model extends EloquentModel
     public static function actionUpdateMany(array $objects = []): array
     {
         $collection = new Collection();
-        $instance = new static();
+        $instance = static::newInstanceForAction();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
@@ -329,7 +334,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        $builder = static::query();
+        $builder = static::newInstanceForAction()->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
         $entities = $builder->get();
@@ -367,7 +372,7 @@ abstract class Model extends EloquentModel
     public static function actionDelete($id): array
     {
         /** @var \Egal\Model\Model $entity */
-        $entity = static::query()->find($id);
+        $entity = static::newInstanceForAction()->newQuery()->find($id);
 
         if (!$entity) {
             throw new NotFoundException();
@@ -388,7 +393,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
-        $instance = new static();
+        $instance = static::newInstanceForAction();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
         DB::beginTransaction();
 
@@ -426,7 +431,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
-        $builder = self::query();
+        $builder = static::newInstanceForAction()->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
         $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
