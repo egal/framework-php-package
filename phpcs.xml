@@ -37,6 +37,9 @@
         <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
         <exclude name="Squiz.Commenting.VariableComment.IncorrectVarType"/>
         <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NoBrackets"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamNameNoMatch"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
         <exclude name="Squiz.PHP.DisallowInlineIf.Found"/>
         <exclude name="Squiz.Commenting.BlockComment.WrongStart"/>
         <exclude name="Squiz.Commenting.InlineComment.DocBlock"/>
@@ -48,6 +51,10 @@
         <exclude name="Squiz.WhiteSpace.ObjectOperatorSpacing.Before"/>
         <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
         <exclude name="Squiz.WhiteSpace.FunctionSpacing.BeforeFirst"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.BreakIndent"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingAfterBreak"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingBeforeBreak"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
@@ -71,6 +78,34 @@
         <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint"/>
         <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
+
+        <!-- Expected 1 line after &quot;case&quot;, found 0. -->
+<!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountAfterControlStructure"/>-->
+
+        <!-- Expected 1 line before &quot;default&quot;, found 0.-->
+<!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
+
+        <!-- Expected 1 line before &quot;break&quot;, found 0. -->
+<!--        <exclude name="SlevomatCodingStandard.ControlStructures.JumpStatementsSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
+    </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
+        <properties>
+            <property name="controlStructures" type="array">
+                <element value="if"/>
+                <element value="switch"/>
+                <element value="try"/>
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.JumpStatementsSpacing">
+        <properties>
+            <property name="linesCountAfterWhenLastInCaseOrDefault" value="0"/>
+            <property name="linesCountAfterWhenLastInLastCaseOrDefault" value="0"/>
+            <property name="jumpStatements" type="array">
+                <element value="throw"/>
+                <element value="return"/>
+            </property>
+        </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
         <properties>
@@ -106,6 +141,5 @@
     <exclude-pattern type="relative-root">*/stubs/*</exclude-pattern>
 
     <arg name="report" value="summary"/>
-    <arg name="report-full" value=".phpcs.results.full"/>
     <arg name="report-xml" value=".phpcs.results.xml"/>
 </ruleset>
