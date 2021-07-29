@@ -7,7 +7,7 @@ namespace Egal\Model\Traits;
 use Egal\Model\Builder;
 
 /**
- * Trait UsesEgalBuilder
+ * Trait UsesBuilder
  *
  * @package Egal\Model\Traits
  * @mixin \Egal\Model\Model
