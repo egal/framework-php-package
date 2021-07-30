@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Order;
 
 use Egal\Model\Exceptions\OrderException;
@@ -17,7 +19,7 @@ final class Order
     /**
      * Order constructor.
      *
-     * @throws OrderException
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public function __construct(string $column, string $direction = OrderDirectionType::ASC)
     {
@@ -41,7 +43,7 @@ final class Order
     }
 
     /**
-     * @throws OrderException
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public function setDirection(string $direction): void
     {
@@ -54,8 +56,8 @@ final class Order
 
     /**
      * @param array $array
-     * @return Order|Order[]
-     * @throws OrderException
+     * @return \Egal\Model\Order\Order|\Egal\Model\Order\Order[]
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public static function fromArray(array $array)
     {
@@ -74,8 +76,7 @@ final class Order
 
     /**
      * @param array $orderArray
-     * @return Order
-     * @throws OrderException
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     private static function fromOrderArray(array $orderArray): Order
     {

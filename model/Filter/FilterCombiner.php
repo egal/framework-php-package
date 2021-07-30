@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Filter;
 
 use Egal\Model\Exceptions\FilterException;
@@ -21,7 +23,7 @@ class FilterCombiner
     }
 
     /**
-     * @throws FilterException
+     * @throws \Egal\Model\Exceptions\FilterException
      */
     public static function fromString(string $string): FilterCombiner
     {

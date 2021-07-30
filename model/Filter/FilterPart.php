@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Filter;
 
 use Egal\Model\Exceptions\FilterException;
@@ -14,8 +16,7 @@ final class FilterPart
 
     /**
      * @param array $array
-     * @return FilterPart
-     * @throws FilterException
+     * @throws \Egal\Model\Exceptions\FilterException
      */
     public static function fromArray(array $array): FilterPart
     {
@@ -43,8 +44,8 @@ final class FilterPart
     }
 
     /**
-     * @param FilterPart|FilterCondition|FilterCombiner $item
-     * @throws FilterException
+     * @param \Egal\Model\Filter\FilterPart|\Egal\Model\Filter\FilterCondition|\Egal\Model\Filter\FilterCombiner $item
+     * @throws \Egal\Model\Exceptions\FilterException
      */
     public function addContentItem($item): void
     {
