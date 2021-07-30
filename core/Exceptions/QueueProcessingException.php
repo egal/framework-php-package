@@ -9,7 +9,7 @@ use Exception;
 class QueueProcessingException extends Exception
 {
 
-    protected $message = 'Queue processing Exception';
+    protected $message = 'Queue processing exception!';
 
     protected $code = 500;
 

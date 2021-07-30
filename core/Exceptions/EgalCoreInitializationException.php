@@ -15,7 +15,7 @@ class EgalCoreInitializationException extends Exception
     /**
      * The error message
      */
-    protected $message = 'Egal Core initialization Exception';
+    protected $message = 'Egal Core initialization exception!';
 
     /**
      * The error code

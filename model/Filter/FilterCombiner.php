@@ -24,7 +24,7 @@ class FilterCombiner
      */
     public static function fromString(string $string): FilterCombiner
     {
-        if (!self::mayMakeFromString($string)) {
+        if (!static::mayMakeFromString($string)) {
             throw new FilterException('Invalid condition combiner format!');
         }
 

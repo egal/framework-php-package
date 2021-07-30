@@ -9,7 +9,7 @@ use Exception;
 class FilterException extends Exception
 {
 
-    protected $message = 'Filter Exception!';
+    protected $message = 'Filter exception!';
 
     protected $code = 400;
 

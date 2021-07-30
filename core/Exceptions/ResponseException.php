@@ -9,7 +9,7 @@ use Exception;
 class ResponseException extends Exception
 {
 
-    protected $message = 'Response Exception!';
+    protected $message = 'Response exception!';
 
     protected $code = 500;
 

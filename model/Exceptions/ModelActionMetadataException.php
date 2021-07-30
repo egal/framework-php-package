@@ -9,7 +9,7 @@ use Exception;
 class ModelActionMetadataException extends Exception
 {
 
-    protected $message = 'Model action metadata Exception!';
+    protected $message = 'Model action metadata exception!';
 
     protected $code = 500;
 

@@ -9,7 +9,7 @@ use Exception;
 class HashGuardException extends Exception
 {
 
-    protected $message = 'Hash guard Exception!';
+    protected $message = 'Hash guard exception!';
 
     protected $code = 500;
 

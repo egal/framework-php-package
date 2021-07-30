@@ -9,6 +9,6 @@ use Exception;
 class EventProcessingException extends Exception
 {
 
-    protected $message = 'Event processing Exception!';
+    protected $message = 'Event processing exception!';
 
 }
