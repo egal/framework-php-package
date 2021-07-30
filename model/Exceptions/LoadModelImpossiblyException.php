@@ -8,8 +8,6 @@ use Exception;
 
 /**
  * Class LoadModelImpossiblyException
- *
- * @package Egal\Model\Exceptions
  */
 class LoadModelImpossiblyException extends Exception
 {

@@ -6,9 +6,6 @@ namespace Egal\Model\Order;
 
 use Egal\Model\Exceptions\OrderException;
 
-/**
- * @package Egal\Model
- */
 final class Order
 {
 
@@ -55,7 +52,7 @@ final class Order
     }
 
     /**
-     * @param array $array
+     * @param mixed[] $array
      * @return \Egal\Model\Order\Order|\Egal\Model\Order\Order[]
      * @throws \Egal\Model\Exceptions\OrderException
      */
@@ -75,7 +72,7 @@ final class Order
     }
 
     /**
-     * @param array $orderArray
+     * @param string[] $orderArray
      * @throws \Egal\Model\Exceptions\OrderException
      */
     private static function fromOrderArray(array $orderArray): Order

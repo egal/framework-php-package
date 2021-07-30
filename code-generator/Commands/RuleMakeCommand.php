@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-/** @noinspection ALL */
-
 namespace Egal\CodeGenerator\Commands;
 
 /**
  * Класс консольной комманды генерации события.
- *
- * @package Egal\Model
  */
 class RuleMakeCommand extends MakeCommand
 {
 
     /**
      * Сигнатура конгсольной команды.
+     *
+     * @var string
      */
     protected $signature = 'egal:make:rule
                             {name : Название класса}
@@ -23,6 +21,8 @@ class RuleMakeCommand extends MakeCommand
 
     /**
      * Описание консольной окманды.
+     *
+     * @var string
      */
     protected $description = 'Генерация класса правила валидации';
 
@@ -40,7 +40,9 @@ class RuleMakeCommand extends MakeCommand
     {
         $fileBaseName = (string) $this->argument('name');
         $extends = 'Rule';
-        $this->fileBaseName = str_ends_with($fileBaseName, $extends) ? $fileBaseName : $fileBaseName . $extends;
+        $this->fileBaseName = str_ends_with($fileBaseName, $extends)
+            ? $fileBaseName
+            : $fileBaseName . $extends;
         $this->filePath = base_path('app/Rules') . '/' . $this->fileBaseName . '.php';
         $this->setFileContents('{{ class }}', $this->fileBaseName);
         $this->writeFile();

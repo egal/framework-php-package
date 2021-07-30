@@ -6,9 +6,6 @@ namespace Egal\Model\Filter;
 
 use Egal\Model\Exceptions\FilterException;
 
-/**
- * @package Egal\Model
- */
 class FilterCombiner
 {
 

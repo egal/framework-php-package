@@ -6,16 +6,16 @@ namespace Egal\Model\Filter;
 
 use Egal\Model\Exceptions\FilterException;
 
-/**
- * @package Egal\Model
- */
 final class FilterPart
 {
 
+    /**
+     * @var mixed[]
+     */
     private array $content = [];
 
     /**
-     * @param array $array
+     * @param mixed[] $array
      * @throws \Egal\Model\Exceptions\FilterException
      */
     public static function fromArray(array $array): FilterPart
