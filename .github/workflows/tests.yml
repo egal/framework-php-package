@@ -36,7 +36,7 @@ jobs:
         id: diff-files-metadata
         run: |
           WORKDIR='/data'
-          GIT_DIFF="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '(.php)$')"
+          GIT_DIFF="$(git diff --name-only --diff-filter=dr ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '(.php)$')"
           for i in $(echo "${GIT_DIFF[@]}" | tr " " "\n"); do
               FILES="${FILE} ${WORKDIR}/${i}"
           done
