@@ -2,6 +2,7 @@
 
 namespace Egal\Model\Metadata;
 
+use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Exception;
@@ -285,9 +286,7 @@ class ModelMetadata
             return $this->actionsMetadata[$actionName];
         }
 
-        throw new ModelMetadataException(
-            $actionName . ' does not exist in the model ' . $this->modelClass . '!'
-        );
+        throw ActionNotFoundException::make($this->modelClass, $actionName);
     }
 
     /**

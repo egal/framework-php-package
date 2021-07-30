@@ -29,9 +29,7 @@ class ModelUsesValidatorTest extends TestCase
      */
     public function testValidateKey(array $validationRules, $keyValue, bool $expectValidateException)
     {
-        $app = new Application(
-            dirname(__DIR__)
-        );
+        $app = new Application(dirname(__DIR__));
         $app->withFacades();
 
         $keyName = 'foo';

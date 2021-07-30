@@ -18,20 +18,17 @@ trait UsesValidator
     protected static function bootUsesValidator(): void
     {
         static::saving(static function (Model $entity): void {
-            // Получаем все измененные атрибуты
-            $attributes = $entity->getDirty();
-
             // Получаем validation rules
             // всех атрибутов если объект новый,
             // только измененных атрибутов если объект обновляется.
             //
             // Получение validation rules только измененных атрибутов происходит
-            // путем получения пересечения всех validation rules и измененный атрибутов по ключам
+            // путем получения пересечения всех validation rules и измененный атрибутов по ключам.
             $validationRules = $entity->exists
-                ? array_intersect_key($entity->getValidationRules(), $attributes)
+                ? array_intersect_key($entity->getValidationRules(), $entity->getDirty())
                 : $entity->getValidationRules();
 
-            // Применяем полученные validation rules на все атрибуты модели
+            // Применяем полученные validation rules на все атрибуты модели.
             $validator = Validator::make($entity->getAttributes(), $validationRules);
 
             if ($validator->fails()) {
@@ -43,6 +40,10 @@ trait UsesValidator
         });
     }
 
+    /**
+     * @param mixed $keyValue
+     * @throws \Egal\Model\Exceptions\ValidateException
+     */
     private function validateKey($keyValue): void
     {
         $validator = Validator::make(

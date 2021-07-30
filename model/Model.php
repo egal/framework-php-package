@@ -263,7 +263,7 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
-     * @throws \Egal\Model\Exceptions\UpdateException|\Egal\Model\Exceptions\ValidateException
+     * @throws \Egal\Model\Exceptions\ValidateException|\Egal\Model\Exceptions\UpdateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
