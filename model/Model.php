@@ -106,17 +106,19 @@ abstract class Model extends EloquentModel
      * @param int|string $id Entity identification.
      * @param string[] $withs Array of relations displayed for an entity.
      * @return mixed[] Entity as an associative array.
+     * @throws \Egal\Model\Exceptions\ValidateException
      */
     public static function actionGetItem($id, array $withs = []): array
     {
-        $item = static::newInstanceForAction()
-            ->newQuery()
+        $instance = static::newInstanceForAction();
+        $instance->validateKey($id);
+
+        return $instance->newQuery()
             ->needFireModelActionEvents()
             ->where('id', '=', $id)
             ->with($withs)
-            ->firstOrFail();
-
-        return $item->toArray();
+            ->firstOrFail()
+            ->toArray();
     }
 
     /**
@@ -261,7 +263,7 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
-     * @throws \Egal\Model\Exceptions\UpdateException
+     * @throws \Egal\Model\Exceptions\UpdateException|\Egal\Model\Exceptions\ValidateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
@@ -275,8 +277,11 @@ abstract class Model extends EloquentModel
             $id = $attributes[$modelInstance->getKeyName()];
         }
 
+        $instance = static::newInstanceForAction();
+        $instance->validateKey($id);
+
         /** @var \Egal\Model\Model $entity */
-        $entity = static::newInstanceForAction()->newQuery()->findOrFail($id);
+        $entity = $instance->newQuery()->findOrFail($id);
         $entity->needFireActionEvents();
         $entity->update($attributes);
 
@@ -297,20 +302,24 @@ abstract class Model extends EloquentModel
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
-        foreach ($objects as $key => $attributes) {
+        foreach ($objects as $objectIndex => $attributes) {
             if (!isset($attributes[$instance->getKeyName()])) {
                 DB::rollBack();
 
-                throw new UpdateManyException('Object not specified index ' . $key . '!');
+                throw new UpdateManyException('Object not specified index ' . $objectIndex . '!');
             }
 
+            $key = $attributes[$instance->getKeyName()];
+            $instance = static::newInstanceForAction();
+            $instance->validateKey($key);
+
             /** @var \Egal\Model\Model $entity */
-            $entity = static::query()->find($attributes[$instance->getKeyName()]);
+            $entity = $instance->newQuery()->find($key);
 
             if (!$entity) {
                 DB::rollBack();
 
-                throw new UpdateManyException('Object not found with ' . $key . ' index!');
+                throw new UpdateManyException('Object not found with ' . $objectIndex . ' index!');
             }
 
             $entity->needFireActionEvents();
@@ -371,8 +380,11 @@ abstract class Model extends EloquentModel
      */
     public static function actionDelete($id): array
     {
+        $instance = static::newInstanceForAction();
+        $instance->validateKey($id);
+
         /** @var \Egal\Model\Model $entity */
-        $entity = static::newInstanceForAction()->newQuery()->find($id);
+        $entity = $instance->newQuery()->find($id);
 
         if (!$entity) {
             throw new NotFoundException();
@@ -398,8 +410,11 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($ids as $id) {
+            $instance = static::newInstanceForAction();
+            $instance->validateKey($id);
+
             /** @var \Egal\Model\Model $entity */
-            $entity = static::query()->find($id);
+            $entity = $instance->newQuery()->find($id);
 
             if (!$entity) {
                 DB::rollBack();

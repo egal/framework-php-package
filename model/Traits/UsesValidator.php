@@ -46,4 +46,18 @@ trait UsesValidator
         });
     }
 
+    private function validateKey($keyValue)
+    {
+        $validator = Validator::make(
+            [$this->getKeyName() => $keyValue],
+            [$this->getKeyName() => $this->getModelMetadata()->getValidationRules($this->getKeyName())]
+        );
+
+        if ($validator->fails()) {
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
+            throw $exception;
+        }
+    }
+
 }

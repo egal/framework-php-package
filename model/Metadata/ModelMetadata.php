@@ -2,10 +2,7 @@
 
 namespace Egal\Model\Metadata;
 
-use Egal\Auth\Accesses\PermissionAccess;
-use Egal\Auth\Accesses\RoleAccess;
-use Egal\Auth\Accesses\ServiceAccess;
-use Egal\Auth\Accesses\StatusAccess;
+use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Exception;
 use phpDocumentor\Reflection\DocBlock;
@@ -14,17 +11,26 @@ use phpDocumentor\Reflection\DocBlock\Tags\Property;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 
 /**
- * @package Egal\Model
+ * TODO: Получать из $this->validationRules с выборкой именно fields
  */
 class ModelMetadata
 {
 
     protected string $modelClass;
     protected string $modelShortName;
-    protected array $databaseFields = []; # TODO: Получать из $this->validationRules с выборкой именно fields
+
+    /**
+     * @deprecated from v2.0.0, use {@see ModelMetadata::$fields}.
+     * @var string[]
+     */
+    protected array $databaseFields = [];
+
+    /**
+     * @var string[]
+     */
+    protected array $fields = [];
     protected array $fieldsWithTypes = [];
     protected array $fakeFields = [];
     protected array $relations = [];
@@ -42,15 +48,18 @@ class ModelMetadata
      */
     public function toArray(): array
     {
-        $result = [];
-        $result['model_class'] = $this->modelClass;
-        $result['model_short_name'] = $this->modelShortName;
-        $result['database_fields'] = $this->databaseFields;
-        $result['fields_with_types'] = $this->fieldsWithTypes;
-        $result['fake_fields'] = $this->fakeFields;
-        $result['relations'] = $this->relations;
-        $result['validation_rules'] = $this->validationRules;
-        $result['primary_keys'] = $this->primaryKeys;
+        $result = [
+            'model_class' => $this->modelClass,
+            'model_short_name' => $this->modelShortName,
+            'database_fields' => $this->fields, # TODO: Remove from v2.0.0.
+            'fields' => $this->fields,
+            'fields_with_types' => $this->fieldsWithTypes,
+            'fake_fields' => $this->fakeFields,
+            'relations' => $this->relations,
+            'validation_rules' => $this->validationRules,
+            'primary_keys' => $this->primaryKeys,
+            'actions_metadata' => [],
+        ];
         foreach ($this->actionsMetadata as $key => $actionMetadata) {
             $result['actions_metadata'][$key] = $actionMetadata->toArray();
         }
@@ -74,7 +83,7 @@ class ModelMetadata
             $this->scanProperties($docBlock);
             $this->scanActionsFromClassDocBlock($modelReflectionClass, $docBlock);
         }
-        $this->databaseFields = array_keys($this->validationRules);
+        $this->fields = array_keys($this->validationRules);
     }
 
     /**
@@ -103,10 +112,11 @@ class ModelMetadata
 
     /**
      * @return array
+     * @deprecated from v2.0.0, use {@see ModelMetadata::getFields()}
      */
     public function getDatabaseFields(): array
     {
-        return $this->databaseFields;
+        return $this->fields;
     }
 
     /**
@@ -131,6 +141,14 @@ class ModelMetadata
     public function setModelClass(string $modelClass): void
     {
         $this->modelClass = $modelClass;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
     }
 
     protected function scanActions(): void
@@ -160,7 +178,7 @@ class ModelMetadata
                 }
 
                 if ($tagName === 'property-type' && $bodyTemplate === 'field') {
-                    $this->databaseFields[] = $property->getVariableName();
+                    $this->fields[] = $property->getVariableName();
                     $this->fieldsWithTypes[$property->getVariableName()] = $property->getType();
                 }
 
@@ -215,10 +233,15 @@ class ModelMetadata
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getValidationRules(): array
+    public function getValidationRules(?string $propertyName = null): array
     {
+        if ($propertyName) {
+            $this->fieldExistOrFail($propertyName);
+            return $this->validationRules[$propertyName] ?? [];
+        }
+
         return $this->validationRules;
     }
 
@@ -267,9 +290,26 @@ class ModelMetadata
         );
     }
 
+    /**
+     * @deprecated from 2.0.0, use {@see ModelMetadata::fieldExist()}
+     */
     public function databaseFieldExists(string $string): bool
     {
-        return in_array($string, $this->databaseFields);
+        return $this->fieldExist($string);
+    }
+
+    public function fieldExist(string $fieldName): bool
+    {
+        return in_array($fieldName, $this->fields);
+    }
+
+    public function fieldExistOrFail(string $fieldName): bool
+    {
+        if (!$this->fieldExist($fieldName)) {
+            throw new FieldNotFoundException();
+        }
+
+        return true;
     }
 
 }
