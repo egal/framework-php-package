@@ -7,7 +7,8 @@ use Exception;
 class InitializeMessageFromArrayException extends Exception
 {
 
-    protected $message = 'InitializeMessageFromArrayException';
+    protected $message = 'Initialize message from array Exception';
+
     protected $code = 400;
 
 }

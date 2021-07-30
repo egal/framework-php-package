@@ -27,7 +27,7 @@ final class FilterPart
             } elseif (FilterCombiner::mayMakeFromString($item)) {
                 $filterPart->addContentItem(FilterCombiner::fromString($item));
             } elseif (is_array($item)) {
-                $filterPart->addContentItem(FilterPart::fromArray($item));
+                $filterPart->addContentItem(self::fromArray($item));
             }
         }
 
@@ -50,10 +50,12 @@ final class FilterPart
     {
         if (count($this->content) > 0) {
             $key = array_key_last($this->content);
+
             if (!($item instanceof FilterCombiner) && !($this->content[$key] instanceof FilterCombiner)) {
-                throw new FilterException('Отсутствует объединитель операций!');
+                throw new FilterException('Operations combiner is missing!');
             }
         }
+
         $this->content[] = $item;
     }
 

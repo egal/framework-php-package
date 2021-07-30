@@ -8,7 +8,8 @@ use Illuminate\Support\MessageBag;
 class ValidateException extends Exception
 {
 
-    protected $message = 'Не пройдена валидация!';
+    protected $message = 'Validation failed!';
+
     protected $code = 405;
 
     private MessageBag $messageBag;

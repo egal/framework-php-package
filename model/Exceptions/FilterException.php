@@ -7,7 +7,8 @@ use Exception;
 class FilterException extends Exception
 {
 
-    protected $message = 'Ошибка фильтрации!';
+    protected $message = 'Filter Exception!';
+
     protected $code = 400;
 
 }

@@ -7,7 +7,8 @@ use Exception;
 class ModelMetadataException extends Exception
 {
 
-    protected $message = 'ModelMetadataException';
+    protected $message = 'Model metadata Exception!';
+
     protected $code = 500;
 
 }

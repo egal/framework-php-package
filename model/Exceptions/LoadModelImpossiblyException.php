@@ -6,12 +6,14 @@ use Exception;
 
 /**
  * Class LoadModelImpossiblyException
+ *
  * @package Egal\Model\Exceptions
  */
 class LoadModelImpossiblyException extends Exception
 {
 
-    protected $message = 'LoadModelImpossiblyException';
+    protected $message = 'Unable to load model!';
+
     protected $code = 500;
 
 }

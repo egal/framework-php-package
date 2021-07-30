@@ -10,7 +10,8 @@ use Exception;
 class ModelException extends Exception
 {
 
-    protected $message = 'Ошибка модели!';
+    protected $message = 'Model Exception!';
+
     protected $code = 500;
 
 }

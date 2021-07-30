@@ -11,12 +11,12 @@ final class Order
 {
 
     private string $column;
+
     private string $direction = OrderDirectionType::ASC;
 
     /**
      * Order constructor.
-     * @param string $column
-     * @param string $direction
+     *
      * @throws OrderException
      */
     public function __construct(string $column, string $direction = OrderDirectionType::ASC)
@@ -41,14 +41,14 @@ final class Order
     }
 
     /**
-     * @param string $direction
      * @throws OrderException
      */
     public function setDirection(string $direction): void
     {
         if (!in_array($direction, [OrderDirectionType::ASC, OrderDirectionType::DESC])) {
-            throw new OrderException('Неверный формат направления!');
+            throw new OrderException('Invalid direction format!');
         }
+
         $this->direction = $direction;
     }
 
@@ -63,11 +63,13 @@ final class Order
             $result = [];
             /** @var array $orderArrayItem */
             foreach ($array as $orderArrayItem) {
-                $result[] = Order::fromOrderArray($orderArrayItem);
+                $result[] = self::fromOrderArray($orderArrayItem);
             }
+
             return $result;
         }
-        return Order::fromOrderArray($array);
+
+        return self::fromOrderArray($array);
     }
 
     /**
@@ -79,11 +81,13 @@ final class Order
     {
         if (array_key_exists('column', $orderArray) && array_key_exists('direction', $orderArray)) {
             return new Order($orderArray['column'], $orderArray['direction']);
-        } elseif (array_key_exists(0, $orderArray) && array_key_exists(1, $orderArray)) {
-            return new Order($orderArray[0], $orderArray[1]);
-        } else {
-            throw new OrderException('Неверный формат!');
         }
+
+        if (array_key_exists(0, $orderArray) && array_key_exists(1, $orderArray)) {
+            return new Order($orderArray[0], $orderArray[1]);
+        }
+
+        throw new OrderException('Invalid format!');
     }
 
 }

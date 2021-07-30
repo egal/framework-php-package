@@ -7,7 +7,8 @@ use Exception;
 class UpdateException extends Exception
 {
 
-    protected $message = 'Ошибка обновления сущности!';
+    protected $message = 'Entity update Exception!';
+
     protected $code = 500;
 
 }

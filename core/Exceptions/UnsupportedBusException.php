@@ -6,6 +6,7 @@ use Exception;
 
 class UnsupportedBusException extends Exception
 {
-    protected $message = 'UnsupportedBusException';
+    protected $message = 'Unsupported Bus Exception';
+
     protected $code = 500;
 }

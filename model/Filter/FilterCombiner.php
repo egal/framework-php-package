@@ -21,43 +21,31 @@ class FilterCombiner
     }
 
     /**
-     * @param $string
-     * @return bool
-     */
-    public static function mayMakeFromString($string): bool
-    {
-        return is_string($string)
-            && in_array(strtoupper($string), [FilterCombiner::AND, FilterCombiner::OR]);
-    }
-
-    /**
-     * @param string $string
-     * @return FilterCombiner
      * @throws FilterException
      */
     public static function fromString(string $string): FilterCombiner
     {
-        if (!FilterCombiner::mayMakeFromString($string)) {
-            throw new FilterException('Неверный формат объединителя условий!');
+        if (!self::mayMakeFromString($string)) {
+            throw new FilterException('Invalid condition combiner format!');
         }
 
         return new FilterCombiner($string);
     }
 
-    /**
-     * @return string
-     */
     public function getValue(): string
     {
         return $this->value;
     }
 
-    /**
-     * @param string $value
-     */
     public function setValue(string $value): void
     {
         $this->value = $value;
+    }
+
+    public static function mayMakeFromString(string $string): bool
+    {
+        return is_string($string)
+            && in_array(strtoupper($string), [self::AND, self::OR]);
     }
 
 }

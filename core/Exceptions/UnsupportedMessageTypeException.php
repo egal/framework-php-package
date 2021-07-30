@@ -7,7 +7,8 @@ use Exception;
 class UnsupportedMessageTypeException extends Exception
 {
 
-    protected $message = 'Неподдерживаемый тип сообщения!';
+    protected $message = 'Unsupported message type!';
+
     protected $code = 500;
 
 }

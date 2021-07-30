@@ -7,7 +7,8 @@ use Exception;
 class TokenSignatureInvalidException extends Exception
 {
 
-    protected $message = 'Token signature invalid!';
+    protected $message = 'Invalid token signature!';
+
     protected $code = 401;
 
 }

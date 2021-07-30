@@ -26,7 +26,7 @@ class RuleMakeCommand extends MakeCommand
      *
      * @var string
      */
-    protected $description = 'Генерация класса события';
+    protected $description = 'Генерация класса правила валидации';
 
     /**
      * Базовое названия файла-заглушки.

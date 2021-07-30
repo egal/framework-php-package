@@ -10,7 +10,8 @@ use Exception;
 class IrreversibleMigrationException extends Exception
 {
 
-    protected $message = 'Миграция необратима!';
+    protected $message = 'Migration is irreversible!';
+
     protected $code = 500;
 
 }

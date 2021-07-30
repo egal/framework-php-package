@@ -7,7 +7,8 @@ use Exception;
 class RequestException extends Exception
 {
 
-    protected $message = 'RequestException';
+    protected $message = 'Request Exception!';
+
     protected $code = 500;
 
 }

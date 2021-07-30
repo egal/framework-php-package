@@ -7,7 +7,8 @@ use Exception;
 class HashGuardException extends Exception
 {
 
-    protected $message = 'Ошибка защиты целостности данных!';
+    protected $message = 'Hash guard Exception!';
+
     protected $code = 500;
 
 }

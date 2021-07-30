@@ -10,7 +10,8 @@ use Exception;
 class WhereException extends Exception
 {
 
-    protected $message = 'Ошибка поиска!';
+    protected $message = 'Search Exception!';
+
     protected $code = 405;
 
 }

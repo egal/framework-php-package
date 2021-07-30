@@ -7,7 +7,8 @@ use Exception;
 class UpdateManyException extends Exception
 {
 
-    protected $message = 'Ошибка множественного обновления сущностей!';
+    protected $message = 'Multiple entity update error!';
+
     protected $code = 500;
 
 }

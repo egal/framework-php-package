@@ -8,6 +8,7 @@ class ResponseException extends Exception
 {
 
     protected $message = 'Response Exception!';
+
     protected $code = 500;
 
 }

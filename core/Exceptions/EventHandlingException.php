@@ -8,6 +8,7 @@ class EventHandlingException extends Exception
 {
 
     protected $message = 'Unable to handle Event!';
+
     protected $code = 500;
 
 }

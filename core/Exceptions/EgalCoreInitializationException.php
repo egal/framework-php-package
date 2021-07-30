@@ -4,10 +4,20 @@ namespace Egal\Core\Exceptions;
 
 use Exception;
 
+/**
+ * Class EgalCoreInitializationException
+ */
 class EgalCoreInitializationException extends Exception
 {
 
-    protected $message = 'EgalCoreInitializationException';
+    /**
+     * The error message
+     */
+    protected $message = 'Egal Core initialization Exception';
+
+    /**
+     * The error code
+     */
     protected $code = 500;
 
 }

@@ -7,7 +7,8 @@ use Exception;
 class ModelNotFoundException extends Exception
 {
 
-    protected $message = 'ModelNotFoundException';
+    protected $message = 'Model not found!';
+
     protected $code = 404;
 
 }
