@@ -51,4 +51,5 @@ jobs:
               --no-interaction
       - name: Run a PHPCS
         run: |
+          echo ${{ steps.diff-files-metadata.outputs.files }}
           bash bin/phpcs.sh ${{ steps.diff-files-metadata.outputs.files }}
