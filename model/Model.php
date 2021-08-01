@@ -267,7 +267,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
-        if (isset($id)) {
+        if (!isset($id)) {
             $modelInstance = new static();
 
             if (!isset($attributes[$modelInstance->getKeyName()])) {
