@@ -22,8 +22,8 @@ class ModelMetadata
     protected string $modelShortName;
 
     /**
-     * @deprecated from v2.0.0, use {@see ModelMetadata::$fields}.
      * @var string[]
+     * @deprecated from v2.0.0, use {@see ModelMetadata::$fields}.
      */
     protected array $databaseFields = [];
 
@@ -32,12 +32,24 @@ class ModelMetadata
      */
     protected array $fields = [];
 
+    /**
+     * @var mixed[]
+     */
     protected array $fieldsWithTypes = [];
 
+    /**
+     * @var string[]
+     */
     protected array $fakeFields = [];
 
+    /**
+     * @var string[]
+     */
     protected array $relations = [];
 
+    /**
+     * @var string[]
+     */
     protected array $validationRules = [];
 
     /**
@@ -45,6 +57,9 @@ class ModelMetadata
      */
     protected array $actionsMetadata = [];
 
+    /**
+     * @var string[]
+     */
     private array $primaryKeys = [];
 
     /**
@@ -68,12 +83,13 @@ class ModelMetadata
     }
 
     /**
+     * TODO: Remove 'database_fields' from v2.0.0.
+     *
      * @return mixed[]
      * @throws \ReflectionException
      */
     public function toArray(): array
     {
-        // TODO: Remove $result['database_fields'] from v2.0.0.
         $result = [
             'model_class' => $this->modelClass,
             'model_short_name' => $this->modelShortName,
@@ -188,7 +204,7 @@ class ModelMetadata
     }
 
     /**
-     * @throws \Exception
+     * @throws \Egal\Model\Exceptions\ActionNotFoundException
      */
     public function getAction(string $actionName): ModelActionMetadata
     {
@@ -223,7 +239,7 @@ class ModelMetadata
 
     protected function scanActions(): void
     {
-        // TODO
+        // TODO: Implement functionality!
     }
 
     /**
@@ -241,28 +257,31 @@ class ModelMetadata
                     : '';
                 $tagName = $propertyTag->getName();
 
-                if ($tagName === 'validation-rules') {
-                    $this->validationRules[$property->getVariableName()] = explode('|', $bodyTemplate);
-                }
+                switch ($tagName) {
+                    case 'validation-rules':
+                        $this->validationRules[$property->getVariableName()] = explode('|', $bodyTemplate);
+                        break;
+                    case 'primary-key':
+                        $this->primaryKeys[] = $property->getVariableName();
+                        break;
+                    case 'property-type':
+                        if ($bodyTemplate === 'field') {
+                            $this->fields[] = $property->getVariableName();
+                            $this->fieldsWithTypes[$property->getVariableName()] = $property->getType();
+                        } elseif ($bodyTemplate === 'relation') {
+                            $this->relations[] = $property->getVariableName();
+                        }
 
-                if ($tagName === 'property-type' && $bodyTemplate === 'field') {
-                    $this->fields[] = $property->getVariableName();
-                    $this->fieldsWithTypes[$property->getVariableName()] = $property->getType();
-                }
-
-                if ($tagName === 'property-type' && $bodyTemplate === 'relation') {
-                    $this->relations[] = $property->getVariableName();
-                }
-
-                if ($tagName === 'primary-key') {
-                    $this->primaryKeys[] = $property->getVariableName();
+                        break;
+                    default:
+                        break;
                 }
             }
         }
     }
 
     /**
-     * @throws \Exception
+     * @throws \Egal\Model\Exceptions\ModelActionMetadataException|\Egal\Model\Exceptions\ModelMetadataException
      */
     protected function scanActionsFromClassDocBlock(ReflectionClass $modelReflectionClass, DocBlock $docBlock): void
     {
@@ -291,7 +310,7 @@ class ModelMetadata
             $modelActionMetadata = new ModelActionMetadata();
             $modelActionMetadata->setActionName($actionName);
             $modelActionMetadata->setParameters($reflectionMethod->getParameters());
-            /** @var \Egal\Model\Metadata\Generic $actionTag */
+            /** @var \phpDocumentor\Reflection\DocBlock\Tags\Generic $actionTag */
             foreach ($tag->getDescription()->getTags() as $actionTag) {
                 $modelActionMetadata->supplementFromTag($actionTag);
             }
