@@ -13,6 +13,14 @@
     <rule ref="Generic.Commenting.DocComment.NonParamGroup">
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
     </rule>
+    <rule ref="Generic.Commenting.Todo.CommentFound">
+        <exclude name="Generic.Commenting.Todo.CommentFound"/>
+    </rule>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+    </rule>
 
     <rule ref="Squiz">
         <exclude name="Squiz.WhiteSpace.FunctionClosingBraceSpace.SpacingBeforeClose"/>
@@ -55,6 +63,16 @@
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.BreakIndent"/>
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingAfterBreak"/>
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingBeforeBreak"/>
+        <exclude name="Squiz.Commenting.VariableComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.ClassComment.Missing"/>
+        <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingBefore"/>
+        <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NotSingleLine"/>
+        <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingBefore"/>
+        <exclude name="Squiz.PHP.DisallowComparisonAssignment.AssignedComparison"/>
+        <exclude name="Squiz.Commenting.VariableComment.TagNotAllowed"/>
+        <exclude name="Squiz.Formatting.OperatorBracket.MissingBrackets"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.EmptyDefault"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
@@ -109,12 +127,12 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
         <properties>
-            <property name="maxLinesLength" value="30" />
+            <property name="maxLinesLength" value="50" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Files.FunctionLength">
         <properties>
-            <property name="maxLinesLength" value="30" />
+            <property name="maxLinesLength" value="50" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
@@ -134,6 +152,9 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
         <exclude-pattern>*Exception.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>*Command.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
