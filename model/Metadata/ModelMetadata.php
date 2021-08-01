@@ -52,7 +52,7 @@ class ModelMetadata
         $result = [
             'model_class' => $this->modelClass,
             'model_short_name' => $this->modelShortName,
-            'database_fields' => $this->fields, # TODO: Remove from v2.0.0.
+            'database_fields' => $this->fields, // TODO: Remove from v2.0.0.
             'fields' => $this->fields,
             'fields_with_types' => $this->fieldsWithTypes,
             'fake_fields' => $this->fakeFields,
@@ -154,7 +154,7 @@ class ModelMetadata
 
     protected function scanActions(): void
     {
-        # TODO
+        // TODO
     }
 
     /**
@@ -204,7 +204,11 @@ class ModelMetadata
         /** @var Generic $tag */
         foreach ($docBlock->getTagsByName('action') as $tag) {
             $actionName = $tag->getDescription()->getBodyTemplate();
-            $actionName = str_replace([' ', '%', '$', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], '#', $actionName);
+            $actionName = str_replace(
+                [' ', '%', '$', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                '#',
+                $actionName
+            );
             $actionNameExtra = stristr($actionName, '#');
             $actionName = str_replace($actionNameExtra, '', $actionName);
             $actionCurrentName = ModelActionMetadata::getCurrentActionName($actionName);
@@ -240,6 +244,7 @@ class ModelMetadata
     {
         if ($propertyName) {
             $this->fieldExistOrFail($propertyName);
+
             return $this->validationRules[$propertyName] ?? [];
         }
 
