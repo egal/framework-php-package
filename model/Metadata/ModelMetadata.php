@@ -247,7 +247,7 @@ class ModelMetadata
     }
 
     /**
-     * @param array $validationRules
+     * @param mixed[] $validationRules
      * @return $this
      */
     public function setValidationRules(array $validationRules): self
@@ -263,14 +263,9 @@ class ModelMetadata
      */
     public function addValidationRules(string $propertyName, string ...$propertyValidationRules): ModelMetadata
     {
-        if (isset($this->validationRules[$propertyName])) {
-            $this->validationRules[$propertyName] = array_merge(
-                $this->validationRules[$propertyName],
-                $propertyValidationRules
-            );
-        } else {
-            $this->validationRules[$propertyName] = $propertyValidationRules;
-        }
+        $this->validationRules[$propertyName] = isset($this->validationRules[$propertyName])
+            ? array_merge($this->validationRules[$propertyName], $propertyValidationRules)
+            : $propertyValidationRules;
 
         return $this;
     }

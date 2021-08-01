@@ -10,6 +10,8 @@ help() {
     echo
 }
 
+COMMAND_ADDITIONAL_LINE="-p"
+
 while [[ $# -gt 0 ]]; do
     key="$1"
 
@@ -29,8 +31,6 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-
-COMMAND_ADDITIONAL_LINE="-p"
 
 if [ -z "${IMAGE}" ]; then
     IMAGE="php:7.4.16-cli-buster"
