@@ -198,14 +198,11 @@ class Builder extends EloquentBuilder
     {
         $relationName = $filterItem->getRelationName();
         if ($relationName) {
-            $metadata = ModelManager::getModelMetadata(get_class($this->getModel()));
-
-            if (in_array($relationName, $metadata->getRelations())) {
-                $whereHasClause = $clause . 'Has';
-                $this->$whereHasClause($relationName, function (Builder $query) use ($filterItem) {
-                    $query->where($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
-                });
-            }
+            $metadata = $this->getModel()->getModelMetadata();
+            $metadata->relationExistOrFail($relationName);
+            $this->{$clause . 'Has'}(camel_case($relationName), function (Builder $query) use ($filterItem) {
+                $query->where($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
+            });
         } else {
             $this->$clause($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
         }

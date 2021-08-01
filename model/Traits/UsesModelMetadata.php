@@ -18,7 +18,7 @@ trait UsesModelMetadata
      */
     public function getModelMetadata(): ModelMetadata
     {
-        return ModelManager::getInstance()->getModelMetadata(static::class);
+        return ModelManager::getModelMetadata(static::class);
     }
 
     /**
