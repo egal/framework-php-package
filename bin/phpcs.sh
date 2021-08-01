@@ -54,7 +54,7 @@ if [ $DIFFS == TRUE ]; then
     COMMAND_ADDITIONAL_LINE="${COMMAND_ADDITIONAL_LINE} ${FILE}"
 fi
 
-docker run -it --rm \
+docker run --rm \
     --user "$(id -u):$(id -g)" \
     --workdir "${WORKDIR}" \
     --entrypoint "vendor/bin/phpcs" \
