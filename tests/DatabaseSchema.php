@@ -16,8 +16,16 @@ trait DatabaseSchema
         $db = new DB;
 
         $db->addConnection([
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
+            'driver'   => getenv('DB_CONNECTION'),
+            'database' => getenv('DB_NAME'),
+            'host' => getenv('DB_HOST'),
+            'port' => getenv('DB_PORT'),
+            'username' => getenv('DB_USERNAME'),
+            'password' => getenv('DB_PASSWORD'),
+            'schema' => 'public',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'sslmode' => 'prefer',
         ]);
 
         $db->bootEloquent();

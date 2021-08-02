@@ -60,44 +60,44 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
     public function productsFilterDataProvider()
     {
         return [
-//            [
-//                [['foo.bar', 'eq', 1]],
-//                RelationNotFoundException::class,
-//                null
-//            ],
-//            [
-//                [['category.id', 'eq', 2]],
-//                null,
-//                []
-//            ],
-//            [
-//                [['category.id', 'eq', 1]],
-//                null,
-//                function () {
-//                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
-//                        $query->where('id', '=', 1);
-//                    })->get()->toArray();
-//                },
-//            ],
-//            [
-//                [['category_with_word.id', 'eq', PHP_INT_MAX]],
-//                null,
-//                [],
-//            ],
-//            [
-//                [
-//                    ['category', 'eq', PHP_INT_MAX],
-//                    'AND',
-//                    ['category_with_word.id', 'eq', PHP_INT_MAX],
-//                ],
-//                null,
-//                [],
-//            ],
+            [
+                [['foo.bar', 'eq', 1]],
+                RelationNotFoundException::class,
+                null
+            ],
+            [
+                [['category.id', 'eq', 2]],
+                null,
+                []
+            ],
+            [
+                [['category.id', 'eq', 1]],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('id', '=', 1);
+                    })->get()->toArray();
+                },
+            ],
+            [
+                [['category_with_word.id', 'eq', 1000]],
+                null,
+                [],
+            ],
+            [
+                [
+                    ['category.id', 'eq', 1000],
+                    'AND',
+                    ['category_with_word.id', 'eq', 1000],
+                ],
+                null,
+                [],
+            ],
             [
                 [
                     ['category.id', 'eq', 1],
                     'OR',
-                    ['category_with_word.id', 'eq', PHP_INT_MAX],
+                    ['category_with_word.id', 'eq', 1000],
                 ],
                 null,
                 function () {
@@ -147,7 +147,6 @@ class ModelTestCategory extends Model
 
     protected $table = 'categories';
     protected $guarded = [];
-    protected int $maxDisplayedCount = PHP_INT_MAX;
 
     public function getModelMetadata(): ModelMetadata
     {
@@ -166,7 +165,6 @@ class ModelTestProduct extends Model
     protected $table = 'products';
     protected $guarded = [];
     protected $fillable = [];
-    protected int $maxDisplayedCount = PHP_INT_MAX;
 
     public function getModelMetadata(): ModelMetadata
     {
