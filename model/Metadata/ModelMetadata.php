@@ -7,6 +7,7 @@ use Egal\Auth\Accesses\RoleAccess;
 use Egal\Auth\Accesses\ServiceAccess;
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Model\Exceptions\ModelMetadataException;
+use Egal\Model\Exceptions\RelationNotFoundException;
 use Exception;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;
@@ -270,6 +271,20 @@ class ModelMetadata
     public function databaseFieldExists(string $string): bool
     {
         return in_array($string, $this->databaseFields);
+    }
+
+    public function relationExist(string $relation): bool
+    {
+        return in_array($relation, $this->relations);
+    }
+
+    public function relationExistOrFail(string $relation): bool
+    {
+        if (!$this->relationExist($relation)) {
+            throw new RelationNotFoundException();
+        }
+
+        return true;
     }
 
 }

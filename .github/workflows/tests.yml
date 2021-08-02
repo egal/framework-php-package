@@ -4,6 +4,7 @@ on:
   pull_request: { }
 
 jobs:
+
   PHPUnit:
     runs-on: ubuntu-latest
     steps:
@@ -20,12 +21,8 @@ jobs:
               --no-interaction
       - name: Run a PHPUnit
         run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --workdir "/data" \
-            --volume "${PWD}:/data:delegated" \
-            --entrypoint "vendor/bin/phpunit" \
-            "php:7.4.16-cli-buster"
+          bash bin/phpunit.sh
+
   PHPCS:
     runs-on: ubuntu-latest
     steps:
@@ -37,9 +34,11 @@ jobs:
         run: |
           WORKDIR='/data'
           GIT_DIFF="$(git diff --name-only --diff-filter=dr ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '(.php)$')"
+          echo $GIT_DIFF
           for i in $(echo "${GIT_DIFF[@]}" | tr " " "\n"); do
               FILES="${FILE} ${WORKDIR}/${i}"
           done
+          echo $FILES
           echo "::set-output name=files::$FILES"
           echo "::set-output name=workdir::$WORKDIR"
       - name: Install Composer
@@ -54,10 +53,5 @@ jobs:
               --no-interaction
       - name: Run a PHPCS
         run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --workdir "${{ steps.diff-files-metadata.outputs.workdir }}" \
-            --volume "${PWD}:/data:delegated" \
-            --entrypoint "vendor/bin/phpcs" \
-            "php:7.4.16-cli-buster" \
-            ${{ steps.diff-files-metadata.outputs.files }}
+          echo ${{ steps.diff-files-metadata.outputs.files }}
+          bash bin/phpcs.sh ${{ steps.diff-files-metadata.outputs.files }}

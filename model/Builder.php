@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model;
 
 use Egal\Model\Exceptions\FilterException;
@@ -14,24 +16,18 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
-use ReflectionException;
 use ReflectionMethod;
 
 /**
  * Класс формирования запросов к БД.
  *
- * По стандарту используется в {@see Model}
- *
- *
- * @package Egal\Model
+ * По стандарту используется в {@see Model}.
  */
 class Builder extends EloquentBuilder
 {
 
     /**
-     * The model being queried.
-     *
-     * @var Model
+     * @var \Egal\Model\Model
      */
     protected $model;
 
@@ -42,12 +38,11 @@ class Builder extends EloquentBuilder
      * Список дополнительных проверок:
      * проверка на наличие метода,
      * должно быть указано возвращаемое значение на уровне PHP,
-     * тип возвращаемого значения должен быть потомком {@see Relation}
+     * тип возвращаемого значения должен быть потомком {@see Relation}.
      *
-     * @param string $name Название отношения
-     * @return Relation
-     * @throws ReflectionException
-     * @noinspection PhpMissingReturnTypeInspection
+     * @param string $name Название отношения.
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
     public function getRelation($name)
     {
@@ -55,15 +50,19 @@ class Builder extends EloquentBuilder
 
         $model = $this->getModel();
         $modelClass = get_class($model);
+
         if (!method_exists($modelClass, $name)) {
             throw RelationNotFoundException::make($model, $name);
         }
-        $returnType = (new ReflectionMethod($modelClass, $name))->getReturnType();
-        if (is_null($returnType)) {
+
+        $refMethod = new ReflectionMethod($modelClass, $name);
+
+        if ($refMethod->getReturnType() === null) {
             throw RelationNotFoundException::make($model, $name);
         }
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $returnTypeName = $returnType->getName();
+
+        $returnTypeName = $refMethod->getReturnType()->getName();
+
         if (!class_exists($returnTypeName) || !is_a($returnTypeName, Relation::class, true)) {
             throw RelationNotFoundException::make($model, $name);
         }
@@ -74,16 +73,15 @@ class Builder extends EloquentBuilder
     /**
      * Формирование сортировки.
      *
-     * @param Order|Order[] $order
-     * @return Builder
-     * @throws OrderException
+     * @param \Egal\Model\Order\Order|\Egal\Model\Order\Order[] $order
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public function setOrder($order): Builder
     {
         if ($order instanceof Order) {
             $this->orderBy($order->getColumn(), $order->getDirection());
         } elseif (is_array_of_classes($order, Order::class)) {
-            /** @var Order $orderItem */
+            /** @var \Egal\Model\Order\Order $orderItem */
             foreach ($order as $orderItem) {
                 $this->orderBy($orderItem->getColumn(), $orderItem->getDirection());
             }
@@ -97,9 +95,9 @@ class Builder extends EloquentBuilder
     /**
      * Difficult order from array.
      *
-     * @param array $array
+     * @param mixed[] $array
      * @return $this
-     * @throws OrderException
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public function setOrderFromArray(array $array): Builder
     {
@@ -113,24 +111,34 @@ class Builder extends EloquentBuilder
     /**
      * Формирование фильтра.
      *
-     * @param FilterPart $filterPart
      * @return $this
-     * @throws FilterException
-     * @throws ReflectionException
+     * @throws \ReflectionException|\Egal\Model\Exceptions\FilterException
      */
     public function setFilter(FilterPart $filterPart): Builder
     {
         $filterPartContent = $filterPart->getContent();
         foreach ($filterPartContent as $key => $filterItem) {
-            $clause = $this->getWhereClause($filterItem, $key, $filterPartContent);
+            if ($filterItem instanceof FilterCombiner) {
+                continue;
+            }
+
+            $clause = $key === 0 || strtoupper($filterPartContent[$key - 1]->getValue()) === FilterCombiner::AND
+                ? 'where'
+                : 'orWhere';
 
             if ($filterItem instanceof FilterCondition) {
                 $this->applyFilterCondition($filterItem, $clause);
-            } elseif ($filterItem instanceof FilterPart) {
-                $this->$clause(function (Builder $query) use ($filterItem) {
+                continue;
+            }
+
+            if ($filterItem instanceof FilterPart) {
+                $this->$clause(static function (Builder $query) use ($filterItem): void {
                     $query->setFilter($filterItem);
                 });
+                continue;
             }
+
+            throw new FilterException();
         }
 
         return $this;
@@ -139,12 +147,12 @@ class Builder extends EloquentBuilder
     /**
      * Difficult filter from array.
      *
-     * @param array $array
+     * @param mixed[] $array
      * @return $this
-     * @throws FilterException
-     * @throws ReflectionException
-     * @throws Exceptions\FilterException
-     * @throws FilterException
+     * @throws \Egal\Model\Exceptions\FilterException
+     * @throws \ReflectionException
+     * @throws \Egal\Model\Exceptions\FilterException
+     * @throws \Egal\Model\Exceptions\FilterException
      */
     public function setFilterFromArray(array $array): Builder
     {
@@ -158,7 +166,7 @@ class Builder extends EloquentBuilder
     /**
      * Difficult load relations from array.
      *
-     * @param array $array
+     * @param string[] $array
      * @return $this
      */
     public function setWithFromArray(array $array): Builder
@@ -171,51 +179,7 @@ class Builder extends EloquentBuilder
     }
 
     /**
-     * Return string "where" or "orWhere"
-     *
-     * @param $filterItem
-     * @param int $key
-     * @param array $filterPartContent
-     * @return string
-     */
-    private function getWhereClause($filterItem, int $key, array $filterPartContent): string
-    {
-        return $key !== 0
-        && !($filterItem instanceof FilterCombiner)
-        && FilterCombiner::OR === strtoupper($filterPartContent[$key - 1]->getValue())
-            ? 'orWhere'
-            : 'where';
-    }
-
-    /**
-     * Apply filter condition to the builder query
-     *
-     * @param FilterCondition $filterItem
-     * @param string $clause
-     * @throws ReflectionException
-     */
-    private function applyFilterCondition(FilterCondition $filterItem, string $clause)
-    {
-        $relationName = $filterItem->getRelationName();
-        if ($relationName) {
-            $metadata = ModelManager::getModelMetadata(get_class($this->getModel()));
-
-            if (in_array($relationName, $metadata->getRelations())) {
-                $whereHasClause = $clause . 'Has';
-                $this->$whereHasClause($relationName, function (Builder $query) use ($filterItem) {
-                    $query->where($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
-                });
-            }
-        } else {
-            $this->$clause($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
-        }
-    }
-
-    /**
      * Difficult paginate from {@see Pagination}
-     *
-     * @param Pagination $pagination
-     * @return LengthAwarePaginator
      */
     public function difficultPaginate(Pagination $pagination): LengthAwarePaginator
     {
@@ -232,8 +196,7 @@ class Builder extends EloquentBuilder
     /**
      * Difficult paginate from array.
      *
-     * @param array $array
-     * @return LengthAwarePaginator
+     * @param mixed[] $array
      */
     public function difficultPaginateFromArray(array $array): LengthAwarePaginator
     {
@@ -249,22 +212,20 @@ class Builder extends EloquentBuilder
      * then limit will take {@see Model::$maxDisplayedCount} value.
      *
      * @param int|null $value
-     * @return Builder
      */
     public function limit($value = null): Builder
     {
-        if (is_null($value) || $value > $this->model->getMaxDisplayedCount()) {
+        if ($value === null || $value > $this->model->getMaxDisplayedCount()) {
             $value = $this->model->getMaxDisplayedCount();
         }
+
         return parent::limit($value);
     }
 
     /**
      * Get the model instance being queried.
      *
-     * @return Model
-     *
-     * TODO: Strongly typed return value (non-class description) swears when used @see Mockery
+     * @return \Egal\Model\Model TODO: Strongly typed return value (non-class description) swears when used @see Mockery
      */
     public function getModel()
     {
@@ -277,7 +238,31 @@ class Builder extends EloquentBuilder
     public function needFireModelActionEvents(): Builder
     {
         $this->model->needFireActionEvents();
+
         return $this;
+    }
+
+    /**
+     * Apply filter condition to the builder query
+     *
+     * @throws \ReflectionException
+     */
+    private function applyFilterCondition(FilterCondition $filterItem, string $clause): void
+    {
+        $relationName = $filterItem->getRelationName();
+
+        if ($relationName) {
+            $metadata = $this->getModel()->getModelMetadata();
+            $metadata->relationExistOrFail($relationName);
+            $this->{$clause . 'Has'}(
+                camel_case($relationName),
+                static function (Builder $query) use ($filterItem): void {
+                    $query->where($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
+                }
+            );
+        } else {
+            $this->$clause($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
+        }
     }
 
 }

@@ -13,6 +13,20 @@
     <rule ref="Generic.Commenting.DocComment.NonParamGroup">
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
     </rule>
+    <rule ref="Generic.Commenting.Todo.CommentFound">
+        <exclude name="Generic.Commenting.Todo.CommentFound"/>
+    </rule>
+    <rule ref="Generic.Commenting.Todo.TaskFound">
+        <exclude name="Generic.Commenting.Todo.TaskFound"/>
+    </rule>
+    <rule ref="Generic.Formatting.MultipleStatementAlignment.NotSame">
+        <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
+    </rule>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+    </rule>
 
     <rule ref="Squiz">
         <exclude name="Squiz.WhiteSpace.FunctionClosingBraceSpace.SpacingBeforeClose"/>
@@ -22,18 +36,15 @@
         <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
         <exclude name="Squiz.WhiteSpace.FunctionSpacing.Before"/>
         <exclude name="Squiz.Commenting.FunctionComment.EmptyThrows"/>
-        <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
         <exclude name="Squiz.WhiteSpace.FunctionSpacing.After"/>
         <exclude name="Squiz.Operators.ComparisonOperatorUsage.ImplicitTrue"/>
         <exclude name="Squiz.Operators.ComparisonOperatorUsage.NotAllowed"/>
         <exclude name="Squiz.Commenting.FunctionComment.MissingReturn"/>
         <exclude name="Squiz.Commenting.ClosingDeclarationComment.Missing"/>
         <exclude name="Squiz.PHP.DisallowBooleanStatement.Found"/>
-        <exclude name="Generic.Commenting.Todo.TaskFound"/>
         <exclude name="Squiz.WhiteSpace.FunctionSpacing.AfterLast"/>
         <exclude name="Squiz.ControlStructures.ElseIfDeclaration.NotAllowed"/>
         <exclude name="Squiz.Strings.ConcatenationSpacing.PaddingFound"/>
-        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
         <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
         <exclude name="Squiz.Commenting.VariableComment.IncorrectVarType"/>
         <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NoBrackets"/>
@@ -61,12 +72,20 @@
         <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingBefore"/>
         <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NotSingleLine"/>
         <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingBefore"/>
+        <exclude name="Squiz.PHP.DisallowComparisonAssignment.AssignedComparison"/>
+        <exclude name="Squiz.Commenting.VariableComment.TagNotAllowed"/>
+        <exclude name="Squiz.Formatting.OperatorBracket.MissingBrackets"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.EmptyDefault"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
     </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
+        <exclude-pattern>model/Builder.php</exclude-pattern>
+    </rule>
 
     <rule ref="SlevomatCodingStandard">
+        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
         <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses.UselessParentheses"/>
         <exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName.NoMatchBetweenTypeNameAndFileName"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.IncorrectStrictTypesFormat"/>
@@ -115,16 +134,20 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
         <properties>
-            <property name="maxLinesLength" value="30" />
+            <property name="maxLinesLength" value="50" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Files.FunctionLength">
         <properties>
-            <property name="maxLinesLength" value="30" />
+            <property name="maxLinesLength" value="50" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Model.php</exclude-pattern>
+        <exclude-pattern>model/Builder.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
@@ -137,6 +160,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+        <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
         <exclude-pattern>*Exception.php</exclude-pattern>
@@ -144,7 +168,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>
     </rule>
-  
+
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/stubs/*</exclude-pattern>
