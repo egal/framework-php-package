@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class UnsupportedMessageTypeException extends Exception
 {
 
-    protected $message = 'Неподдерживаемый тип сообщения!';
+    protected $message = 'Unsupported message type!';
+
     protected $code = 500;
 
 }

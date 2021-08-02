@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class ModelActionMetadataException extends Exception
 {
 
-    protected $message = 'ModelActionMetadataException';
+    protected $message = 'Model action metadata exception!';
+
     protected $code = 500;
 
 }

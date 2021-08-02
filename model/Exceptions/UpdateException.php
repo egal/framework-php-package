@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class UpdateException extends Exception
 {
 
-    protected $message = 'Ошибка обновления сущности!';
+    protected $message = 'Entity update exception!';
+
     protected $code = 500;
 
 }

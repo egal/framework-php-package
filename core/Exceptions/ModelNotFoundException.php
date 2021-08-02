@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class ModelNotFoundException extends Exception
 {
 
-    protected $message = 'ModelNotFoundException';
+    protected $message = 'Model not found!';
+
     protected $code = 404;
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class UpdateManyException extends Exception
 {
 
-    protected $message = 'Ошибка множественного обновления сущностей!';
+    protected $message = 'Multiple entity update error!';
+
     protected $code = 500;
 
 }
