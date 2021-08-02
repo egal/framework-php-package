@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Order;
 
 use Egal\Model\Exceptions\OrderException;
 
-/**
- * @package Egal\Model
- */
 final class Order
 {
 
     private string $column;
+
     private string $direction = OrderDirectionType::ASC;
 
     /**
      * Order constructor.
-     * @param string $column
-     * @param string $direction
-     * @throws OrderException
+     *
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public function __construct(string $column, string $direction = OrderDirectionType::ASC)
     {
@@ -41,21 +40,21 @@ final class Order
     }
 
     /**
-     * @param string $direction
-     * @throws OrderException
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public function setDirection(string $direction): void
     {
         if (!in_array($direction, [OrderDirectionType::ASC, OrderDirectionType::DESC])) {
-            throw new OrderException('Неверный формат направления!');
+            throw new OrderException('Invalid direction format!');
         }
+
         $this->direction = $direction;
     }
 
     /**
-     * @param array $array
-     * @return Order|Order[]
-     * @throws OrderException
+     * @param mixed[] $array
+     * @return \Egal\Model\Order\Order|\Egal\Model\Order\Order[]
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     public static function fromArray(array $array)
     {
@@ -63,27 +62,30 @@ final class Order
             $result = [];
             /** @var array $orderArrayItem */
             foreach ($array as $orderArrayItem) {
-                $result[] = Order::fromOrderArray($orderArrayItem);
+                $result[] = self::fromOrderArray($orderArrayItem);
             }
+
             return $result;
         }
-        return Order::fromOrderArray($array);
+
+        return self::fromOrderArray($array);
     }
 
     /**
-     * @param array $orderArray
-     * @return Order
-     * @throws OrderException
+     * @param string[] $orderArray
+     * @throws \Egal\Model\Exceptions\OrderException
      */
     private static function fromOrderArray(array $orderArray): Order
     {
         if (array_key_exists('column', $orderArray) && array_key_exists('direction', $orderArray)) {
             return new Order($orderArray['column'], $orderArray['direction']);
-        } elseif (array_key_exists(0, $orderArray) && array_key_exists(1, $orderArray)) {
-            return new Order($orderArray[0], $orderArray[1]);
-        } else {
-            throw new OrderException('Неверный формат!');
         }
+
+        if (array_key_exists(0, $orderArray) && array_key_exists(1, $orderArray)) {
+            return new Order($orderArray[0], $orderArray[1]);
+        }
+
+        throw new OrderException('Invalid format!');
     }
 
 }

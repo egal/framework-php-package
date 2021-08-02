@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class UndefinedTypeOfMessageException extends Exception
 {
 
-    protected $message = 'UndefinedTypeOfMessageException';
+    protected $message = 'Undefined type of message!';
+
     protected $code = 400;
 
 }

@@ -51,15 +51,13 @@ if [ $DIFFS == TRUE ]; then
     for i in $(echo "${TEMP[@]}" | tr " " "\n"); do
         FILE="${FILE} ${WORKDIR}/${i}"
     done
-else
-    FILE="${WORKDIR}"
+    COMMAND_ADDITIONAL_LINE="${COMMAND_ADDITIONAL_LINE} ${FILE}"
 fi
 
-docker run -it --rm \
+docker run --rm \
     --user "$(id -u):$(id -g)" \
     --workdir "${WORKDIR}" \
     --entrypoint "vendor/bin/phpcs" \
     --volume "${PWD}:${WORKDIR}" \
     "${IMAGE}" \
-    ${COMMAND_ADDITIONAL_LINE} \
-    ${FILE}
+    ${COMMAND_ADDITIONAL_LINE}
