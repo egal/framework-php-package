@@ -2,8 +2,23 @@ version: '3.7'
 
 services:
 
-#  postgres:
-#    image: postgres
+  phpunit:
+    build:
+      context: ./dockerfiles
+      dockerfile: "${DOCKER_FILE:-php74.Dockerfile}"
+    working_dir: '/data'
+    volumes:
+      - .:/data
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
 
-#  rabbitmq:
-#    image: rabbitmq
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres

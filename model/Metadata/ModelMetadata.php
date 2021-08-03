@@ -7,6 +7,8 @@ namespace Egal\Model\Metadata;
 use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\ModelMetadataException;
+use Egal\Model\Exceptions\RelationNotFoundException;
+use Exception;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
@@ -325,6 +327,20 @@ class ModelMetadata
         }
 
         $this->actionsMetadata[$modelActionMetadata->getActionName()] = $modelActionMetadata;
+    }
+
+    public function relationExist(string $relation): bool
+    {
+        return in_array($relation, $this->relations);
+    }
+
+    public function relationExistOrFail(string $relation): bool
+    {
+        if (!$this->relationExist($relation)) {
+            throw new RelationNotFoundException();
+        }
+
+        return true;
     }
 
 }

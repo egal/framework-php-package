@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Exceptions;
 
 use Exception;
@@ -8,7 +10,8 @@ use Illuminate\Support\MessageBag;
 class ValidateException extends Exception
 {
 
-    protected $message = 'Не пройдена валидация!';
+    protected $message = 'Validation failed!';
+
     protected $code = 405;
 
     private MessageBag $messageBag;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Exceptions;
 
 use Exception;
@@ -7,7 +9,8 @@ use Exception;
 class QueueProcessingException extends Exception
 {
 
-    protected $message = 'QueueProcessingException';
+    protected $message = 'Queue processing exception!';
+
     protected $code = 500;
 
 }

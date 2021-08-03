@@ -4,20 +4,12 @@ help() {
     # Display Help
     echo "Usage:    bash bin/phpunit.sh [OPTIONS]"
     echo
-    echo "Options:"
-    echo "-i,   --image string      Select image."
-    echo
 }
 
 while [[ $# -gt 0 ]]; do
     key="$1"
 
     case $key in
-    -i | --image)
-        IMAGE="$2"
-        shift # past argument
-        shift # past value
-        ;;
     *)
         COMMAND_ADDITIONAL_LINE="${COMMAND_ADDITIONAL_LINE} ${1}"
         shift # past argument
@@ -25,12 +17,19 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [ -z "${IMAGE}" ]; then
-    IMAGE="php:7.4.16-cli-buster";
-fi
+docker-compose down -t 0 &> /dev/null
+docker-compose build -q
+docker-compose up -d postgres &> /dev/null
 
-docker run -it --rm \
-    --workdir "/data" \
-    --volume "${PWD}:/data:delegated" \
-    "${IMAGE}" \
-    "vendor/bin/phpunit" ${COMMAND_ADDITIONAL_LINE};
+if docker-compose run --rm phpunit -r "\$tries = 0; while (true) { try { \$tries++; if (\$tries > 60) { throw new RuntimeException('PostgreSQL never became available'); } sleep(1); new PDO(getenv('DB_CONNECTION').':host='.getenv('DB_HOST').';port='.getenv('DB_PORT').';dbname='.getenv('DB_NAME').'', getenv('DB_USERNAME'), getenv('DB_PASSWORD'), [PDO::ATTR_TIMEOUT => 3]); break; } catch (PDOException \$e) {} }"; then
+    if docker-compose run --rm phpunit "vendor/bin/phpunit" ${COMMAND_ADDITIONAL_LINE}; then
+        docker-compose down -t 0 &> /dev/null
+    else
+        docker-compose down -t 0 &> /dev/null
+        exit 1
+    fi
+else
+    docker-compose logs
+    docker-compose down -t 0 &> /dev/null
+    exit 1
+fi
