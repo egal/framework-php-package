@@ -61,8 +61,14 @@ abstract class Model extends EloquentModel
      */
     protected $perPage = 10;
 
+    /**
+     * @var string
+     */
     protected $primaryKey = 'id';
 
+    /**
+     * @var string
+     */
     protected $keyType = 'integer';
 
     /**
