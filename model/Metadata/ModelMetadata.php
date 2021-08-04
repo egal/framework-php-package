@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Model\Metadata;
 
 use Egal\Model\Exceptions\ActionNotFoundException;
+use Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -58,10 +59,7 @@ class ModelMetadata
      */
     protected array $actionsMetadata = [];
 
-    /**
-     * @var string[]
-     */
-    private array $primaryKeys = [];
+    private ?string $primaryKey = null;
 
     /**
      * @throws \ReflectionException
@@ -85,6 +83,7 @@ class ModelMetadata
 
     /**
      * TODO: Remove 'database_fields' from v2.0.0.
+     * TODO: Remove 'primary_keys' from v2.0.0.
      *
      * @return mixed[]
      * @throws \ReflectionException
@@ -100,7 +99,7 @@ class ModelMetadata
             'fake_fields' => $this->fakeFields,
             'relations' => $this->relations,
             'validation_rules' => $this->validationRules,
-            'primary_keys' => $this->primaryKeys,
+            'primary_keys' => $this->getPrimaryKeys(),
             'actions_metadata' => [],
         ];
 
@@ -121,10 +120,11 @@ class ModelMetadata
 
     /**
      * @return array
+     * @depricated from v2.0.0
      */
     public function getPrimaryKeys(): array
     {
-        return $this->primaryKeys;
+        return [$this->primaryKey];
     }
 
     /**
@@ -243,6 +243,9 @@ class ModelMetadata
         return in_array($relation, $this->relations);
     }
 
+    /**
+     * @throws RelationNotFoundException
+     */
     public function relationExistOrFail(string $relation): bool
     {
         if (!$this->relationExist($relation)) {
@@ -252,6 +255,14 @@ class ModelMetadata
         return true;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getPrimaryKey(): ?string
+    {
+        return $this->primaryKey;
+    }
+
     protected function scanActions(): void
     {
         // TODO: Implement functionality!
@@ -259,6 +270,7 @@ class ModelMetadata
 
     /**
      * Разбирает все property в phpDoc и отбирает field, relation и правила валидации
+     * @throws DuplicatePrimaryKeyModelMetadataException
      */
     protected function scanProperties(DocBlock $docBlock): void
     {
@@ -277,7 +289,12 @@ class ModelMetadata
                         $this->validationRules[$property->getVariableName()] = explode('|', $bodyTemplate);
                         break;
                     case 'primary-key':
-                        $this->primaryKeys[] = $property->getVariableName();
+                        if (isset($this->primaryKey)) {
+                            throw new DuplicatePrimaryKeyModelMetadataException();
+                        }
+                        if ($property->getVariableName()) {
+                            $this->primaryKey = (string)$property->getVariableName();
+                        }
                         break;
                     case 'property-type':
                         if ($bodyTemplate === 'field') {
