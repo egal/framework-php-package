@@ -48,15 +48,18 @@ trait UsesValidator
     {
         $primaryKey = $this->getModelMetadata()->getPrimaryKey();
 
-        $validator = $primaryKey === null
-            ? Validator::make(
+        if ($primaryKey === null) {
+            $validator = Validator::make(
                 [$this->getKeyName() => $keyValue],
                 [$this->getKeyName() => [$this->getKeyType()]]
-            )
-            : Validator::make(
-                [$primaryKey => $keyValue],
-                [$primaryKey => $this->getModelMetadata()->getValidationRules($primaryKey)]
             );
+        } else {
+            $validationRules = $this->getModelMetadata()->getValidationRules($primaryKey);
+            $validator = Validator::make(
+                [$primaryKey => $keyValue],
+                [$primaryKey => $validationRules === [] ? [$this->getKeyType()] : $validationRules]
+            );
+        }
 
         if ($validator->fails()) {
             $exception = new ValidateException();
