@@ -72,11 +72,13 @@ class ModelMetadata
         $this->modelShortName = $modelReflectionClass->getShortName();
         $docComment = $modelReflectionClass->getDocComment();
 
-        if ($docComment) {
-            $docBlock = DocBlockFactory::createInstance()->create($docComment);
-            $this->scanProperties($docBlock);
-            $this->scanActionsFromClassDocBlock($modelReflectionClass, $docBlock);
+        if (!$docComment) {
+            return;
         }
+
+        $docBlock = DocBlockFactory::createInstance()->create($docComment);
+        $this->scanProperties($docBlock);
+        $this->scanActionsFromClassDocBlock($modelReflectionClass, $docBlock);
     }
 
     /**
