@@ -34,12 +34,16 @@ class ModelUsesValidatorTest extends TestCase
 
         $keyName = 'foo';
 
-        $modelMetadata = m::mock(ModelMetadata::class . '[getValidationRules]', [Model::class]);
-        $modelMetadata->shouldReceive('getValidationRules')->with($keyName)->andReturn($validationRules);
+        $metadata = m::mock(
+            ModelMetadata::class . '[getPrimaryKey,fieldExist,getValidationRules]',
+            [Model::class]
+        );
+        $metadata->shouldReceive('getPrimaryKey')->andReturn($keyName);
+        $metadata->shouldReceive('fieldExist')->with($keyName)->andReturn(true);
+        $metadata->shouldReceive('getValidationRules')->with($keyName)->andReturn($validationRules);
 
-        $model = m::mock(Model::class . '[getModelMetadata,getKeyName]');
-        $model->shouldReceive('getKeyName')->andReturn($keyName);
-        $model->shouldReceive('getModelMetadata')->andReturn($modelMetadata);
+        $model = m::mock(Model::class . '[getModelMetadata]');
+        $model->shouldReceive('getModelMetadata')->andReturn($metadata);
 
         if ($expectValidateException) {
             $this->expectException(ValidateException::class);

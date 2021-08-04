@@ -61,6 +61,10 @@ abstract class Model extends EloquentModel
      */
     protected $perPage = 10;
 
+    protected $primaryKey = 'id';
+
+    protected $keyType = 'integer';
+
     /**
      * The attributes that aren't mass assignable.
      *

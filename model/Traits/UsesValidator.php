@@ -46,10 +46,19 @@ trait UsesValidator
      */
     private function validateKey($keyValue): void
     {
-        $validator = Validator::make(
-            [$this->getKeyName() => $keyValue],
-            [$this->getKeyName() => $this->getModelMetadata()->getValidationRules($this->getKeyName())]
-        );
+        $primaryKey = $this->getModelMetadata()->getPrimaryKey();
+
+        if ($primaryKey !== null) {
+            $validator = Validator::make(
+                [$primaryKey => $keyValue],
+                [$primaryKey => $this->getModelMetadata()->getValidationRules($primaryKey)]
+            );
+        } else {
+            $validator = Validator::make(
+                [$this->getKeyName() => $keyValue],
+                [$this->getKeyName() => [$this->getKeyType()]]
+            );
+        }
 
         if ($validator->fails()) {
             $exception = new ValidateException();
