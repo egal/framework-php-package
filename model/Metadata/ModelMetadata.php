@@ -77,8 +77,6 @@ class ModelMetadata
             $this->scanProperties($docBlock);
             $this->scanActionsFromClassDocBlock($modelReflectionClass, $docBlock);
         }
-
-        $this->fields = array_keys($this->validationRules);
     }
 
     /**
