@@ -244,7 +244,7 @@ class ModelMetadata
     }
 
     /**
-     * @throws RelationNotFoundException
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
      */
     public function relationExistOrFail(string $relation): bool
     {
@@ -255,9 +255,6 @@ class ModelMetadata
         return true;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPrimaryKey(): ?string
     {
         return $this->primaryKey;
@@ -270,7 +267,8 @@ class ModelMetadata
 
     /**
      * Разбирает все property в phpDoc и отбирает field, relation и правила валидации
-     * @throws DuplicatePrimaryKeyModelMetadataException
+     *
+     * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
      */
     protected function scanProperties(DocBlock $docBlock): void
     {
@@ -292,9 +290,11 @@ class ModelMetadata
                         if (isset($this->primaryKey)) {
                             throw new DuplicatePrimaryKeyModelMetadataException();
                         }
+
                         if ($property->getVariableName()) {
-                            $this->primaryKey = (string)$property->getVariableName();
+                            $this->primaryKey = (string) $property->getVariableName();
                         }
+
                         break;
                     case 'property-type':
                         if ($bodyTemplate === 'field') {
