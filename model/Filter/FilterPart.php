@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Model\Filter;
 
 use Egal\Model\Exceptions\FilterException;
+use Egal\Model\Exceptions\InitializeFilterPartException;
 
 final class FilterPart
 {
@@ -16,7 +17,7 @@ final class FilterPart
 
     /**
      * @param mixed[] $array
-     * @throws \Egal\Model\Exceptions\FilterException
+     * @throws \Egal\Model\Exceptions\FilterException|\Egal\Model\Exceptions\InitializeFilterPartException
      */
     public static function fromArray(array $array): FilterPart
     {
@@ -25,10 +26,12 @@ final class FilterPart
         foreach ($array as $item) {
             if (FilterCondition::mayMakeFromArray($item)) {
                 $filterPart->addContentItem(FilterCondition::fromArray($item));
-            } elseif (FilterCombiner::mayMakeFromString($item)) {
-                $filterPart->addContentItem(FilterCombiner::fromString($item));
             } elseif (is_array($item)) {
                 $filterPart->addContentItem(self::fromArray($item));
+            } elseif (FilterCombiner::mayMakeFromString($item)) {
+                $filterPart->addContentItem(FilterCombiner::fromString($item));
+            } else {
+                throw new InitializeFilterPartException();
             }
         }
 
