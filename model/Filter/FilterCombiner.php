@@ -41,10 +41,13 @@ class FilterCombiner
         $this->value = $value;
     }
 
-    public static function mayMakeFromString(string $string): bool
+    /**
+     * @param mixed $value
+     */
+    public static function mayMakeFromString($value): bool
     {
-        return is_string($string)
-            && in_array(strtoupper($string), [self::AND, self::OR]);
+        return is_string($value)
+            && in_array(strtoupper($value), [self::AND, self::OR]);
     }
 
 }

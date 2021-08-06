@@ -146,6 +146,9 @@
         <exclude-pattern>model/Model.php</exclude-pattern>
         <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
+        <exclude-pattern>*FilterConditionApplier.php</exclude-pattern>
+    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>

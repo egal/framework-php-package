@@ -6,6 +6,7 @@ namespace Egal\Model;
 
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\OrderException;
+use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Filter\FilterCombiner;
 use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Filter\FilterPart;
@@ -122,19 +123,21 @@ class Builder extends EloquentBuilder
                 continue;
             }
 
-            $clause = $key === 0 || strtoupper($filterPartContent[$key - 1]->getValue()) === FilterCombiner::AND
-                ? 'where'
-                : 'orWhere';
+            $operator = $key === 0 || strtoupper($filterPartContent[$key - 1]->getValue()) === FilterCombiner::AND
+                ? FilterCombiner::AND
+                : FilterCombiner::OR;
 
             if ($filterItem instanceof FilterCondition) {
-                $this->applyFilterCondition($filterItem, $clause);
+                $this->applyFilterCondition($filterItem, $operator);
                 continue;
             }
 
             if ($filterItem instanceof FilterPart) {
-                $this->$clause(static function (Builder $query) use ($filterItem): void {
-                    $query->setFilter($filterItem);
-                });
+                $this->{$operator === FilterCombiner::AND ? 'where' : 'orWhere'}(
+                    static function (Builder $query) use ($filterItem): void {
+                        $query->setFilter($filterItem);
+                    }
+                );
                 continue;
             }
 
@@ -245,24 +248,18 @@ class Builder extends EloquentBuilder
     /**
      * Apply filter condition to the builder query
      *
-     * @throws \ReflectionException
+     * @throws \ReflectionException|\Egal\Model\Exceptions\RelationNotFoundException|\Egal\Model\Exceptions\UnsupportedFilterConditionException
      */
-    private function applyFilterCondition(FilterCondition $filterItem, string $clause): void
+    private function applyFilterCondition(FilterCondition $condition, string $beforeOperator): void
     {
-        $relationName = $filterItem->getRelationName();
+        $applier = 'apply' . studly_case($condition->getOperator()) . 'FilterCondition';
+        $model = $this->getModel();
 
-        if ($relationName) {
-            $metadata = $this->getModel()->getModelMetadata();
-            $metadata->relationExistOrFail($relationName);
-            $this->{$clause . 'Has'}(
-                camel_case($relationName),
-                static function (Builder $query) use ($filterItem): void {
-                    $query->where($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
-                }
-            );
-        } else {
-            $this->$clause($filterItem->getField(), $filterItem->getOperator(), $filterItem->getValue());
+        if (!method_exists($model, $applier)) {
+            throw new UnsupportedFilterConditionException();
         }
+
+        $model->$applier($this, $condition, $beforeOperator);
     }
 
 }
