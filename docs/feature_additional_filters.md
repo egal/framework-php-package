@@ -14,14 +14,15 @@ Just create method in model:
 
 use Egal\Model\Builder;
 use Egal\Model\Filter\FilterCondition;
-use \Egal\Model\Model;
+use Egal\Model\Model;
 
 class Bar extends Model
 {
     
     public static function applyFooFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
     {
-        // TODO
+        // EXAMPLE
+        // $builder->where($condition->getField(), '=', $condition->getValue());
     }
     
 }
