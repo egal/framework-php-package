@@ -13,7 +13,6 @@ class ModelActionGetItemsFilterTest extends TestCase
 
     use DatabaseSchema;
 
-
     protected function createSchema(): void
     {
         $this->schema()->create('products', function (Blueprint $table) {
