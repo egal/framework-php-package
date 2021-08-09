@@ -9,6 +9,7 @@ use Egal\Model\Exceptions\NotFoundException;
 use Egal\Model\Exceptions\UpdateException;
 use Egal\Model\Exceptions\UpdateManyException;
 use Egal\Model\Filter\FilterPart;
+use Egal\Model\Traits\FilterConditionApplier;
 use Egal\Model\Traits\HasDefaultLimits;
 use Egal\Model\Traits\HasEvents;
 use Egal\Model\Traits\HashGuardable;
@@ -53,6 +54,7 @@ abstract class Model extends EloquentModel
     use UsesValidator;
     use XssGuardable;
     use InstanceForAction;
+    use FilterConditionApplier;
 
     /**
      * The default number of models to return for pagination.
