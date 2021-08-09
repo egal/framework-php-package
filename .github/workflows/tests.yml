@@ -41,5 +41,10 @@ jobs:
               --no-interaction
       - name: Run a PHPCS
         run: |
-          git diff --name-only --diff-filter=dr ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '(.php)$'
-          bash bin/phpcs.sh $(git diff --name-only --diff-filter=dr ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '(.php)$')
+          DIFF="$(git diff \
+            --name-only \
+            --diff-filter=dr \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
+          if [ "${DIFF}" == '' ]; then exit 0; fi
+          bash bin/phpcs.sh $DIFF
