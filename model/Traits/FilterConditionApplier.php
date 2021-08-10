@@ -64,4 +64,34 @@ trait FilterConditionApplier
         SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
     }
 
+    public function applyEqiFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+        SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
+    }
+
+    public function applyNeiFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+        SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
+    }
+
+    public function applyCoiFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+        SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
+    }
+
+    public function applySwiFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+        SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
+    }
+
+    public function applyEwiFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+        SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
+    }
+
+    public function applyNciFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+        SimpleFilterConditionApplier::apply($builder, $condition, $beforeOperator);
+    }
+
 }

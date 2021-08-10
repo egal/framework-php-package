@@ -13,15 +13,21 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 {
 
     private const EQUAL_OPERATOR = 'eq';
+    private const EQUAL_IGNORE_CASE_OPERATOR = 'eqi';
     private const NOT_EQUAL_OPERATOR = 'ne';
+    private const NOT_EQUAL_IGNORE_CASE_OPERATOR = 'nei';
     private const GREATER_THEN_OPERATOR = 'gt';
-    private const LESS_THEN_OPERATOR = 'lt';
     private const GREATER_OR_EQUAL_OPERATOR = 'ge';
+    private const LESS_THEN_OPERATOR = 'lt';
     private const LESS_OR_EQUAL_OPERATOR = 'le';
     private const CONTAIN_OPERATOR = 'co';
-    private const START_WITH_OPERATOR = 'sw';
-    private const END_WITH_OPERATOR = 'ew';
+    private const CONTAIN_IGNORE_CASE_OPERATOR = 'coi';
     private const NOT_CONTAIN_OPERATOR = 'nc';
+    private const NOT_CONTAIN_IGNORE_CASE_OPERATOR = 'nci';
+    private const START_WITH_OPERATOR = 'sw';
+    private const START_WITH_IGNORE_CASE_OPERATOR = 'swi';
+    private const END_WITH_OPERATOR = 'ew';
+    private const END_WITH_IGNORE_CASE_OPERATOR = 'ewi';
 
     public static function apply(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
     {
@@ -75,6 +81,14 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
                 return 'LIKE';
             case self::NOT_CONTAIN_OPERATOR:
                 return 'NOT LIKE';
+            case self::EQUAL_IGNORE_CASE_OPERATOR:
+            case self::CONTAIN_IGNORE_CASE_OPERATOR:
+            case self::START_WITH_IGNORE_CASE_OPERATOR:
+            case self::END_WITH_IGNORE_CASE_OPERATOR:
+                return 'ILIKE';
+            case self::NOT_EQUAL_IGNORE_CASE_OPERATOR:
+            case self::NOT_CONTAIN_IGNORE_CASE_OPERATOR:
+                return 'NOT ILIKE';
             default:
                 throw new FilterException('Incorrect operator!');
         }
@@ -87,11 +101,15 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     {
         switch ($condition->getOperator()) {
             case self::CONTAIN_OPERATOR:
+            case self::CONTAIN_IGNORE_CASE_OPERATOR:
             case self::NOT_CONTAIN_OPERATOR:
+            case self::NOT_CONTAIN_IGNORE_CASE_OPERATOR:
                 return '%' . $condition->getValue() . '%';
             case self::START_WITH_OPERATOR:
+            case self::START_WITH_IGNORE_CASE_OPERATOR:
                 return $condition->getValue() . '%';
             case self::END_WITH_OPERATOR:
+            case self::END_WITH_IGNORE_CASE_OPERATOR:
                 return '%' . $condition->getValue();
             default:
                 return $condition->getValue();
