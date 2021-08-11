@@ -1,88 +1,81 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\CodeGenerator\Commands;
 
 use Egal\CodeGenerator\Exceptions\ReadingStudFileException;
-use Exception;
 use Illuminate\Console\Command as IlluminateCommand;
 use Illuminate\Support\Str;
 
 /**
- * Класс консольной команды предназначенный для создания на его основе консольных команд генерации файлов
- *
- * @package Egal\Model
+ * Console command class designed to create console commands for generating files based on it.
  */
 abstract class MakeCommand extends IlluminateCommand
 {
 
-    /**
-     * Содержит базовое название файла-заглушки
-     *
-     * @var string
-     */
     protected string $stubFileBaseName;
 
     /**
-     * Содержит базовое название файла - результата работы консольной команды
-     *
-     * @var string
+     * Contains the base name of the file - the result of the console command.
      */
     protected string $fileBaseName;
 
-    /**
-     * @var string
-     */
     protected string $fileContents;
 
     protected string $filePath;
 
     /**
-     * Инициализатор экземпляра класса
+     * Class instance initializer
      *
-     * Присваивает {@see MakeCommand::$fileContents} содержание файла-заглушки,
-     * указанного в {@see MakeCommand::$stubFileBaseName}.
+     * Assigns {@see MakeCommand::$fileContents} the contents of the stub file
+     * specified in {@see MakeCommand::$stubFileBaseName}.
      *
-     * @throws Exception
+     * @throws \Egal\CodeGenerator\Exceptions\ReadingStudFileException
      */
     public function __construct()
     {
         parent::__construct();
+
         $stubFilesDir = realpath(__DIR__ . '/../../stubs');
         $this->fileContents = file_get_contents(realpath($stubFilesDir . '/' . $this->stubFileBaseName . '.stub'));
+
         if (!$this->fileContents) {
             throw new ReadingStudFileException();
         }
     }
 
     /**
-     * Записывает файл
+     * Writes a file
      *
-     * Записывает содержание {@see MakeCommand::$fileContents} в файл,
-     * путь которого указан в {@see MakeCommand::$filePath}.
+     * Writes the contents of {@see MakeCommand::$fileContents} to a file,
+     * which path is specified in {@see MakeCommand::$filePath}.
      *
-     * Если такого файла нет - создает его.
+     * If there is no such file, it creates it.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function writeFile(): void
     {
-        if (file_exists($this->filePath) && !$this->confirm('Файл существует. Перезаписать?')) {
-            $this->warn('Отмена!');
+        if (file_exists($this->filePath) && !$this->confirm('File exists. Overwrite?')) {
+            $this->warn('Canceled!');
+
             return;
         }
-        if (!is_dir(dirname($this->filePath))) mkdir(dirname($this->filePath));
+
+        if (!is_dir(dirname($this->filePath))) {
+            mkdir(dirname($this->filePath));
+        }
+
         file_put_contents($this->filePath, $this->fileContents);
         $file = Str::replaceFirst(base_path() . '/', '', $this->filePath);
         $this->line('<info>Result File:</info> ' . $file);
     }
 
     /**
-     * Заменяет переменную вида {{ var }} значением в файле заглушке
-     *
-     * @param string $variable
-     * @param string $value
+     * Replaces a variable of the type {{ var }} with the value from the stub file.
      */
-    public function setFileContents(string $variable, string $value)
+    public function setFileContents(string $variable, string $value): void
     {
         $this->fileContents = str_replace($variable, $value, $this->fileContents);
     }

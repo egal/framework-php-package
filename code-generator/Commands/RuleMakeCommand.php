@@ -11,29 +11,20 @@ class RuleMakeCommand extends MakeCommand
 {
 
     /**
-     * Сигнатура конгсольной команды.
-     *
      * @var string
      */
     protected $signature = 'egal:make:rule
-                            {name : Название класса}
+                            {name : Class name}
                            ';
 
     /**
-     * Описание консольной окманды.
-     *
      * @var string
      */
-    protected $description = 'Генерация класса правила валидации';
+    protected $description = 'Generating a validation rule class';
 
-    /**
-     * Базовое названия файла-заглушки.
-     */
     protected string $stubFileBaseName = 'rule';
 
     /**
-     * Действие консольной команды.
-     *
      * @throws \Exception
      */
     public function handle(): void

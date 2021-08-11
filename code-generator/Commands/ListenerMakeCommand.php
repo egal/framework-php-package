@@ -1,51 +1,42 @@
-<?php /** @noinspection ALL */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
-use Exception;
-
 /**
- * Класс консольной комманды генерации события.
- *
- * @package Egal\Model
+ * The class of the console command for generating the event.
  */
 class ListenerMakeCommand extends MakeCommand
 {
 
     /**
-     * Сигнатура конгсольной команды.
-     *
      * @var string
      */
     protected $signature = 'egal:make:listener
-                            {name : Название обработчика}
-                            {--g|global : Обработчик глобального события}
+                            {name : Listener name}
+                            {--g|global : Global event listener}
                            ';
 
     /**
-     * Описание консольной окманды.
-     *
      * @var string
      */
-    protected $description = 'Генерация класса обработчика события';
+    protected $description = 'Event listener class generating';
 
-    /**
-     * Базовое названия файла-заглушки.
-     *
-     * @var string
-     */
     protected string $stubFileBaseName = 'listener';
 
     /**
-     * Действие консольной команды.
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {
-        $fileBaseName = (string)$this->argument('name');
-        $extends = $this->option('global') ? 'GlobalEventListener' : 'EventListener';
-        $this->fileBaseName = str_ends_with($fileBaseName, 'Listener') ? $fileBaseName : $fileBaseName . 'Listener';
+        $fileBaseName = (string) $this->argument('name');
+        $extends = $this->option('global')
+            ? 'GlobalEventListener'
+            : 'EventListener';
+        $this->fileBaseName = str_ends_with($fileBaseName, 'Listener')
+            ? $fileBaseName
+            : $fileBaseName . 'Listener';
         $this->filePath = base_path('app/Listeners') . '/' . $this->fileBaseName . '.php';
         $this->setFileContents('{{ class }}', $this->fileBaseName);
         $this->setFileContents('{{ extends }}', $extends);
