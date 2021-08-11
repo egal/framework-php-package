@@ -88,7 +88,8 @@ class MigrationCreateMakeCommand extends MakeCommand
         foreach ($this->fieldsTypes as $field => $type) {
             $this->parseFieldsByValidationRules($field);
 
-            // If nothing was taken from the validation rules, then take the field type from the type specified in "@property".
+            // If nothing was taken from the validation rules,
+            // then take the field type from the type specified in "@property".
             if ($type && !isset($this->tableFields[$field])) {
                 $this->parseFieldsByProperties($field, $type);
             }
