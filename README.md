@@ -63,7 +63,7 @@
 
 [Docs Status URL]: https://egal.github.io/egal-docs/
 [Egal/Framework PHP Package Status URL]: https://packagist.org/packages/egal/framework
-[Egal/Framework NPM Package Status URL]: https://www.npmjs.com/package/@egalteam/egal
+[Egal/Framework NPM Package Status URL]: https://www.npmjs.com/package/@egalteam/framework
 [Egal/Egal PHP Project Status URL]: https://packagist.org/packages/egal/egal
 [Web Service Status URL]: https://hub.docker.com/r/egalbox/web-service
 [Auth Service Status URL]: https://hub.docker.com/r/egalbox/auth-service
