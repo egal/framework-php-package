@@ -218,6 +218,21 @@ abstract class Model extends EloquentModel
     }
 
     /**
+     * @param mixed[] $filter
+     * @throws \Egal\Model\Exceptions\FilterException|\ReflectionException
+     */
+    public static function actionGetCount(array $filter = []): array
+    {
+        $count = static::newInstanceForAction()
+            ->newQuery()
+            ->needFireModelActionEvents()
+            ->setFilterFromArray($filter)
+            ->count();
+
+        return ['count' => $count];
+    }
+
+    /**
      * Entity creation.
      *
      * @param mixed[] $attributes Associative array of attributes.
