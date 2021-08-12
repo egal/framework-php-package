@@ -59,6 +59,15 @@ class ModelActionGetItemsFilterTest extends TestCase
                 null,
                 [1, 2]
             ],
+            [
+                [
+                    ['name', 'eq', 'first_product'],
+                    'AND',
+                    [['name', 'eq', 'first_product']]
+                ],
+                null,
+                [1]
+            ],
         ];
     }
 
