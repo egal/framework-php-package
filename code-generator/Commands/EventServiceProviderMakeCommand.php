@@ -18,7 +18,7 @@ class EventServiceProviderMakeCommand extends MakeCommand
     /**
      * @var string
      */
-    protected $description = 'Generating';
+    protected $description = 'Event service provider class generating';
 
     protected string $stubFileBaseName = 'event_service_provider';
 
