@@ -143,6 +143,9 @@
             <property name="maxLinesLength" value="50" />
         </properties>
     </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed">
+        <exclude-pattern>code-generator/Commands/MigrationCreateMakeCommand.php</exclude-pattern>
+    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Model.php</exclude-pattern>
         <exclude-pattern>model/Builder.php</exclude-pattern>

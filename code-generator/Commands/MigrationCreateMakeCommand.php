@@ -170,13 +170,12 @@ class MigrationCreateMakeCommand extends MakeCommand
             return;
         }
 
-        switch (true) {
-            case in_array('unique:' . $this->tableName, $this->validationRules[$field]):
-                $this->tableFields[$field] = str_replace(';', '->unique();', $this->tableFields[$field]);
-            case in_array('nullable', $this->validationRules[$field]):
-                $this->tableFields[$field] = str_replace(';', '->nullable();', $this->tableFields[$field]);
-            default:
-                break;
+        if (in_array('unique:' . $this->tableName, $this->validationRules[$field])) {
+            $this->tableFields[$field] = str_replace(';', '->unique();', $this->tableFields[$field]);
+        }
+
+        if (in_array('nullable', $this->validationRules[$field])) {
+            $this->tableFields[$field] = str_replace(';', '->nullable();', $this->tableFields[$field]);
         }
     }
 
