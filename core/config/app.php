@@ -141,5 +141,5 @@ return [
     |
     */
 
-    'wait_reply_message_ttl' => env('WAIT_REPLY_MESSAGE_TTL', 10),
+    'wait_reply_message_ttl' => (int)env('WAIT_REPLY_MESSAGE_TTL', 10),
 ];
