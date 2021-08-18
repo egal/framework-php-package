@@ -110,7 +110,7 @@ class MigrationCreateMakeCommand extends MakeCommand
      */
     private function parseFieldsByValidationRules(string $field): void
     {
-        if (!isset($this->validationRules[$field])) {
+        if (!isset($this->validationRules[$field]) || count($this->validationRules[$field]) === 0) {
             return;
         }
 
