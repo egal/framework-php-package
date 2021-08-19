@@ -6,6 +6,7 @@ namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
+use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
@@ -15,6 +16,8 @@ use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Exception;
 use Illuminate\Support\Carbon;
+use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use Throwable;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
@@ -96,7 +99,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException|\Exception
+     * @throws RequestException|Exception
      */
     public function openConnection(): void
     {
@@ -107,7 +110,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException|\Exception
+     * @throws RequestException|Exception
      */
     public function reopenConnection(): void
     {
@@ -120,7 +123,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Exception
+     * @throws AMQPProtocolChannelException|Exception
      */
     public function closeConnection(): void
     {
@@ -131,7 +134,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws RequestException|AMQPProtocolChannelException|ImpossibilityDeterminingStatusOfResponseException
      */
     public function waitReplyMessages(): void
     {
@@ -141,23 +144,19 @@ class Request extends ActionMessage
         $this->response->setActionMessage($this);
 
         $startedAt = Carbon::now('UTC');
-        $mustDieAt = (clone $startedAt)->addSeconds(10);
+        $mustDieAt = (clone $startedAt)->addSeconds(config('app.request.wait_reply_message_ttl'));
 
         try {
             while (Carbon::now('UTC') < $mustDieAt) {
                 $this->collectRabbitMessageIntoResponse();
 
-                if ($this->response->getActionResultMessage()) {
-                    break;
-                }
-
-                if ($this->response->getActionErrorMessage()) {
+                if ($this->response->getActionResultMessage() || $this->response->getActionErrorMessage()) {
                     break;
                 }
 
                 usleep(100);
             }
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             $this->closeConnection();
 
             throw $exception;
@@ -184,7 +183,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\PhpAmqpLib\Exception\AMQPProtocolChannelException
+     * @throws RequestException|ResponseException|RequestException|AMQPProtocolChannelException|ImpossibilityDeterminingStatusOfResponseException|AMQPProtocolChannelException
      */
     public function call(): Response
     {
@@ -204,7 +203,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws AMQPProtocolChannelException|ResponseException|RequestException|ImpossibilityDeterminingStatusOfResponseException
      */
     public function send(): void
     {
@@ -221,7 +220,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException
+     * @throws AMQPProtocolChannelException|ImpossibilityDeterminingStatusOfResponseException|ResponseException|RequestException
      */
     private function authorizeService(): void
     {
@@ -258,7 +257,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException
+     * @throws RequestException
      */
     private function isConnectionNotOpenedOrFail(): void
     {
@@ -268,7 +267,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException
+     * @throws RequestException
      */
     private function isConnectionOpenedOrFail(): void
     {
@@ -278,7 +277,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws ImpossibilityDeterminingStatusOfResponseException
      */
     private function setResponseStatusCode(): void
     {
@@ -316,8 +315,8 @@ class Request extends ActionMessage
     /**
      * Gets data from rabbit channel and sets it into response
      *
-     * @throws \Egal\Core\Exceptions\UnableDetermineMessageTypeException
-     * @throws \Exception|\Egal\Core\Exceptions\UnsupportedMessageTypeException
+     * @throws UnableDetermineMessageTypeException
+     * @throws Exception|UnsupportedMessageTypeException
      */
     private function collectRabbitMessageIntoResponse(): void
     {
