@@ -13,6 +13,7 @@ use Egal\Core\Session\Session;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 /**
  * Class ActionJob
@@ -53,19 +54,21 @@ class ActionJob extends Job
         $rabbitMQJob->delete();
         $this->setActionMessage(ActionMessage::fromArray($data));
         $this->publishMessageStartProcessing();
-        Session::setActionMessage($this->getActionMessage());
-        $this->configureActionMessageResult();
 
-        $actionCaller = new ActionCaller(
-            $this->actionMessage->getModelName(),
-            $this->actionMessage->getActionName(),
-            $this->actionMessage->getParameters()
-        );
+        try {
+            Session::setActionMessage($this->getActionMessage());
+            $this->configureActionMessageResult();
+            $actionCaller = new ActionCaller(
+                $this->actionMessage->getModelName(),
+                $this->actionMessage->getActionName(),
+                $this->actionMessage->getParameters()
+            );
+            $this->actionResultMessage->setData($actionCaller->call());
+            Bus::getInstance()->publishMessage($this->actionResultMessage);
+        } catch (Throwable $exception) {
+            report($exception);
+        }
 
-        $result = $actionCaller->call();
-
-        $this->actionResultMessage->setData($result);
-        Bus::getInstance()->publishMessage($this->actionResultMessage);
         Session::unsetActionMessage();
     }
 
