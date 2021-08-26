@@ -13,8 +13,8 @@ use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
-use Exception;
 use Illuminate\Support\Carbon;
+use Throwable;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
@@ -131,7 +131,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws \Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\Throwable
      */
     public function waitReplyMessages(): void
     {
@@ -141,23 +141,19 @@ class Request extends ActionMessage
         $this->response->setActionMessage($this);
 
         $startedAt = Carbon::now('UTC');
-        $mustDieAt = (clone $startedAt)->addSeconds(10);
+        $mustDieAt = (clone $startedAt)->addSeconds(config('app.request.wait_reply_message_ttl'));
 
         try {
             while (Carbon::now('UTC') < $mustDieAt) {
                 $this->collectRabbitMessageIntoResponse();
 
-                if ($this->response->getActionResultMessage()) {
+                if ($this->response->getActionResultMessage() || $this->response->getActionErrorMessage()) {
                     break;
                 }
 
-                if ($this->response->getActionErrorMessage()) {
-                    break;
-                }
-
-                usleep(100);
+                usleep(config('app.request.wait_reply_message_delay'));
             }
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             $this->closeConnection();
 
             throw $exception;
@@ -184,7 +180,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\PhpAmqpLib\Exception\AMQPProtocolChannelException
+     * @throws \Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
     public function call(): Response
     {
@@ -204,7 +200,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\RequestException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
      */
     public function send(): void
     {
@@ -221,7 +217,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\Egal\Core\Exceptions\ResponseException|\Egal\Core\Exceptions\RequestException
+     * @throws \PhpAmqpLib\Exception\AMQPProtocolChannelException|\Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException|\Egal\Core\Exceptions\RequestException
      */
     private function authorizeService(): void
     {

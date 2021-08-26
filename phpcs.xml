@@ -83,6 +83,12 @@
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
+    <rule ref="Squiz.Commenting.BlockComment.LineIndent">
+        <exclude-pattern>core/config/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.BlockComment.FirstLineIndent">
+        <exclude-pattern>core/config/*</exclude-pattern>
+    </rule>
 
     <rule ref="SlevomatCodingStandard">
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
@@ -151,6 +157,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Builder.php</exclude-pattern>
+        <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
@@ -170,6 +177,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>
+        <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>

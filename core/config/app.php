@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -13,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Egal'),
+    'name' => (string) env('APP_NAME', 'Egal'),
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +28,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV', 'production'),
+    'env' => (string) env('APP_ENV', 'production'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +54,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => (string) env('APP_URL', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +80,7 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => (string) env('APP_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -91,7 +93,7 @@ return [
     |
     */
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => (string) env('APP_FALLBACK_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +106,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY'),
+    'key' => (string) env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',
 
@@ -117,7 +119,7 @@ return [
     |
     */
 
-    'service_name' => env('APP_SERVICE_NAME', 'service'),
+    'service_name' => (string) env('APP_SERVICE_NAME', 'service'),
 
     /*
     |--------------------------------------------------------------------------
@@ -129,6 +131,21 @@ return [
     |
     */
 
-    'service_key' => env('APP_SERVICE_KEY', env('APP_KEY')),
+    'service_key' => (string) env('APP_SERVICE_KEY', env('APP_KEY')),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Wait reply message ttl
+    |--------------------------------------------------------------------------
+    |
+    | Using for configure waiting response time from microservice.
+    | Measured in seconds.
+    |
+    */
+
+    'request' => [
+        'wait_reply_message_ttl' => (int) env('APP_REQUEST_WAIT_REPLY_MESSAGE_TTL', 10),
+        'wait_reply_message_delay' => (int) env('APP_REQUEST_WAIT_REPLY_MESSAGE_DELAY', 100),
+    ],
 
 ];
