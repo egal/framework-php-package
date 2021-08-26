@@ -37,7 +37,7 @@ abstract class MakeCommand extends IlluminateCommand
     {
         parent::__construct();
 
-        $stubFilesDir = realpath(__DIR__ . '/../../stubs');
+        $stubFilesDir = realpath(__DIR__ . '/stubs');
         $this->fileContents = file_get_contents(realpath($stubFilesDir . '/' . $this->stubFileBaseName . '.stub'));
 
         if (!$this->fileContents) {
