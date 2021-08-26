@@ -1,43 +1,29 @@
-<?php /** @noinspection ALL */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
-use Exception;
-
 /**
- * Класс консольной комманды генерации события.
- *
- * @package Egal\Model
+ * The class of the console command for generating the event.
  */
 class EventServiceProviderMakeCommand extends MakeCommand
 {
 
     /**
-     * Сигнатура конгсольной команды.
-     *
      * @var string
      */
-    protected $signature = 'egal:make:event-service-provider
-                           ';
+    protected $signature = 'egal:make:event-service-provider';
 
     /**
-     * Описание консольной окманды.
-     *
      * @var string
      */
-    protected $description = 'Генерация';
+    protected $description = 'Event service provider class generating';
 
-    /**
-     * Базовое названия файла-заглушки.
-     *
-     * @var string
-     */
     protected string $stubFileBaseName = 'event_service_provider';
 
     /**
-     * Действие консольной команды.
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {

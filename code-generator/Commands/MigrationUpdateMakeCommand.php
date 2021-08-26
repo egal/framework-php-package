@@ -1,47 +1,59 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\CodeGenerator\Commands;
 
 use Egal\Model\Metadata\ModelMetadata;
-use Exception;
 use Illuminate\Support\Str;
 
-/**
- * TODO: Нужно реализовать и добавить в ServiceProvider.php
- * @package Egal\Model\Commands
- */
 class MigrationUpdateMakeCommand extends MakeCommand
 {
 
+    /**
+     * @var string
+     */
     protected $signature = 'egal:make:migration-update
-                            {model-name : Название модели по которой генерируем миграцию}
+                            {model-name : The name of the model by which the migration is generated}
                            ';
 
-    protected $description = 'Генерация класса миграции по существующей модели';
+    /**
+     * @var string
+     */
+    protected $description = 'Generating of a migration class from an existing model';
 
     protected string $stubFileBaseName = 'migration.update';
 
     private string $className;
+
     private string $tableName;
 
-    /** @var array Массив подготовленных полей для создания миграции */
+    /**
+     * @var mixed[] Array of prepared fields for creating migration.
+     */
     private array $tableFields = [];
 
-    /** @var array Массив: поле => тип из тега "@property" модели */
+    /**
+     * @var string[] Array: field => type from the "{@property}" tag of the model.
+     */
     private array $fieldsTypes = [];
 
-    /** @var array Массив правил валидации из тега "{@validation-rules }" модели */
+    /**
+     * @var mixed[] Array of validation rules from the "{@validation-rules}" tag of the model.
+     */
     private array $validationRules;
 
-    /** @var array Массив полей ключей из тега "{@primary-key}" модели */
+    /**
+     * @var string[] Array of key fields from the "{@primary-key}" tag of the model.
+     */
     private array $primaryKeys = [];
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {
-        $modelName = trim((string)$this->argument('model-name'));
+        $modelName = trim((string) $this->argument('model-name'));
         $this->tableName = Str::snake(Str::plural($modelName));
 
         $modelMetadata = new ModelMetadata('App\\Models\\' . $modelName);
@@ -58,7 +70,7 @@ class MigrationUpdateMakeCommand extends MakeCommand
         $this->writeFile();
     }
 
-    private function passVariables()
+    private function passVariables(): void
     {
         $this->setFileContents('{{ class }}', $this->className);
         $this->setFileContents('{{ table }}', $this->tableName);

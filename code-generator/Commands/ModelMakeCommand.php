@@ -1,56 +1,43 @@
-<?php /** @noinspection ALL */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
-use Egal\Model\Model;
-use Exception;
-
 /**
- * Класс консольной комманды генерации.
- *
- * Генерируется файл {@see Model}.
- *
- * @package Egal\Model
+ * A file is generated {@see Model}.
  */
 class ModelMakeCommand extends MakeCommand
 {
 
     /**
-     * Сигнатура конгсольной команды.
-     *
      * @var string
      */
     protected $signature = 'egal:make:model
-                            {model-name : Название модели}
+                            {model-name : Model name}
                            ';
 
     /**
-     * Описание консольной окманды.
-     *
      * @var string
      */
-    protected $description = 'Генерация класса модели';
+    protected $description = 'Model class generating';
 
-    /**
-     * Базовое названия файла-заглушки.
-     *
-     * @var string
-     */
     protected string $stubFileBaseName = 'model';
 
     /**
-     * Действие консольной команды.
+     * Console command action.
      *
-     * Записывает файл {@see Model} с названием указанным при вызове команды в директорию PROJECT_PATH/app/Models
-     * содержанием {@see model.stub}.
+     * Writes the {@see Model} file with the name specified when the command is called into the PROJECT_PATH/app/Models
+     * directory with the contents {@see model.stub}.
      *
-     * В содержании конечного файла буду заменены строки '{{ class }}' на название указанное при вызове команды.
+     * In the content of the final file, the lines '{{ class }}' will be replaced with the name specified
+     * when the command is called.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {
-        $this->fileBaseName = (string)$this->argument('model-name');
+        $this->fileBaseName = (string) $this->argument('model-name');
         $this->filePath = base_path('app/Models') . '/' . $this->fileBaseName . '.php';
         $this->fileContents = str_replace('{{ class }}', $this->fileBaseName, $this->fileContents);
         $this->writeFile();

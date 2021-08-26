@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\CodeGenerator\Commands;
 
 use Egal\Model\Metadata\ModelMetadata;
@@ -9,35 +11,50 @@ use Illuminate\Support\Str;
 class MigrationCreateMakeCommand extends MakeCommand
 {
 
+    /**
+     * @var string
+     */
     protected $signature = 'egal:make:migration-create
-                            {model-name : Название модели по которой генерируем миграцию}
+                            {model-name : The name of the model by which the migration is generated}
                            ';
 
-    protected $description = 'Генерация класса миграции по существующей модели';
+    /**
+     * @var string
+     */
+    protected $description = 'Generating of a migration class from an existing model';
 
     protected string $stubFileBaseName = 'migration.create';
 
     private string $className;
+
     private string $tableName;
 
-    /** @var array Массив подготовленных полей для создания миграции */
+    /**
+     * @var mixed[] Array of prepared fields for creating migration.
+     */
     private array $tableFields = [];
 
-    /** @var array Массив: поле => тип из тега "@property" модели */
+    /**
+     * @var string[] Array: field => type from the "{@property}" tag of the model.
+     */
     private array $fieldsTypes = [];
 
-    /** @var array Массив правил валидации из тега "{@validation-rules }" модели */
+    /**
+     * @var mixed[] An array of validation rules from the "{@validation-rules}" tag of the model.
+     */
     private array $validationRules;
 
-    /** @var array Массив полей ключей из тега "{@primary-key}" модели */
+    /**
+     * @var string[] An array of key fields from the "{@primary-key}" tag of the model.
+     */
     private array $primaryKeys = [];
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {
-        $modelName = trim((string)$this->argument('model-name'));
+        $modelName = trim((string) $this->argument('model-name'));
         $this->tableName = Str::snake(Str::plural($modelName));
 
         $modelMetadata = new ModelMetadata('App\\Models\\' . $modelName);
@@ -45,9 +62,6 @@ class MigrationCreateMakeCommand extends MakeCommand
         $this->validationRules = $modelMetadata->getValidationRules();
         $this->fieldsTypes = $modelMetadata->getFieldsWithTypes();
         $this->primaryKeys = $modelMetadata->getPrimaryKeys();
-        // todo
-        // $relations = $modelMetadata->getRelations();
-
         $this->className = 'Create' . Str::plural($modelName) . 'Table';
         $this->fileBaseName = Str::snake(date('Y_m_d_His') . $this->className);
         $this->filePath = base_path('database/migrations') . '/' . $this->fileBaseName . '.php';
@@ -56,7 +70,7 @@ class MigrationCreateMakeCommand extends MakeCommand
         $this->writeFile();
     }
 
-    private function passVariables()
+    private function passVariables(): void
     {
         $this->setFileContents('{{ class }}', $this->className);
         $this->setFileContents('{{ table }}', $this->tableName);
@@ -67,45 +81,43 @@ class MigrationCreateMakeCommand extends MakeCommand
     }
 
     /**
-     * Формируем массив всех полей с типами и правилами для создания новой таблицы.
+     * Formation of an array of all fields with types and rules for creating a new table.
      */
-    private function parseFields()
+    private function parseFields(): void
     {
         foreach ($this->fieldsTypes as $field => $type) {
-
-            // Типы полей из валидации в приоритете!
             $this->parseFieldsByValidationRules($field);
 
-            // Если из правил валидации ничего не взяли, то берем тип поля из типа указанного в "@property"
+            // If nothing was taken from the validation rules,
+            // then take the field type from the type specified in "@property".
             if ($type && !isset($this->tableFields[$field])) {
                 $this->parseFieldsByProperties($field, $type);
             }
 
-            // Добавляем правила валидации для полей
             $this->parseValidationRules($field);
 
-            // Добавление primary для поля
-            if (isset($this->tableFields[$field]) && in_array($field, $this->primaryKeys)) {
-                $this->tableFields[$field] = str_replace(';', '->primary();', $this->tableFields[$field]);
+            // Adding primary for the field.
+            if (!isset($this->tableFields[$field]) || !in_array($field, $this->primaryKeys)) {
+                continue;
             }
+
+            $this->tableFields[$field] = str_replace(';', '->primary();', $this->tableFields[$field]);
         }
     }
 
     /**
-     * Вытаскиваем типы полей из правил валидации
-     *
-     * @param string $field
+     * Extracting field types from validation rules.
      */
-    private function parseFieldsByValidationRules(string $field)
+    private function parseFieldsByValidationRules(string $field): void
     {
-        if (empty($this->validationRules[$field])) {
+        if (!isset($this->validationRules[$field]) || count($this->validationRules[$field]) === 0) {
             return;
         }
 
         if (in_array('string', $this->validationRules[$field])) {
             $this->tableFields[$field] = '$table->string(\'' . $field . '\');';
         } elseif (in_array('integer', $this->validationRules[$field])) {
-            $this->tableFields[$field] = (str_contains($field, '_id'))
+            $this->tableFields[$field] = str_contains($field, '_id')
                 ? '$table->unsignedBigInteger(\'' . $field . '\');'
                 : '$table->bigInteger(\'' . $field . '\');';
         } elseif (in_array('numeric', $this->validationRules[$field])) {
@@ -120,16 +132,15 @@ class MigrationCreateMakeCommand extends MakeCommand
     }
 
     /**
-     * Заполняем поле из типов полей указанным в "@property"
+     * Filling a field from the field types specified in "@property".
      *
-     * @param string $field
-     * @param string $type
+     * @throws \Exception
      */
-    private function parseFieldsByProperties(string $field, string $type)
+    private function parseFieldsByProperties(string $field, string $type): void
     {
         switch ($type) {
             case 'int':
-                $this->tableFields[$field] = (str_contains($field, '_id'))
+                $this->tableFields[$field] = str_contains($field, '_id')
                     ? '$table->unsignedBigInteger(\'' . $field . '\');'
                     : '$table->bigInteger(\'' . $field . '\');';
                 break;
@@ -145,17 +156,17 @@ class MigrationCreateMakeCommand extends MakeCommand
             case '\Carbon':
                 $this->tableFields[$field] = '$table->timestamp(\'' . $field . '\');';
                 break;
+            default:
+                throw new Exception('Invalid field type!');
         }
     }
 
     /**
-     * Заполняем правила для полей.
-     *
-     * @param string $field
+     * Filling in the rules for the fields.
      */
-    private function parseValidationRules(string $field)
+    private function parseValidationRules(string $field): void
     {
-        if (empty($this->validationRules[$field])) {
+        if (!isset($this->validationRules[$field]) || count($this->validationRules[$field]) === 0) {
             return;
         }
 
@@ -166,11 +177,6 @@ class MigrationCreateMakeCommand extends MakeCommand
         if (in_array('nullable', $this->validationRules[$field])) {
             $this->tableFields[$field] = str_replace(';', '->nullable();', $this->tableFields[$field]);
         }
-
-//        // todo: max:255
-//        if (in_array($this->validationRules[$field], ['string'])) {
-//
-//        }
     }
 
 }

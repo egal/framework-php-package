@@ -1,27 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\CodeGenerator\Commands;
 
 use Illuminate\Support\Str;
-use Exception;
 
 class MigrationDeleteMakeCommand extends MakeCommand
 {
 
+    /**
+     * @var string
+     */
     protected $signature = 'egal:make:migration-delete
-                            {model-name : Название модели по которой генерируем миграцию удаления таблицы}
+                            {model-name : The name of the model by which the table drop migration is generated}
                            ';
 
-    protected $description = 'Генерация класса миграции удаления таблицы по миграции';
+    /**
+     * @var string
+     */
+    protected $description = 'Generating of a table drop migration class';
 
     protected string $stubFileBaseName = 'migration.delete';
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {
-        $modelName = trim((string)$this->argument('model-name'));
+        $modelName = trim((string) $this->argument('model-name'));
         $tableName = Str::snake(Str::plural($modelName));
 
         $className = 'Delete' . Str::plural($modelName) . 'Table';

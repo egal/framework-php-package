@@ -1,5 +1,6 @@
-<?php /** @noinspection PhpMissingFieldTypeInspection */
+<?php
 
+declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
@@ -11,17 +12,23 @@ use Illuminate\Support\Str;
 class QueueConfigMakeCommand extends Command
 {
 
-    protected $signature = 'egal:make:config {config_name : Название конфигурации, которую надо сгенерировать}
-                           ';
-
-    protected $description = 'Генерация конфигураций';
+    /**
+     * @var string
+     */
+    protected $signature = 'egal:make:config {config_name : The name of configuration to be generated}';
 
     /**
-     * @throws Exception
+     * @var string
+     */
+    protected $description = 'Generating configuration';
+
+    /**
+     * @throws \Egal\CodeGenerator\Exceptions\ConfigMakeException
      */
     public function handle(): void
     {
         $makeFunction = Str::camel('make_' . $this->argument('config_name'));
+
         try {
             $this->$makeFunction();
         } catch (Exception $exception) {
@@ -30,10 +37,10 @@ class QueueConfigMakeCommand extends Command
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function makeQueue()
+    private function makeQueue(): void
     {
         $this->copyConfig(
             __DIR__ . '/../../stubs/config.queue.stub',
@@ -42,21 +49,20 @@ class QueueConfigMakeCommand extends Command
     }
 
     /**
-     * @param string $from
-     * @param string $to
-     * @throws Exception
+     * @throws \Egal\CodeGenerator\Exceptions\ConfigMakeException
      */
-    private function copyConfig(string $from, string $to)
+    private function copyConfig(string $from, string $to): void
     {
-        if (
-            file_exists($to)
-            && !$this->confirm('Файл конфигурации уже существует. Заменить?', false)
-        ) {
-            $this->warn('Операция отменена!');
+        $isConfirmed = $this->confirm('Configuration file already exists. Replace?', false);
+
+        if (file_exists($to) && !$isConfirmed) {
+            $this->warn('Canceled!');
+
             return;
         }
+
         if (!copy($from, $to)) {
-            throw new ConfigMakeException("File copy error! From $from to $to.");
+            throw new ConfigMakeException('File copy error! From ' . $from . ' to ' . $to . '.');
         }
     }
 

@@ -1,51 +1,42 @@
-<?php /** @noinspection ALL */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
-use Exception;
-
 /**
- * Класс консольной комманды генерации события.
- *
- * @package Egal\Model
+ * The class of the console command for generating the event.
  */
 class EventMakeCommand extends MakeCommand
 {
 
     /**
-     * Сигнатура конгсольной команды.
-     *
      * @var string
      */
     protected $signature = 'egal:make:event
-                            {event-name : Название события}
-                            {--g|global : Генерировать глобальное событие}
+                            {event-name : Event name}
+                            {--g|global : Generate global event}
                            ';
 
     /**
-     * Описание консольной окманды.
-     *
      * @var string
      */
-    protected $description = 'Генерация класса события';
+    protected $description = 'Event class generating';
 
-    /**
-     * Базовое названия файла-заглушки.
-     *
-     * @var string
-     */
     protected string $stubFileBaseName = 'event';
 
     /**
-     * Действие консольной команды.
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     public function handle(): void
     {
-        $fileBaseName = (string)$this->argument('event-name');
-        $extends = $this->option('global') ? 'GlobalEvent' : 'Event';
-        $this->fileBaseName = str_ends_with($fileBaseName, $extends) ? $fileBaseName : $fileBaseName . $extends;
+        $fileBaseName = (string) $this->argument('event-name');
+        $extends = $this->option('global')
+            ? 'GlobalEvent'
+            : 'Event';
+        $this->fileBaseName = str_ends_with($fileBaseName, $extends)
+            ? $fileBaseName
+            : $fileBaseName . $extends;
         $this->filePath = base_path('app/Events') . '/' . $this->fileBaseName . '.php';
         $this->setFileContents('{{ class }}', $this->fileBaseName);
         $this->setFileContents('{{ extends }}', $extends);
