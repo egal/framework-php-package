@@ -81,11 +81,26 @@ class Builder extends EloquentBuilder
     public function setOrder($order): Builder
     {
         if ($order instanceof Order) {
-            $this->orderBy($order->getColumn(), $order->getDirection());
+            if (preg_match('/^([A-aZ-z,\_]+)\.([A-aZ-z,\_]+)$/', $order->getColumn(), $matches)) {
+                $model = $this->getModel();
+                $relation = $matches[1];
+                $relationColumn = $matches[2];
+                $orderMethod = 'orderBy' . studly_case($relation);
+
+                if (!method_exists($model, $orderMethod)) {
+                    throw new OrderException(
+                        'Unsupported order by ' . $relationColumn . ' field of the ' . $relation . ' relation!'
+                    );
+                }
+
+                $model->$orderMethod($this, $relationColumn, $order->getDirection());
+            } else {
+                $this->orderBy($order->getColumn(), $order->getDirection());
+            }
         } elseif (is_array_of_classes($order, Order::class)) {
             /** @var \Egal\Model\Order\Order $orderItem */
             foreach ($order as $orderItem) {
-                $this->orderBy($orderItem->getColumn(), $orderItem->getDirection());
+                $this->setOrder($orderItem);
             }
         } else {
             throw new OrderException();
