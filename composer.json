@@ -1,8 +1,8 @@
 {
     "name": "egal/framework",
+    "description": "The Egal Framework.",
     "type": "library",
     "license": "Apache-2.0",
-    "description": "",
     "require": {
         "ext-json": "*",
         "ext-pcntl": "*",
@@ -20,19 +20,22 @@
         "slevomat/coding-standard": "^7.0"
     },
     "autoload": {
-        "psr-4": {
-            "Egal\\Egal\\": "egal/",
-            "Egal\\Auth\\": "auth/",
-            "Egal\\CodeGenerator\\": "code-generator/",
-            "Egal\\Core\\": "core/",
-            "Egal\\Exception\\": "exception/",
-            "Egal\\Model\\": "model/",
-            "Egal\\Validation\\": "validation/",
-            "Egal\\Tests\\": "tests/"
-        },
         "files": [
-            "core/helpers.php",
-            "model/helpers.php"
-        ]
-    }
+            "src/Core/helpers.php",
+            "src/Model/helpers.php"
+        ],
+        "psr-4": {
+            "Egal\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Egal\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

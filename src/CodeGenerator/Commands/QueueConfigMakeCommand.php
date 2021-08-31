@@ -43,7 +43,7 @@ class QueueConfigMakeCommand extends Command
     private function makeQueue(): void
     {
         $this->copyConfig(
-            __DIR__ . '/../../stubs/config.queue.stub',
+            __DIR__ . '/stubs/config.queue.stub',
             base_path('config/queue.php')
         );
     }
