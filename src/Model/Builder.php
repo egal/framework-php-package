@@ -12,6 +12,7 @@ use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Filter\FilterPart;
 use Egal\Model\Order\Order;
 use Egal\Model\Pagination\Pagination;
+use Egal\Model\With\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
@@ -174,8 +175,20 @@ class Builder extends EloquentBuilder
      */
     public function setWithFromArray(array $array): Builder
     {
-        if ($array !== []) {
-            $this->with($array);
+        if ($array === []) {
+            return $this;
+        }
+
+        foreach (Collection::fromArray($array)->getRelations() as $relation) {
+            if (!$relation->isFilterExists()) {
+                $this->with($relation->getName());
+            } else {
+                $this->with([
+                    $relation->getName() => static function (Relation $queryRelation) use ($relation) {
+                        $queryRelation->getQuery()->setFilter($relation->getFilter());
+                    },
+                ]);
+            }
         }
 
         return $this;
