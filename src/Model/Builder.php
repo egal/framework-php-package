@@ -183,9 +183,11 @@ class Builder extends EloquentBuilder
             if (!$relation->isFilterExists()) {
                 $this->with($relation->getName());
             } else {
-                $this->with([$relation->getName() => function (Relation $queryRelation) use ($relation) {
-                    $queryRelation->getQuery()->setFilter($relation->getFilter());
-                }]);
+                $this->with([
+                    $relation->getName() => static function (Relation $queryRelation) use ($relation) {
+                        $queryRelation->getQuery()->setFilter($relation->getFilter());
+                    },
+                ]);
             }
         }
 

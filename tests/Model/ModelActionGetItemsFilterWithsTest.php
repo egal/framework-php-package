@@ -76,7 +76,6 @@ class ModelActionGetItemsFilterWithsTest extends TestCase
     }
 
     /**
-     * @group current
      * @dataProvider dataProviderFilterWiths
      */
     public function testFilterWiths(?array $withs, ?string $expectException, $equalsExpect)

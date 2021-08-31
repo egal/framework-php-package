@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 if (!function_exists('array_is_multidimensional')) {
 
     /**
      * Проверяет является ли массив многомерным
      *
-     * @param array $array
-     * @return bool
+     * @param mixed[] $array
      */
     function array_is_multidimensional(array $array): bool
     {
@@ -17,11 +18,15 @@ if (!function_exists('array_is_multidimensional')) {
 
 if (!function_exists('is_array_of_classes')) {
 
+    /**
+     * @param mixed[] $array
+     */
     function is_array_of_classes(array $array, string $class): bool
     {
-        return count(array_filter($array, function ($entry) use ($class) {
-                return $entry instanceof $class;
-            })) === count($array);
+        return count(array_filter(
+            $array,
+            static fn ($entry) => $entry instanceof $class
+        )) === count($array);
     }
 
 }
@@ -29,17 +34,11 @@ if (!function_exists('is_array_of_classes')) {
 if (!function_exists('str_replace_first')) {
 
     /**
-     * Заменяет первое вхождение подстроки в строке на указанную строку
-     *
-     * @param $search
-     * @param $replace
-     * @param $subject
-     * @return string|string[]|null
+     * Replaces the first occurrence of a substring in a string with the specified string.
      */
-    function str_replace_first($search, $replace, $subject)
+    function str_replace_first(string $search, string $replace, string $subject): string
     {
-        $search = '/' . preg_quote($search, '/') . '/';
-        return preg_replace($search, $replace, $subject, 1);
+        return preg_replace('/' . preg_quote($search, '/') . '/', $replace, $subject, 1);
     }
 
 }
