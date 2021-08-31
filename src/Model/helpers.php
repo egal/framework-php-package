@@ -25,6 +25,7 @@ if (!function_exists('is_array_of_classes')) {
     }
 
 }
+
 if (!function_exists('str_replace_first')) {
 
     /**
@@ -39,6 +40,34 @@ if (!function_exists('str_replace_first')) {
     {
         $search = '/' . preg_quote($search, '/') . '/';
         return preg_replace($search, $replace, $subject, 1);
+    }
+
+}
+
+if (!function_exists('is_sequential_array')) {
+
+    /**
+     * Checks an array is sequential.
+     *
+     * @param mixed[] $array
+     */
+    function is_sequential_array(array $array): bool
+    {
+        return array_keys($array) === range(0, count($array) - 1);
+    }
+
+}
+
+if (!function_exists('is_associative_array')) {
+
+    /**
+     * Checks an array is associative.
+     *
+     * @param mixed[] $array
+     */
+    function is_associative_array(array $array): bool
+    {
+        return !is_sequential_array($array);
     }
 
 }
