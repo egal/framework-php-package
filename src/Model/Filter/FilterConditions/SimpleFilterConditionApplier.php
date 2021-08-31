@@ -44,13 +44,26 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 
             $field = $fieldParts[count($fieldParts) - 1];
             $relationName = $fieldParts[count($fieldParts) - 2];
-            $builder->getModel()->getModelMetadata()->relationExistOrFail($relationName);
-            $builder->{$clause . 'Has'}(
-                camel_case($relationName),
-                static function (Builder $query) use ($condition, $field): void {
-                    $query->where($field, static::getSqlOperator($condition), static::getPreparedValue($condition));
-                }
-            );
+
+            if (preg_match('/^(.+)\[(.+)\]$/', $relationName, $matches)) {
+                $relationName = $matches[1];
+                $builder->getModel()->getModelMetadata()->relationExistOrFail($relationName);
+                $builder->{$clause . 'HasMorph'}(
+                    $relationName,
+                    explode(',', $matches[2]),
+                    static function (Builder $query) use ($condition, $field): void {
+                        $query->where($field, static::getSqlOperator($condition), static::getPreparedValue($condition));
+                    }
+                );
+            } else {
+                $builder->getModel()->getModelMetadata()->relationExistOrFail($relationName);
+                $builder->{$clause . 'Has'}(
+                    camel_case($relationName),
+                    static function (Builder $query) use ($condition, $field): void {
+                        $query->where($field, static::getSqlOperator($condition), static::getPreparedValue($condition));
+                    }
+                );
+            }
         } else {
             $builder->$clause(
                 $condition->getField(),
