@@ -34,7 +34,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         $operator = static::getSqlOperator($condition->getOperator());
         $value = static::getPreparedValue($condition->getOperator(), $condition->getValue());
 
-        if (preg_match('/^([A-aZ-z,\_]+)\[([A-aZ-z,\,,\\,\_]+)\]\.([A-aZ-z,\_]+)$/', $condition->getField(), $matches)) {
+        if (preg_match('/^(\w+)\[([\w,\\\\]+)\]\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `morph_rel[first_type,second_type].field`.
             $relation = $matches[1];
             $field = $matches[3];
@@ -44,7 +44,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             };
             $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
             $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
-        } elseif (preg_match('/^([A-aZ-z,\_]+)\.([A-aZ-z,\_]+)$/', $condition->getField(), $matches)) {
+        } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
             $relation = $matches[1];
             $field = $matches[2];
@@ -53,7 +53,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             };
             $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
             $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
-        } elseif (preg_match('/^([A-aZ-z,\_]+)$/', $condition->getField(), $matches)) {
+        } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
             $builder->where($condition->getField(), $operator, $value, $boolean);
         } else {
