@@ -180,14 +180,19 @@ class Builder extends EloquentBuilder
         }
 
         foreach (Collection::fromArray($array)->getRelations() as $relation) {
-            if (!$relation->isFilterExists()) {
-                $this->with($relation->getName());
+            $relationClosure = static function ($queryRelation) use ($relation) {
+                if (!$relation->isFilterExists()) {
+                    return;
+                }
+
+                $queryRelation->getQuery()->setFilter($relation->getFilter());
+            };
+            $relations = [$relation->getName() => $relationClosure];
+
+            if ($relation->isAggregateFunctionExists()) {
+                $this->withAggregate($relations, $relation->getAggregateColumn(), $relation->getAggregateFunction());
             } else {
-                $this->with([
-                    $relation->getName() => static function (Relation $queryRelation) use ($relation) {
-                        $queryRelation->getQuery()->setFilter($relation->getFilter());
-                    },
-                ]);
+                $this->with($relations);
             }
         }
 

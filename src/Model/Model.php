@@ -196,9 +196,9 @@ abstract class Model extends EloquentModel
         $builder = static::newInstanceForAction()
             ->newQuery()
             ->needFireModelActionEvents()
+            ->setWithFromArray($withs)
             ->setOrderFromArray($order)
-            ->setFilterFromArray($filter)
-            ->setWithFromArray($withs);
+            ->setFilterFromArray($filter);
 
         if (isset($pagination)) {
             $paginator = $builder->difficultPaginateFromArray($pagination);

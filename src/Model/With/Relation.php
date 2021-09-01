@@ -13,6 +13,10 @@ class Relation
 
     private FilterPart $filter;
 
+    private string $aggregateFunction;
+
+    private string $aggregateColumn = '*';
+
     public function setName(string $name): Relation
     {
         $this->name = $name;
@@ -40,6 +44,35 @@ class Relation
         $this->filter = $filter;
 
         return $this;
+    }
+
+    public function setAggregateFunction(string $aggregateFunction): Relation
+    {
+        $this->aggregateFunction = $aggregateFunction;
+
+        return $this;
+    }
+
+    public function isAggregateFunctionExists(): bool
+    {
+        return isset($this->aggregateFunction);
+    }
+
+    public function getAggregateColumn(): string
+    {
+        return $this->aggregateColumn;
+    }
+
+    public function setAggregateColumn(string $aggregateColumn): Relation
+    {
+        $this->aggregateColumn = $aggregateColumn;
+
+        return $this;
+    }
+
+    public function getAggregateFunction(): string
+    {
+        return $this->aggregateFunction;
     }
 
 }
