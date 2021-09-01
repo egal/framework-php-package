@@ -81,7 +81,7 @@ class Builder extends EloquentBuilder
     public function setOrder($order): Builder
     {
         if ($order instanceof Order) {
-            if (preg_match('/^([A-aZ-z,\_]+)\.([A-aZ-z,\_]+)$/', $order->getColumn(), $matches)) {
+            if (preg_match('/^(\w+)\.(\w+)$/', $order->getColumn(), $matches)) {
                 $model = $this->getModel();
                 $relation = $matches[1];
                 $relationColumn = $matches[2];
