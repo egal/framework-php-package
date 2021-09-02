@@ -24,6 +24,7 @@
         <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
     </rule>
 
+
     <rule ref="PEAR.Functions.FunctionCallSignature">
         <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
@@ -77,6 +78,7 @@
         <exclude name="Squiz.Commenting.VariableComment.TagNotAllowed"/>
         <exclude name="Squiz.Formatting.OperatorBracket.MissingBrackets"/>
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.EmptyDefault"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
@@ -109,19 +111,22 @@
         <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
         <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
-        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
+        <exclude
+            name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
         <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint"/>
         <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
         <exclude name="SlevomatCodingStandard.Functions.DisallowArrowFunction.DisallowedArrowFunction"/>
+        <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
+        <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
         <!-- Expected 1 line after &quot;case&quot;, found 0. -->
-<!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountAfterControlStructure"/>-->
+        <!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountAfterControlStructure"/>-->
 
         <!-- Expected 1 line before &quot;default&quot;, found 0.-->
-<!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
+        <!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
 
         <!-- Expected 1 line before &quot;break&quot;, found 0. -->
-<!--        <exclude name="SlevomatCodingStandard.ControlStructures.JumpStatementsSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
+        <!--        <exclude name="SlevomatCodingStandard.ControlStructures.JumpStatementsSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
@@ -144,12 +149,12 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
         <properties>
-            <property name="maxLinesLength" value="50" />
+            <property name="maxLinesLength" value="50"/>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Files.FunctionLength">
         <properties>
-            <property name="maxLinesLength" value="50" />
+            <property name="maxLinesLength" value="50"/>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed">

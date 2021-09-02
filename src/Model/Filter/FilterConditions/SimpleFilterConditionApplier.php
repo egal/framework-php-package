@@ -6,7 +6,7 @@ namespace Egal\Model\Filter\FilterConditions;
 
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
-use Egal\Model\Filter\FilterCombiner;
+use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
 use Egal\Model\Filter\FilterCondition;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
@@ -29,40 +29,41 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     private const END_WITH_OPERATOR = 'ew';
     private const END_WITH_IGNORE_CASE_OPERATOR = 'ewi';
 
-    public static function apply(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    public static function apply(Builder &$builder, FilterCondition $condition, string $boolean): void
     {
-        $clause = $beforeOperator === FilterCombiner::AND
-            ? 'where'
-            : 'orWhere';
+        $operator = static::getSqlOperator($condition->getOperator());
+        $value = static::getPreparedValue($condition->getOperator(), $condition->getValue());
 
-        if (str_contains($condition->getField(), '.')) {
-            $fieldParts = explode('.', $condition->getField());
-
-            if (count($fieldParts) < 2) {
-                throw new FilterException('Field format is not correct!');
-            }
-
-            $field = $fieldParts[count($fieldParts) - 1];
-            $relationName = $fieldParts[count($fieldParts) - 2];
-            $builder->getModel()->getModelMetadata()->relationExistOrFail($relationName);
-            $builder->{$clause . 'Has'}(
-                camel_case($relationName),
-                static function (Builder $query) use ($condition, $field): void {
-                    $query->where($field, static::getSqlOperator($condition), static::getPreparedValue($condition));
-                }
-            );
+        if (preg_match('/^(\w+)\[([\w,\\\\]+)\]\.(\w+)$/', $condition->getField(), $matches)) {
+            // For condition field like `morph_rel[first_type,second_type].field`.
+            $relation = $matches[1];
+            $field = $matches[3];
+            $types = explode(',', $matches[2]);
+            $clause = static function (Builder $query) use ($field, $operator, $value): void {
+                $query->where($field, $operator, $value);
+            };
+            $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+            $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
+        } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
+            // For condition field like `rel.field`.
+            $relation = $matches[1];
+            $field = $matches[2];
+            $clause = static function (Builder $query) use ($field, $operator, $value): void {
+                $query->where($field, $operator, $value);
+            };
+            $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+            $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
+        } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
+            // For condition field like `field`.
+            $builder->where($condition->getField(), $operator, $value, $boolean);
         } else {
-            $builder->$clause(
-                $condition->getField(),
-                static::getSqlOperator($condition),
-                static::getPreparedValue($condition)
-            );
+            throw new UnsupportedFilterConditionFieldFormException();
         }
     }
 
-    private static function getSqlOperator(FilterCondition $condition): string
+    private static function getSqlOperator(string $operator): string
     {
-        switch ($condition->getOperator()) {
+        switch ($operator) {
             case self::EQUAL_OPERATOR:
                 return '=';
             case self::NOT_EQUAL_OPERATOR:
@@ -95,24 +96,25 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     }
 
     /**
+     * @param mixed $value
      * @return mixed
      */
-    private static function getPreparedValue(FilterCondition $condition)
+    private static function getPreparedValue(string $operator, $value)
     {
-        switch ($condition->getOperator()) {
+        switch ($operator) {
             case self::CONTAIN_OPERATOR:
             case self::CONTAIN_IGNORE_CASE_OPERATOR:
             case self::NOT_CONTAIN_OPERATOR:
             case self::NOT_CONTAIN_IGNORE_CASE_OPERATOR:
-                return '%' . $condition->getValue() . '%';
+                return '%' . $value . '%';
             case self::START_WITH_OPERATOR:
             case self::START_WITH_IGNORE_CASE_OPERATOR:
-                return $condition->getValue() . '%';
+                return $value . '%';
             case self::END_WITH_OPERATOR:
             case self::END_WITH_IGNORE_CASE_OPERATOR:
-                return '%' . $condition->getValue();
+                return '%' . $value;
             default:
-                return $condition->getValue();
+                return $value;
         }
     }
 

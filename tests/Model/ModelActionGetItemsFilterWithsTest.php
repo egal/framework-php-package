@@ -49,6 +49,11 @@ class ModelActionGetItemsFilterWithsTest extends TestCase
                 [1, 2, 3],
             ],
             [
+                ['products' => []],
+                null,
+                [1, 2, 3],
+            ],
+            [
                 [
                     'products' => [
                         'filter' => [
