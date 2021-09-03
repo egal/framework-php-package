@@ -44,40 +44,46 @@ class ModelActionGetItemsWithsAggregateTest extends TestCase
     {
         return [
             [
-                ['products.count()'],
-                null,
-                'products_count',
-                3,
-            ],
-            [
                 ['products.count()' => []],
                 null,
                 'products_count',
                 3,
             ],
             [
-                ['products.sum(id)' => []],
+                ['products.count()'],
+                null,
+                'products_count',
+                3,
+            ],
+            [
+                ['products.sum(id)'],
                 null,
                 'products_sum_id',
                 6,
             ],
             [
-                ['products.max(id)' => []],
+                ['products.max(id)'],
                 null,
                 'products_max_id',
                 3,
             ],
             [
-                ['products.min(id)' => []],
+                ['products.min(id)'],
                 null,
                 'products_min_id',
                 1,
             ],
             [
-                ['products.avg(id)' => []],
+                ['products.avg(id)'],
                 null,
                 'products_avg_id',
                 2,
+            ],
+            [
+                ['products.exists()'],
+                null,
+                'products_exists',
+                true,
             ],
         ];
     }

@@ -32,7 +32,7 @@ class Collection
 
             $relation = new Relation();
 
-            if (preg_match('/^([A-aZ-z,\_,\.]+)\.(.+)\(([A-aZ-z,\_]+)?\)$/', $relationName, $matches)) {
+            if (preg_match('/^(\w+)\.(\w+)\((\w+)?\)$/', $relationName, $matches)) {
                 $relationName = $matches[1];
                 $relation->setAggregateFunction($matches[2]);
                 if (isset($matches[3])) {
