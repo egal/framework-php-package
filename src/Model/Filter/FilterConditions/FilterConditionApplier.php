@@ -10,6 +10,6 @@ use Egal\Model\Filter\FilterCondition;
 abstract class FilterConditionApplier
 {
 
-    abstract public static function apply(Builder &$builder, FilterCondition $condition, string $beforeOperator): void;
+    abstract public static function apply(Builder &$builder, FilterCondition $condition, string $boolean): void;
 
 }
