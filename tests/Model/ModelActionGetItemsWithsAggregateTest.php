@@ -5,6 +5,7 @@ namespace Egal\Tests\Model;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
@@ -84,6 +85,12 @@ class ModelActionGetItemsWithsAggregateTest extends TestCase
                 null,
                 'products_exists',
                 true,
+            ],
+            [
+                ['dd.avg()'],
+                RelationNotFoundException::class,
+                null,
+                null,
             ],
         ];
     }

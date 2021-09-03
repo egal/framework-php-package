@@ -172,6 +172,7 @@ class Builder extends EloquentBuilder
      *
      * @param string[] $array
      * @return $this
+     * @throws \ReflectionException|\Illuminate\Database\Eloquent\RelationNotFoundException
      */
     public function setWithFromArray(array $array): Builder
     {
@@ -180,6 +181,10 @@ class Builder extends EloquentBuilder
         }
 
         foreach (Collection::fromArray($array)->getRelations() as $relation) {
+            if (!in_array($relation->getName(), $this->getModel()->getModelMetadata()->getRelations())) {
+                throw RelationNotFoundException::make($this->getModel(), $relation->getName());
+            }
+
             $relationClosure = static function ($queryRelation) use ($relation) {
                 if (!$relation->isFilterExists()) {
                     return;

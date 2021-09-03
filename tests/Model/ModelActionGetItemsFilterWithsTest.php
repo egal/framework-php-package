@@ -103,6 +103,9 @@ class ModelActionGetItemsFilterWithsTest extends TestCase
 
 }
 
+/**
+ * @property $products {@property-type relation}
+ */
 class ModelActionGetItemsFilterWithsTestCategoryStub extends Model
 {
 
