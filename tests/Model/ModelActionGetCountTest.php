@@ -2,7 +2,6 @@
 
 namespace Egal\Tests\Model;
 
-use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
