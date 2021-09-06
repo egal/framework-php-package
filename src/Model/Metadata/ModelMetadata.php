@@ -7,6 +7,7 @@ namespace Egal\Model\Metadata;
 use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException;
 use Egal\Model\Exceptions\FieldNotFoundException;
+use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use phpDocumentor\Reflection\DocBlock;
@@ -269,12 +270,21 @@ class ModelMetadata
      * Разбирает все property в phpDoc и отбирает field, relation и правила валидации
      *
      * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
+     * @throws \Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException
      */
     protected function scanProperties(DocBlock $docBlock): void
     {
         /** @var \phpDocumentor\Reflection\DocBlock\Tags\Property $property */
         foreach ($docBlock->getTagsByName('property') as $property) {
             $propertyTags = $property->getDescription()->getTags();
+
+            if ($property->getVariableName() !== snake_case($property->getVariableName())) {
+                throw IncorrectCaseOfPropertyVariableNameException::make(
+                    $this->modelClass,
+                    $property->getVariableName()
+                );
+            }
+
             /** @var \phpDocumentor\Reflection\DocBlock\Tags\Generic $propertyTag */
             foreach ($propertyTags as $propertyTag) {
                 $bodyTemplate = $propertyTag->getDescription()
