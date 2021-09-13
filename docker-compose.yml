@@ -6,6 +6,7 @@ services:
     build:
       context: ./dockerfiles
       dockerfile: "${DOCKER_FILE:-php74.Dockerfile}"
+#      dockerfile: "${DOCKER_FILE:-php80.Dockerfile}"
     working_dir: '/data'
     volumes:
       - .:/data

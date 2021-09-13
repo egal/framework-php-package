@@ -4,6 +4,7 @@
     "type": "library",
     "license": "Apache-2.0",
     "require": {
+        "php": "^7.4|^8.0",
         "ext-json": "*",
         "ext-pcntl": "*",
         "phpdocumentor/reflection-docblock": "^5.2",
