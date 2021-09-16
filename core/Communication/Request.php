@@ -89,9 +89,6 @@ class Request extends ActionMessage
         $this->isConnectionOpened = false;
     }
 
-    /**
-     * @throws Exception
-     */
     public function waitReplyMessages()
     {
         $this->isConnectionOpenedOrFail();
@@ -114,7 +111,7 @@ class Request extends ActionMessage
                 }
                 usleep(100);
             }
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->closeConnection();
             throw $exception;
         }

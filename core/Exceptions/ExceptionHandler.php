@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingFieldTypeInspection */
+<?php
 
 namespace Egal\Core\Exceptions;
 
@@ -23,52 +23,26 @@ class ExceptionHandler extends BaseExceptionHandler
      */
     protected $dontReport = [];
 
-    /**
-     * Сообщить или записать исключение.
-     *
-     * Это отличное место для отправки исключений в Sentry, Bugsnag и т. Д.
-     *
-     * @param Throwable $e
-     * @return void
-     *
-     * @throws Exception
-     */
-    public function report(Throwable $e)
+    public function report(Throwable $exception)
     {
         if (Session::isActionMessageExists()) {
             $actionErrorMessage = new ActionErrorMessage();
+            $actionErrorMessage->setMessage($exception->getMessage());
 
-            switch (get_class($e)) {
+            switch (get_class($exception)) {
                 case QueryException::class:
-                    /** @var QueryException $e */
-                    $actionErrorMessage->setMessage($e->getMessage());
                     $actionErrorMessage->setCode(500);
                     break;
                 default:
-                    $actionErrorMessage->setMessage($e->getMessage());
-                    $actionErrorMessage->setCode($e->getCode());
+                    $actionErrorMessage->setCode($exception->getCode());
                     break;
             }
 
             $actionErrorMessage->setActionMessage(Session::getActionMessage());
             Bus::getInstance()->publishMessage($actionErrorMessage);
-            Bus::getInstance()->destructEnvironment();
         }
-        parent::report($e);
-    }
 
-    /**
-     * Вывести исключение в HTTP-ответ.
-     *
-     * @param Request $request
-     * @param Throwable $e
-     * @return Response|JsonResponse
-     *
-     * @throws Throwable
-     */
-    public function render($request, Throwable $e)
-    {
-        return parent::render($request, $e);
+        parent::report($exception);
     }
 
 }

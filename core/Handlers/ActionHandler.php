@@ -38,18 +38,24 @@ class ActionHandler implements HandlerInterface
     public function handle(array $data): void
     {
         $this->setActionMessage(ActionMessage::fromArray($data));
-        Session::setActionMessage($this->getActionMessage());
         $this->publishMessageStartProcessing();
-        $this->configureActionMessageResult();
 
-        $result = (new ActionCaller(
-            $this->actionMessage->getModelName(),
-            $this->actionMessage->getActionName(),
-            $this->actionMessage->getParameters()
-        ))->call();
+        try {
+            Session::setActionMessage($this->getActionMessage());
+            $this->configureActionMessageResult();
 
-        $this->actionResultMessage->setData($result);
-        Bus::getInstance()->publishMessage($this->actionResultMessage);
+            $result = (new ActionCaller(
+                $this->actionMessage->getModelName(),
+                $this->actionMessage->getActionName(),
+                $this->actionMessage->getParameters()
+            ))->call();
+
+            $this->actionResultMessage->setData($result);
+            Bus::getInstance()->publishMessage($this->actionResultMessage);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
         Session::unsetActionMessage();
     }
 
