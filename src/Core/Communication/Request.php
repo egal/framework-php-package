@@ -46,11 +46,6 @@ class Request extends ActionMessage
     private bool $serviceAuthorization = true;
 
     /**
-     * Mark: service requests itself.
-     */
-    private bool $itself;
-
-    /**
      * @param mixed[] $parameters
      */
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
@@ -58,7 +53,6 @@ class Request extends ActionMessage
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
 
         $this->isConnectionOpened = false;
-        $this->itself = config('app.service_name') === $this->authServiceName;
     }
 
     public function setAuthServiceName(string $authServiceName): void
@@ -188,7 +182,9 @@ class Request extends ActionMessage
         }
 
         $this->setToken(
-            $this->itself ? $this->getItselfServiceServiceToken() : $this->getServiceServiceToken()
+            config('app.service_name') === $this->authServiceName
+                ? $this->getItselfServiceServiceToken()
+                : $this->getServiceServiceToken()
         );
     }
 
