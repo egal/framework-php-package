@@ -58,7 +58,7 @@ class Request extends ActionMessage
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
 
         $this->isConnectionOpened = false;
-        $this->itself = config('app.service_name') === $this->serviceName;
+        $this->itself = config('app.service_name') === $this->authServiceName;
     }
 
     public function setAuthServiceName(string $authServiceName): void
