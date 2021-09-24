@@ -67,7 +67,13 @@ class RabbitMQBus extends Bus
                 /** @var ActionErrorMessage|ActionResultMessage|StartProcessingMessage $message */
                 $this->connection->getChannel()->queue_declare(
                     $message->getActionMessage()->getUuid(),
-                    true
+                    true,
+                    false,
+                    false,
+                    true,
+                    false,
+                    new AMQPTable(["x-queue-mode" => "default"]),
+                    null
                 );
                 $this->connection->getChannel()->queue_bind(
                     $message->getActionMessage()->getUuid(),
@@ -77,14 +83,23 @@ class RabbitMQBus extends Bus
                 break;
             case MessageType::ACTION:
                 /** @var ActionMessage $message */
-                $this->connection->getChannel()->queue_declare($message->getUuid());
+                $this->connection->getChannel()->queue_declare(
+                    $message->getUuid(),
+                    false,
+                    false,
+                    false,
+                    true,
+                    false,
+                    new AMQPTable(["x-queue-mode" => "default"]),
+                    null
+                );
                 break;
         }
 
         $AMQPMessage = new AMQPMessage(
             $message->toJson(),
             [
-                'delivery_mode' => 2,
+                'delivery_mode' => 1,
                 'application_headers' => new AMQPTable(['hash-on' => $message->getUuid()])
             ]
         );
@@ -151,7 +166,12 @@ class RabbitMQBus extends Bus
         $this->queueName = words_to_dot_case(config('app.service_name'), $processUuid, 'queue');
         $exchangeBalancerName = words_to_dot_case(config('app.service_name'), 'balancer', 'exchange');
 
-        $this->connection->declareQueue($this->queueName, true, true);
+        $this->connection->declareQueue(
+            $this->queueName,
+            true,
+            true,
+            ["x-queue-mode" => "default"]
+        );
         $this->connection->declareExchange(
             $exchangeBalancerName,
             'x-consistent-hash',
