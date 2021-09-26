@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\ModelS3FileStoring;
 
-use Aws\S3\S3Client;
+use Aws\S3\S3ClientInterface;
 use Egal\ModelFileStoring\FileStoring;
 
 /**
@@ -16,7 +16,7 @@ trait S3FileStoring
 
     use FileStoring;
 
-    private S3Client $client;
+    private S3ClientInterface $client;
 
     public function initializeS3FileStoring(): void
     {

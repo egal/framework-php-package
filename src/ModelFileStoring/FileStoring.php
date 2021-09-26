@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Egal\ModelFileStoring;
 
 use Exception;
-use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 trait FileStoring
 {
 
-    private FilesystemAdapter $disk;
+    private Filesystem $disk;
 
     public function initializeFileStoring(): void
     {
