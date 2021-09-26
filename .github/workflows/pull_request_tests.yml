@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up PHP Dockerfile
+        run: export PHP_DOCKERFILE='php74.Dockerfile'
       - name: Install Composer
         run: |
           docker-compose run --rm \
@@ -19,9 +21,7 @@ jobs:
               --no-interaction \
               --no-progress
       - name: Run a PHPUnit
-        run: |
-          export PHP_DOCKERFILE='php74.Dockerfile'
-          bash bin/phpunit.sh
+        run: bash bin/phpunit.sh
 
   PHPCS74:
     runs-on: ubuntu-latest
@@ -29,6 +29,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
+      - name: Set up PHP Dockerfile
+        run: export PHP_DOCKERFILE='php74.Dockerfile'
       - name: Install Composer
         run: |
           docker-compose run --rm \
@@ -46,13 +48,14 @@ jobs:
             ${{ github.event.pull_request.base.sha }} \
             ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
           if [ "${DIFF}" == '' ]; then exit 0; fi
-          export PHP_DOCKERFILE='php74.Dockerfile'
           bash bin/phpcs.sh --warning-severity=0 $DIFF
 
   PHPUnit80:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up PHP Dockerfile
+        run: export PHP_DOCKERFILE='php80.Dockerfile'
       - name: Install Composer
         run: |
           docker-compose run --rm \
@@ -63,9 +66,7 @@ jobs:
               --no-interaction \
               --no-progress
       - name: Run a PHPUnit
-        run: |
-          export PHP_DOCKERFILE='php80.Dockerfile'
-          bash bin/phpunit.sh
+        run: bash bin/phpunit.sh
 
   PHPCS80:
     runs-on: ubuntu-latest
@@ -73,6 +74,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
+      - name: Set up PHP Dockerfile
+        run: export PHP_DOCKERFILE='php80.Dockerfile'
       - name: Install Composer
         run: |
           docker-compose run --rm \
@@ -90,5 +93,4 @@ jobs:
             ${{ github.event.pull_request.base.sha }} \
             ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
           if [ "${DIFF}" == '' ]; then exit 0; fi
-          export PHP_DOCKERFILE='php80.Dockerfile'
           bash bin/phpcs.sh --warning-severity=0 $DIFF
