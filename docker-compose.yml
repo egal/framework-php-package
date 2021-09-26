@@ -2,10 +2,10 @@ version: '3.7'
 
 services:
 
-  phpunit:
+  php:
     build:
       context: ./dockerfiles
-      dockerfile: "${DOCKER_FILE:-php74.Dockerfile}"
+      dockerfile: "${PHP_DOCKERFILE:-php74.Dockerfile}"
     working_dir: '/data'
     volumes:
       - .:/data

@@ -22,7 +22,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
      *
      * @return void
      */
-    protected function createSchema()
+    protected function createSchema(): void
     {
         $this->schema()->create('categories', function (Blueprint $table) {
             $table->increments('id');
