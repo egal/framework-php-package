@@ -6,6 +6,7 @@ namespace Egal\ModelS3FileStoring;
 
 use Aws\S3\S3ClientInterface;
 use Egal\ModelFileStoring\FileStoring;
+use Illuminate\Filesystem\FilesystemAdapter;
 
 /**
  * @mixin \Egal\Model\Model
@@ -16,6 +17,7 @@ trait S3FileStoring
 
     use FileStoring;
 
+    private FilesystemAdapter $disk;
     private S3ClientInterface $client;
 
     public function initializeS3FileStoring(): void
