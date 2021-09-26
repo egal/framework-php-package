@@ -174,10 +174,15 @@ trait AwsFileStoring
             && str_ends_with($key, $this->getContentUrlPropertyNamePostfix())
             && $this->isContentExists($contentName = $this->getContentName($key))
         ) {
-            return $this->disk->url($this->getContentPath($contentName));
+            return $this->getContentUrl($contentName);
         }
 
         return parent::mutateAttribute($key, $value);
+    }
+
+    protected function getContentUrl(string $contentName): string
+    {
+        return $this->disk->url($this->getContentPath($contentName));
     }
 
     public function getContentName(string $contentNameOrPathOrUrl): string
