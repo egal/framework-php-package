@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\ModelFileStoring;
 
-use Aws\S3\S3Client;
-use Egal\Model\Model;
 use Exception;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Collection;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
- * @mixin Model
+ * @mixin \Egal\Model\Model
  * @property string[] $contentNames
  */
 trait FileStoring
@@ -19,15 +19,7 @@ trait FileStoring
 
     private FilesystemAdapter $disk;
 
-    /**
-     * @return string[]
-     */
-    private function getContentNames(): array
-    {
-        return $this->contentNames ?? [];
-    }
-
-    public function initializeFileStoring()
+    public function initializeFileStoring(): void
     {
         foreach ($this->getContentNames() as $contentName) {
             $this->append(Str::snake($this->getContentUrlPropertyName($contentName)));
@@ -41,15 +33,59 @@ trait FileStoring
         $this->disk = Storage::disk($this->getDiskName());
     }
 
+    public function getContentName(string $contentNameOrPathOrUrl): string
+    {
+        if (str_ends_with($contentNameOrPathOrUrl, $this->getContentPathPropertyNamePostfix())) {
+            $contentName = str_replace($this->getContentPathPropertyNamePostfix(), '', $contentNameOrPathOrUrl);
+        } elseif (str_ends_with($contentNameOrPathOrUrl, $this->getContentUrlPropertyNamePostfix())) {
+            $contentName = str_replace($this->getContentUrlPropertyNamePostfix(), '', $contentNameOrPathOrUrl);
+        } else {
+            throw new Exception('Content does not exists!');
+        }
+
+        $this->isContentExistsOrFail($contentName);
+
+        return $contentName;
+    }
+
     public static function actionUpload(string $fileBasename, string $contents): array
     {
         $file = new static();
         $path = $file->generatePath($fileBasename);
         $file->disk->put($path, $contents, $file->getVisibility());
 
-        return [
-            'path' => $path
-        ];
+        return ['path' => $path];
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function mutateAttribute($key, $value)
+    {
+        if ($this->isNeedMutateUrlFields() && str_ends_with($key, $this->getContentUrlPropertyNamePostfix())) {
+            $contentName = $this->getContentName($key);
+
+            if ($this->isContentExists($contentName)) {
+                return $this->getContentUrl($contentName);
+            }
+        }
+
+        return parent::mutateAttribute($key, $value);
+    }
+
+    protected function getContentUrl(string $contentName): string
+    {
+        return $this->disk->url($this->getContentPath($contentName));
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getContentNames(): array
+    {
+        return $this->contentNames ?? [];
     }
 
     private function generatePath(string $fileBasename): string
@@ -89,8 +125,12 @@ trait FileStoring
         return $this->listPartsPage($key, $uploadId, 0);
     }
 
-    private function listPartsPage(string $key, string $uploadId, int $partNumber, Collection $parts = null): Collection
-    {
+    private function listPartsPage(
+        string $key,
+        string $uploadId,
+        int $partNumber,
+        ?Collection $parts = null
+    ): Collection {
         $parts ??= collect();
 
         $results = $this->client->listParts([
@@ -102,6 +142,7 @@ trait FileStoring
 
         if ($results['Parts']) {
             $parts = $parts->concat($results['Parts']);
+
             if ($results['IsTruncated']) {
                 $results = $this->listPartsPage($key, $uploadId, $results['NextPartNumberMarker'], $parts);
                 $parts = $parts->concat($results['Parts']);
@@ -114,39 +155,6 @@ trait FileStoring
     private function getVisibility(): string
     {
         return config('filesystems.disks.' . $this->getDiskName() . '.visibility');
-    }
-
-    protected function mutateAttribute($key, $value)
-    {
-        if (
-            $this->isNeedMutateUrlFields()
-            && str_ends_with($key, $this->getContentUrlPropertyNamePostfix())
-            && $this->isContentExists($contentName = $this->getContentName($key))
-        ) {
-            return $this->getContentUrl($contentName);
-        }
-
-        return parent::mutateAttribute($key, $value);
-    }
-
-    protected function getContentUrl(string $contentName): string
-    {
-        return $this->disk->url($this->getContentPath($contentName));
-    }
-
-    public function getContentName(string $contentNameOrPathOrUrl): string
-    {
-        if (str_ends_with($contentNameOrPathOrUrl, $this->getContentPathPropertyNamePostfix())) {
-            $contentName = str_replace($this->getContentPathPropertyNamePostfix(), '', $contentNameOrPathOrUrl);
-        } elseif (str_ends_with($contentNameOrPathOrUrl, $this->getContentUrlPropertyNamePostfix())) {
-            $contentName = str_replace($this->getContentUrlPropertyNamePostfix(), '', $contentNameOrPathOrUrl);
-        } else {
-            throw new Exception('Content does not exists!');
-        }
-
-        $this->isContentExistsOrFail($contentName);
-
-        return $contentName;
     }
 
     private function getContentPathPropertyNamePostfix(): string
