@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\ModelS3FileStoring;
 
 use Aws\S3\S3Client;
-use Egal\Model\Model;
 use Egal\ModelFileStoring\FileStoring;
 
 /**
- * @mixin Model
+ * @mixin \Egal\Model\Model
  * @property string[] $contentNames
  */
 trait S3FileStoring
@@ -17,7 +18,7 @@ trait S3FileStoring
 
     private S3Client $client;
 
-    public function initializeFileStoring()
+    public function initializeFileStoring(): void
     {
         $this->client = $this->disk->getDriver()->getAdapter()->getClient();
     }
@@ -48,9 +49,7 @@ trait S3FileStoring
             'Body' => $contents,
         ]);
 
-        return [
-            'message' => 'Uploaded!'
-        ];
+        return ['message' => 'Uploaded!'];
     }
 
     public static function actionCompleteMultipartUpload(string $path, string $uploadId): array
@@ -60,15 +59,11 @@ trait S3FileStoring
             'Bucket' => $file->getBucketName(),
             'Key' => $path,
             'UploadId' => $uploadId,
-            'MultipartUpload' => [
-                'Parts' => $file->getUploadedParts($path, $uploadId)->toArray()
-            ],
+            'MultipartUpload' => ['Parts' => $file->getUploadedParts($path, $uploadId)->toArray()],
         ]);
         $file->disk->setVisibility($path, $file->getVisibility());
 
-        return [
-            'path' => $path
-        ];
+        return ['path' => $path];
     }
 
 }

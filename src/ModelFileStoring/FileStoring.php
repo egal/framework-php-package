@@ -91,7 +91,7 @@ trait FileStoring
 
     private function listPartsPage(string $key, string $uploadId, int $partNumber, Collection $parts = null): Collection
     {
-        $parts = $parts ?? collect();
+        $parts ??= collect();
 
         $results = $this->client->listParts([
             'Bucket' => $this->getBucketName(),

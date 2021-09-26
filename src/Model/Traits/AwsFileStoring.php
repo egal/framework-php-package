@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Traits;
 
-use Egal\Model\Model;
 use Egal\ModelS3FileStoring\S3FileStoring;
 
 /**
- * @mixin Model
+ * @mixin \Egal\Model\Model
  * @property string[] $contentNames
  * @deprecated since v2.0.0, use {@see FileStoring} or {@see S3FileStoring}.
  */
