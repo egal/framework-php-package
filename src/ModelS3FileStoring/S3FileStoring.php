@@ -18,8 +18,9 @@ trait S3FileStoring
 
     private S3Client $client;
 
-    public function initializeFileStoring(): void
+    public function initializeS3FileStoring(): void
     {
+        $this->initializeFileStoring();
         $this->client = $this->disk->getDriver()->getAdapter()->getClient();
     }
 
