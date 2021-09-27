@@ -84,6 +84,9 @@
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
+        <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.BlockComment.LineIndent">
@@ -118,15 +121,8 @@
         <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
         <exclude name="SlevomatCodingStandard.Functions.DisallowArrowFunction.DisallowedArrowFunction"/>
         <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
         <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
-        <!-- Expected 1 line after &quot;case&quot;, found 0. -->
-        <!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountAfterControlStructure"/>-->
-
-        <!-- Expected 1 line before &quot;default&quot;, found 0.-->
-        <!--        <exclude name="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
-
-        <!-- Expected 1 line before &quot;break&quot;, found 0. -->
-        <!--        <exclude name="SlevomatCodingStandard.ControlStructures.JumpStatementsSpacing.IncorrectLinesCountBeforeControlStructure"/>-->
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
@@ -159,6 +155,9 @@
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed">
         <exclude-pattern>code-generator/Commands/MigrationCreateMakeCommand.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Model.php</exclude-pattern>
