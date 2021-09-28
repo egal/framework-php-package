@@ -278,7 +278,9 @@ class Request extends ActionMessage
 
     private function getItselfServiceServiceToken(): string
     {
-        $masterActionMessage = Session::isActionMessageExists() ? Session::getActionMessage() : null;
+        $masterActionMessage = Session::isActionMessageExists()
+            ? Session::getActionMessage()
+            : null;
 
         $smtActionMessage = new ActionMessage(
             $this->authServiceName,
@@ -308,7 +310,9 @@ class Request extends ActionMessage
         );
         $sst = $sstActionCaller->call();
 
-        $masterActionMessage ? Session::setActionMessage($masterActionMessage) : Session::unsetActionMessage();
+        $masterActionMessage
+            ? Session::setActionMessage($masterActionMessage)
+            : Session::unsetActionMessage();
 
         return $sst;
     }
