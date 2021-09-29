@@ -19,6 +19,8 @@ class BusCreator
         switch ($driver) {
             case 'rabbitmq':
                 return new RabbitMQBus();
+            case 'rabbitmq_rpc':
+                return new RabbitMQRPCBus();
             default:
                 throw new BusCreatorException("Unsupported queue driver type - $driver!");
         }
