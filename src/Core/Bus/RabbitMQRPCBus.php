@@ -24,7 +24,6 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 class RabbitMQRPCBus extends Bus
 {
 
-//    private RabbitMQConnector $connector;
     private AMQPStreamConnection $connection;
     public string $queueName;
 
@@ -34,16 +33,12 @@ class RabbitMQRPCBus extends Bus
      */
     public function __construct()
     {
-//        $this->connector = new RabbitMQConnector(app('events'));
-//        $this->connection = $this->connector->connect(config('queue.connections.rabbitmq'));
-
-        $config = config('queue.connections.rabbitmq')['hosts'][0];
+        $config = config('queue.connections.rabbitmq_rpc')['hosts'][0];
         $this->connection = new AMQPStreamConnection(
             $config['host'],
             $config['port'],
             $config['user'],
             $config['password'],
-//            'localhost', 5672, 'guest', 'guest'
         );
     }
 
