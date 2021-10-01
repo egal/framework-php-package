@@ -12,7 +12,7 @@ class {{ class }} extends EgalRule
         // TODO
     }
 
-    public function message()
+    public function message(): string
     {
         return parent::message(); // TODO
     }
