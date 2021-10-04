@@ -13,6 +13,7 @@ use Egal\Auth\Tokens\TokenType;
 use Egal\Auth\Tokens\UserServiceToken;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
+use Egal\Core\Exceptions\ActionMessageExistsIsSessionException;
 use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Exceptions\TokenSignatureInvalidException;
 use Egal\Core\Messages\ActionMessage;
@@ -152,17 +153,11 @@ final class Session
         return self::isActionMessageExistsOrFail();
     }
 
-    /**
-     * @param ActionMessage $actionMessage
-     * @throws TokenSignatureInvalidException
-     * @throws UndefinedTokenTypeException
-     * @throws InitializeServiceServiceTokenException
-     * @throws InitializeUserServiceTokenException
-     * @throws TokenExpiredException
-     */
     public static function setActionMessage(ActionMessage $actionMessage): void
     {
+        self::unsetActionMessage();
         self::getSingleton()->actionMessage = $actionMessage;
+
         if (!$actionMessage->isTokenExist()) {
             return;
         }
