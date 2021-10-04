@@ -124,6 +124,7 @@
         <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
         <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
+        <exclude name="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired"/>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
