@@ -41,5 +41,15 @@ class ServiceProvider extends IlluminateServiceProvider
         });
 
         $this->commands([]);
+
+        $this->mergeConfigs();
+    }
+
+    private function mergeConfigs()
+    {
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/centrifugo.php', 'centrifugo'
+        );
+
     }
 }
