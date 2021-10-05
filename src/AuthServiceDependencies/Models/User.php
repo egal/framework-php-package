@@ -15,8 +15,6 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 abstract class User extends Model
 {
-
-    use UsesUuid;
     use HasFactory;
     use HasRelationships;
 
@@ -40,7 +38,7 @@ abstract class User extends Model
         return $user;
     }
 
-    public static function actionLoginByEmailAndPassword(string $email, string $password): string
+    final public static function actionLoginByEmailAndPassword(string $email, string $password): string
     {
         /** @var User $user */
         $user = self::query()
