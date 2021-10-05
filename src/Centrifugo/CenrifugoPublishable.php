@@ -2,6 +2,7 @@
 
 namespace Egal\Centrifugo;
 
+use Exception;
 use phpcent\Client;
 
 trait CenrifugoPublishable
@@ -70,9 +71,9 @@ trait CenrifugoPublishable
         $client = app(Client::class);
         try {
             $client->broadcast($this->getChannelNames(), $this->getMessage());
-        } catch (CentrifugoPublishException $exception) {
-            throw new CentrifugoPublishException('ERROR: Centrifuge publish throws with exception', [$exception]);
+        } catch (Exception $exception) {
+            throw new CentrifugoPublishException('ERROR: Centrifuge publish throws with exception: ' .
+                $exception->getMessage());
         }
     }
-
 }
