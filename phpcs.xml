@@ -82,10 +82,12 @@
         <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>model/Builder.php</exclude-pattern>
@@ -160,6 +162,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Model.php</exclude-pattern>
@@ -191,6 +194,9 @@
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>
         <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion.RequiredConstructorPropertyPromotion">
+        <exclude-pattern>src/Centrifugo/CentrifugoEvent.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
