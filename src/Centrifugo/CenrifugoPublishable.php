@@ -7,13 +7,18 @@ use phpcent\Client;
 
 trait CenrifugoPublishable
 {
+    public function __construct(Model $entity)
+    {
+        $this->entity = $entity;
+        $this->name = snake_case(get_class_short_name($this));
+    }
 
     public function getChannelNames(): array
     {
         $service = config('app.name');
-        $model = get_class($this->getEntity());
-        $modelId = $this->getEntity()->getKey();
-        $event = $this->getName();
+        $model = get_class_short_name($this->entity);
+        $modelId = $this->entity->getKey();
+        $event = $this->name;
 
         return [
             $service,
@@ -29,21 +34,11 @@ trait CenrifugoPublishable
         return [
             'type' => 'model_event',
             'data' => [
-                'name' => $this->getName(),
-                'model_name' => get_class_short_name($this->getEntity()),
-                'model_id' => $this->getEntity()->getKey()
+                'name' => $this->name,
+                'model_name' => get_class_short_name($this->entity),
+                'model_id' => $this->entity->getKey()
             ]
         ];
-    }
-
-    private function getName(): string
-    {
-        return $this->name ?? snake_case(get_class_short_name($this));
-    }
-
-    private function getEntity(): Model
-    {
-        return $this->entity;
     }
 
     /**

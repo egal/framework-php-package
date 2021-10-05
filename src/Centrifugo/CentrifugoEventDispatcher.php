@@ -9,7 +9,9 @@ class CentrifugoEventDispatcher extends Dispatcher
     public function dispatch($event, $payload = [], $halt = false)
     {
         $dispatch = parent::dispatch($event, $payload, $halt);
-        $event->publish();
+        if (method_exists($event, 'publish')) {
+            $event->publish();
+        }
         return $dispatch;
     }
 }
