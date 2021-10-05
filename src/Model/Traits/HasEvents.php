@@ -91,10 +91,12 @@ trait HasEvents
     /**
      * Запустить событие пользовательской модели для данного события.
      *
+     * @param string $event
+     * @param string $method
      * @return mixed|null
      * @noinspection PhpUnused
      */
-    protected function fireCustomModelEvent(string $event, string $method)
+    protected function fireCustomModelEvent($event, $method)
     {
         $result = parent::fireCustomModelEvent($event, $method);
 
