@@ -58,6 +58,10 @@ class ServiceProvider extends IlluminateServiceProvider
                 $this->app->register('Egal\Model\ServiceProvider');
             }
 
+            if (class_exists('Egal\Centrifugo\ServiceProvider')) {
+                $this->app->register('Egal\Centrifugo\ServiceProvider');
+            }
+
             $this->commands([
                 EgalRunCommand::class,
                 EgalListenerRunCommand::class,
@@ -75,18 +79,6 @@ class ServiceProvider extends IlluminateServiceProvider
 
         $this->app->singleton(EventManager::class, function () {
             return new EventManager();
-        });
-
-        $this->app->singleton(Client::class, function (): Client {
-            return new Client(
-                config('centrifugo.url'),
-                config('centrifugo.api_key'),
-                config('centrifugo.secret')
-            );
-        });
-
-        $this->app->singleton('events', function ($app) {
-            return (new CentrifugoEventDispatcher($app));
         });
 
         $this->commands([]);
