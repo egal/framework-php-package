@@ -44,7 +44,7 @@ abstract class Service
         return $smt->generateJWT();
     }
 
-    final public static function actionLoginToService(string $token, string $serviceName): string
+    public static function actionLoginToService(string $token, string $serviceName): string
     {
         /** @var ServiceMasterToken $smt */
         $smt = ServiceMasterToken::fromJWT($token, config('app.service_key'));

@@ -4,19 +4,12 @@ namespace Egal\AuthServiceDependencies\Models;
 
 use Egal\Auth\Tokens\UserMasterToken;
 use Egal\Auth\Tokens\UserServiceToken;
-use Egal\AuthServiceDependencies\Exceptions\EmptyPasswordException;
 use Egal\AuthServiceDependencies\Exceptions\LoginException;
-use Egal\AuthServiceDependencies\Exceptions\PasswordHashException;
 use Egal\AuthServiceDependencies\Exceptions\UserNotIdentifiedException;
 use Egal\Model\Model;
-use Egal\Model\Traits\UsesUuid;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 abstract class User extends Model
 {
-    use HasFactory;
-    use HasRelationships;
 
     public static function actionLoginToService(string $token, string $serviceName): string
     {
