@@ -1,4 +1,4 @@
-FROM php:7.4.16-cli-buster
+FROM php:8.0-cli-buster
 
 # Arguments defined in docker-compose.yml
 ARG user=dev

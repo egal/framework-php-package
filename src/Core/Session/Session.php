@@ -1,11 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
-use Egal\Auth\Exceptions\InitializeServiceServiceTokenException;
-use Egal\Auth\Exceptions\InitializeUserServiceTokenException;
-use Egal\Auth\Exceptions\TokenExpiredException;
 use Egal\Auth\Exceptions\UndefinedTokenTypeException;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
@@ -16,24 +15,20 @@ use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Exceptions\TokenSignatureInvalidException;
 use Egal\Core\Messages\ActionMessage;
-use Exception;
 use Firebase\JWT\SignatureInvalidException;
 
 final class Session
 {
 
     private ?ActionMessage $actionMessage = null;
-    private ?UserServiceToken $userServiceToken = null;
-    private ?ServiceServiceToken $serviceServiceToken = null;
 
-    private static function getSingleton(): Session
-    {
-        return app(self::class);
-    }
+    private ?UserServiceToken $userServiceToken = null;
+
+    private ?ServiceServiceToken $serviceServiceToken = null;
 
     public static function isActionMessageExists(): bool
     {
-        return !is_null(self::getSingleton()->actionMessage);
+        return self::getSingleton()->actionMessage !== null;
     }
 
     public static function isAuthEnabled(): bool
@@ -41,31 +36,23 @@ final class Session
         return config('auth.enabled');
     }
 
-    /**
-     * @return UserServiceToken
-     * @throws Exception
-     */
     public static function getUserServiceToken(): UserServiceToken
     {
         self::isUserServiceTokenExistsOrFail();
+
         return self::getSingleton()->userServiceToken;
     }
 
-    /**
-     * @return bool
-     * @throws CurrentSessionException
-     */
     public static function isUserServiceTokenExistsOrFail(): bool
     {
         if (!self::isUserServiceTokenExists()) {
             throw new CurrentSessionException('The current Session does not contain UST!');
         }
+
         return true;
     }
 
     /**
-     * @return bool
-     * @throws CurrentSessionException
      * @deprecated since v2.0.0, use {@see Session::isUserServiceTokenExistsOrFail()}.
      */
     public static function userServiceTokenExistsOrFail(): bool
@@ -73,39 +60,25 @@ final class Session
         return self::isUserServiceTokenExistsOrFail();
     }
 
-    /**
-     * Return auth status for user.
-     *
-     * @return string
-     */
     public static function getAuthStatus(): string
     {
-        if (Session::isUserServiceTokenExists() || Session::isServiceServiceTokenExists()) {
-            return StatusAccess::LOGGED;
-        } else {
-            return StatusAccess::GUEST;
-        }
+        return self::isUserServiceTokenExists() || self::isServiceServiceTokenExists()
+            ? StatusAccess::LOGGED
+            : StatusAccess::GUEST;
     }
 
     public static function isUserServiceTokenExists(): bool
     {
-        return !is_null(self::getSingleton()->userServiceToken);
+        return self::getSingleton()->userServiceToken !== null;
     }
 
-    /**
-     * @return ServiceServiceToken
-     * @throws CurrentSessionException
-     */
     public static function getServiceServiceToken(): ServiceServiceToken
     {
         self::isServiceServiceTokenExistsOrFail();
+
         return self::getSingleton()->serviceServiceToken;
     }
 
-    /**
-     * @return bool
-     * @throws CurrentSessionException
-     */
     public static function isServiceServiceTokenExistsOrFail(): bool
     {
         if (!self::isServiceServiceTokenExists()) {
@@ -117,34 +90,26 @@ final class Session
 
     public static function isServiceServiceTokenExists(): bool
     {
-        return !is_null(self::getSingleton()->serviceServiceToken);
+        return self::getSingleton()->serviceServiceToken !== null;
     }
 
-    /**
-     * @return ActionMessage
-     * @throws Exception
-     */
     public static function getActionMessage(): ActionMessage
     {
         self::isActionMessageExistsOrFail();
+
         return self::getSingleton()->actionMessage;
     }
 
-    /**
-     * @return bool
-     * @throws CurrentSessionException
-     */
     public static function isActionMessageExistsOrFail(): bool
     {
         if (!self::isActionMessageExists()) {
             throw new CurrentSessionException('The current Session does not contain ActionMessage!');
         }
+
         return true;
     }
 
     /**
-     * @return bool
-     * @throws CurrentSessionException
      * @deprecated since v2.0.0, use {@see Session::isActionMessageExistsOrFail()}.
      */
     public static function actionMessageExistsOrFail(): bool
@@ -152,17 +117,11 @@ final class Session
         return self::isActionMessageExistsOrFail();
     }
 
-    /**
-     * @param ActionMessage $actionMessage
-     * @throws TokenSignatureInvalidException
-     * @throws UndefinedTokenTypeException
-     * @throws InitializeServiceServiceTokenException
-     * @throws InitializeUserServiceTokenException
-     * @throws TokenExpiredException
-     */
     public static function setActionMessage(ActionMessage $actionMessage): void
     {
+        self::unsetActionMessage();
         self::getSingleton()->actionMessage = $actionMessage;
+
         if (!$actionMessage->isTokenExist()) {
             return;
         }
@@ -174,33 +133,6 @@ final class Session
         }
     }
 
-    /**
-     * @param string $encodedToken
-     * @throws InitializeServiceServiceTokenException
-     * @throws InitializeUserServiceTokenException
-     * @throws UndefinedTokenTypeException
-     * @throws TokenExpiredException
-     */
-    private static function setToken(string $encodedToken): void
-    {
-        $decodedToken = Token::decode($encodedToken, config('app.service_key'));
-
-        switch ($decodedToken['type']) {
-            case TokenType::USER_SERVICE:
-                self::setUserServiceToken(UserServiceToken::fromArray($decodedToken));
-                break;
-            case TokenType::SERVICE_SERVICE:
-                self::setServiceServiceToken(ServiceServiceToken::fromArray($decodedToken));
-                break;
-            default:
-                throw new UndefinedTokenTypeException();
-        }
-    }
-
-    /**
-     * @param ServiceServiceToken $serviceServiceToken
-     * @throws TokenExpiredException
-     */
     public static function setServiceServiceToken(ServiceServiceToken $serviceServiceToken): void
     {
         $serviceServiceToken->isAliveOrFail();
@@ -208,10 +140,6 @@ final class Session
         event(new ServiceServiceTokenDetectedEvent());
     }
 
-    /**
-     * @param UserServiceToken $userServiceToken
-     * @throws TokenExpiredException
-     */
     public static function setUserServiceToken(UserServiceToken $userServiceToken): void
     {
         $userServiceToken->isAliveOrFail();
@@ -234,6 +162,27 @@ final class Session
     public static function unsetServiceServiceToken(): void
     {
         self::getSingleton()->serviceServiceToken = null;
+    }
+
+    private static function getSingleton(): Session
+    {
+        return app(self::class);
+    }
+
+    private static function setToken(string $encodedToken): void
+    {
+        $decodedToken = Token::decode($encodedToken, config('app.service_key'));
+
+        switch ($decodedToken['type']) {
+            case TokenType::USER_SERVICE:
+                self::setUserServiceToken(UserServiceToken::fromArray($decodedToken));
+                break;
+            case TokenType::SERVICE_SERVICE:
+                self::setServiceServiceToken(ServiceServiceToken::fromArray($decodedToken));
+                break;
+            default:
+                throw new UndefinedTokenTypeException();
+        }
     }
 
 }

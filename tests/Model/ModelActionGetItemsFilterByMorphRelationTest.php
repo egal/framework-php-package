@@ -24,7 +24,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
      *
      * @return void
      */
-    protected function createSchema()
+    protected function createSchema(): void
     {
         $this->schema()->create('products', function (Blueprint $table) {
             $table->increments('id');
