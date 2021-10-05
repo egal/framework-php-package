@@ -13,7 +13,14 @@ trait HasEvents
 
     private bool $needFireActionEvents = false;
 
-    public function newInstance(array $attributes = [], bool $exists = false)
+    /**
+     * Create a new instance of the given model.
+     *
+     * @param array $attributes
+     * @param bool $exists
+     * @return static
+     */
+    public function newInstance($attributes = [], $exists = false)
     {
         $instance = parent::newInstance($attributes, $exists);
 

@@ -84,10 +84,12 @@
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>model/Builder.php</exclude-pattern>
@@ -189,6 +191,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
         <exclude-pattern>model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
         <exclude-pattern>*Exception.php</exclude-pattern>
