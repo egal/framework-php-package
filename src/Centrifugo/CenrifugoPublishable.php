@@ -2,43 +2,64 @@
 
 namespace Egal\Centrifugo;
 
-use Egal\Model\Model;
 use phpcent\Client;
 
 trait CenrifugoPublishable
 {
-    public function __construct(Model $entity)
-    {
-        $this->entity = $entity;
-        $this->name = snake_case(get_class_short_name($this));
-    }
-
     public function getChannelNames(): array
     {
         $service = config('app.name');
-        $model = get_class_short_name($this->entity);
-        $modelId = $this->entity->getKey();
-        $event = $this->name;
+        $event = $this->getName();
 
-        return [
+        $channelNames = [
             $service,
-            $service . '@' . $model . '.' . $modelId,
-            $service . '@' . $model . '.' . $event,
-            $service . '@' . $model . '.' . $event . '.' . $modelId,
-            $service . '@' . $model
+            $service . $event
         ];
+
+        if (isset($this->model)) {
+            $modelName = get_class_short_name($this->model);
+            $modelId = $this->model->getKey();
+
+            $modelChannelNames = [
+                $service . $modelName . $event,
+                $service . $modelName
+            ];
+
+            $channelNames = array_merge($channelNames, $modelChannelNames);
+            if (isset($modelId)) {
+                $modelIdChannelNames = [
+                    $service . $modelName . $modelId . $event,
+                    $service . $modelName . $modelId
+                ];
+
+                $channelNames = array_merge($channelNames, $modelIdChannelNames);
+            }
+        }
+        return $channelNames;
     }
 
     public function getMessage(): array
     {
-        return [
-            'type' => 'model_event',
-            'data' => [
-                'name' => $this->name,
-                'model_name' => get_class_short_name($this->entity),
-                'model_id' => $this->entity->getKey()
+        return isset($this->model)
+            ? [
+                'type' => 'model_event',
+                'data' => [
+                    'name' => $this->getName(),
+                    'model_name' => get_class_short_name($this->model),
+                    'model_id' => $this->model->getKey()
+                ]
             ]
-        ];
+            : [
+                'type' => 'event',
+                'data' => [
+                    'name' => $this->getName()
+                ]
+            ];
+    }
+
+    private function getName(): string
+    {
+        return $this->name ?? snake_case(get_class_short_name($this));
     }
 
     /**

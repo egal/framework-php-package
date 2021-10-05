@@ -9,6 +9,12 @@ abstract class CentrifugoEvent extends Event
 {
     use CenrifugoPublishable;
 
-    private Model $entity;
+    private Model $model;
     private string $name;
+
+    public function __construct(Model $model)
+    {
+        $this->model = $model;
+        $this->name = snake_case(get_class_short_name($this));
+    }
 }
