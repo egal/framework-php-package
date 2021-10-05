@@ -3,41 +3,19 @@
 namespace Egal\Model\Traits;
 
 use Egal\Model\Model;
-use Illuminate\Support\Str;
 
 /**
  * @mixin Model
+ * @depricated since v2.0.0, use {@see UsesUuidKey}
  */
 trait UsesUuid
 {
 
-    /**
-     * @noinspection PhpUnused
-     */
+    use UsesUuidKey;
+
     protected static function bootUsesUuid()
     {
-        static::creating(function ($model) {
-            /** @var Model $model */
-            $model->{$model->getKeyName()} = (string)Str::uuid();
-        });
-    }
-
-    /**
-     * @return bool
-     * @noinspection PhpUnused
-     */
-    public function getIncrementing(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @return string
-     * @noinspection PhpUnused
-     */
-    public function getKeyType(): string
-    {
-        return 'string';
+        self::bootUsesUuidKey();
     }
 
 }

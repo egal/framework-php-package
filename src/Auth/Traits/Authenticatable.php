@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Model
+ * @deprecated since v2.0.0
  */
 trait Authenticatable
 {
@@ -13,7 +14,7 @@ trait Authenticatable
     /**
      * Get the name of the unique identifier for the user.
      *
-     * @return string
+     * @deprecated since v2.0.0
      */
     public function getAuthIdentifierName(): string
     {
@@ -24,6 +25,8 @@ trait Authenticatable
      * Get the unique identifier for the user.
      *
      * @return mixed
+     *
+     * @deprecated since v2.0.0
      */
     public function getAuthIdentifier()
     {
