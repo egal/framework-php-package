@@ -2,6 +2,7 @@
 
 namespace Egal\Core;
 
+use Egal\Centrifugo\CentrifugoEventDispatcher;
 use Egal\Core\Bus\Bus;
 use Egal\Core\Bus\BusCreator;
 use Egal\Core\Commands\EgalListenerRunCommand;
@@ -11,6 +12,7 @@ use Egal\Core\Events\EventManager;
 use Egal\Core\Exceptions\EgalCoreInitializationException;
 use Egal\Core\Session\Session;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
+use phpcent\Client;
 use VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider;
 
 class ServiceProvider extends IlluminateServiceProvider
@@ -73,6 +75,18 @@ class ServiceProvider extends IlluminateServiceProvider
 
         $this->app->singleton(EventManager::class, function () {
             return new EventManager();
+        });
+
+        $this->app->singleton(Client::class, function (): Client {
+            return new Client(
+                config('centrifugo.url'),
+                config('centrifugo.api_key'),
+                config('centrifugo.secret')
+            );
+        });
+
+        $this->app->singleton('events', function ($app) {
+            return (new CentrifugoEventDispatcher($app));
         });
 
         $this->commands([]);
