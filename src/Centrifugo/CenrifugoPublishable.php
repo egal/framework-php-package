@@ -13,7 +13,7 @@ trait CenrifugoPublishable
 
         $channelNames = [
             $service,
-            $service . $event
+            $service . '@' . $event
         ];
 
         if (isset($this->model)) {
@@ -21,15 +21,15 @@ trait CenrifugoPublishable
             $modelId = $this->model->getKey();
 
             $modelChannelNames = [
-                $service . $modelName . $event,
-                $service . $modelName
+                $service . '@' . $modelName . '.' . $event,
+                $service . '@' . $modelName
             ];
 
             $channelNames = array_merge($channelNames, $modelChannelNames);
             if (isset($modelId)) {
                 $modelIdChannelNames = [
-                    $service . $modelName . $modelId . $event,
-                    $service . $modelName . $modelId
+                    $service . '@' . $modelName . '.' . $modelId . '.' . $event,
+                    $service . '@' . $modelName . '.' .  $modelId
                 ];
 
                 $channelNames = array_merge($channelNames, $modelIdChannelNames);
