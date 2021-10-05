@@ -18,45 +18,7 @@ abstract class User extends Model
     use HasFactory;
     use HasRelationships;
 
-    public static function actionRegisterByEmailAndPassword(string $email, string $password): self
-    {
-        if (!$password) {
-            throw new EmptyPasswordException();
-        }
-
-        $user = new static();
-        $user->setAttribute('email', $email);
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-        if (!$hashedPassword) {
-            throw new PasswordHashException();
-        }
-
-        $user->setAttribute('password', $hashedPassword);
-        $user->save();
-
-        return $user;
-    }
-
-    final public static function actionLoginByEmailAndPassword(string $email, string $password): string
-    {
-        /** @var User $user */
-        $user = self::query()
-            ->where('email', '=', $email)
-            ->first();
-
-        if (!$user || !password_verify($password, $user->getAttribute('password'))) {
-            throw new LoginException('Incorrect Email or password!');
-        }
-
-        $umt = new UserMasterToken();
-        $umt->setSigningKey(config('app.service_key'));
-        $umt->setAuthIdentification($user->getAuthIdentifier());
-
-        return $umt->generateJWT();
-    }
-
-    final public static function actionLoginToService(string $token, string $serviceName): string
+    public static function actionLoginToService(string $token, string $serviceName): string
     {
         /** @var UserMasterToken $umt */
         $umt = UserMasterToken::fromJWT($token, config('app.service_key'));
