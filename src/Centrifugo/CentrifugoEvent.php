@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Egal\Centrifugo;
 
 use Egal\Model\Model;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Support\Facades\Event;
 
-abstract class CentrifugoEvent extends Event
+abstract class CentrifugoEvent extends Event implements ShouldBroadcast
 {
 
     use CenrifugoPublishable;
@@ -19,7 +20,6 @@ abstract class CentrifugoEvent extends Event
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->name = snake_case(get_class_short_name($this));
     }
 
 }

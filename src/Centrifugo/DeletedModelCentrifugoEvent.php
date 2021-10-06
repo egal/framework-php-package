@@ -7,6 +7,6 @@ namespace Egal\Centrifugo;
 class DeletedModelCentrifugoEvent extends CentrifugoEvent
 {
 
-    protected string $name = 'deleted';
+    protected string $name = 'deleted_model';
 
 }

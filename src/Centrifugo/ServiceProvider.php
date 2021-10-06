@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\Centrifugo;
 
+use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
 use phpcent\Client;
 
@@ -24,6 +25,18 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     protected array $commands = [];
 
+    /**
+     * Add centrifugo broadcaster.
+     *
+     * @param BroadcastManager $broadcastManager
+     */
+    public function boot(BroadcastManager $broadcastManager)
+    {
+        $broadcastManager->extend('centrifugo', function () {
+            return new CentrifugoBroadcaster();
+        });
+    }
+
     public function register(): void
     {
         if ($this->app->runningInConsole()) {
@@ -31,17 +44,12 @@ class ServiceProvider extends IlluminateServiceProvider
         }
 
         $this->app->singleton(
-            Client::class,
+            'CentrifugoClient',
             static fn (): Client => new Client(
                 config('centrifugo.url'),
                 config('centrifugo.api_key'),
                 config('centrifugo.secret')
             )
-        );
-
-        $this->app->singleton(
-            'events',
-            static fn ($app) => new CentrifugoEventDispatcher($app)
         );
 
         $this->commands([]);
@@ -52,6 +60,8 @@ class ServiceProvider extends IlluminateServiceProvider
     private function mergeConfigs(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/config/centrifugo.php', 'centrifugo');
+
+        $this->mergeConfigFrom(__DIR__ . '/config/broadcasting.php', 'broadcasting');
     }
 
 }

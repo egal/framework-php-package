@@ -10,7 +10,7 @@ use phpcent\Client;
 trait CenrifugoPublishable
 {
 
-    public function getChannelNames(): array
+    public function broadcastOn(): array
     {
         $service = config('app.name');
         $event = $this->getName();
@@ -44,7 +44,7 @@ trait CenrifugoPublishable
         return $channelNames;
     }
 
-    public function getMessage(): array
+    public function broadcastWith(): array
     {
         return isset($this->model)
             ? [
@@ -61,21 +61,6 @@ trait CenrifugoPublishable
                     'name' => $this->getName(),
                 ],
             ];
-    }
-
-    /**
-     * @throws \Egal\Centrifugo\CentrifugoPublishException
-     */
-    public function publish(): void
-    {
-        $client = app(Client::class);
-
-        try {
-            $client->broadcast($this->getChannelNames(), $this->getMessage());
-        } catch (Exception $exception) {
-            throw new CentrifugoPublishException('ERROR: Centrifuge publish throws with exception: ' .
-            $exception->getMessage());
-        }
     }
 
     private function getName(): string

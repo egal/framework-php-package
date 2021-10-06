@@ -7,6 +7,6 @@ namespace Egal\Centrifugo;
 class RestoredModelCentrifugoEvent extends CentrifugoEvent
 {
 
-    protected string $name = 'restored';
+    protected string $name = 'restored_model';
 
 }

@@ -7,6 +7,6 @@ namespace Egal\Centrifugo;
 class UpdatedModelCentrifugoEvent extends CentrifugoEvent
 {
 
-    protected string $name = 'updated';
+    protected string $name = 'updated_model';
 
 }
