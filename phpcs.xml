@@ -95,10 +95,10 @@
         <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.BlockComment.LineIndent">
-        <exclude-pattern>core/config/*</exclude-pattern>
+        <exclude-pattern>*/config/*</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.BlockComment.FirstLineIndent">
-        <exclude-pattern>core/config/*</exclude-pattern>
+        <exclude-pattern>*/config/*</exclude-pattern>
     </rule>
     <rule ref="Squiz.NamingConventions.ValidFunctionName.NotCamelCaps">
         <exclude-pattern>*/helpers.php</exclude-pattern>
