@@ -44,7 +44,6 @@ class ServiceProvider extends IlluminateServiceProvider
         $this->app->register(LaravelQueueRabbitMQServiceProvider::class);
 
         if ($this->app->runningInConsole()) {
-
             if (class_exists('Egal\CodeGenerator\ServiceProvider')) {
                 $this->app->register('Egal\CodeGenerator\ServiceProvider');
             }

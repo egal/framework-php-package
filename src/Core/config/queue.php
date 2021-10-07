@@ -7,7 +7,7 @@ return [
     'default' => env('QUEUE_CONNECTION', 'rabbitmq'),
 
     'connections' => [
-        'sync' => ['driver' => 'sync',],
+        'sync' => ['driver' => 'sync'],
         'rabbitmq' => [
 
             'driver' => 'rabbitmq',
