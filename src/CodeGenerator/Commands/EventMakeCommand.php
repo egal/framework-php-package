@@ -44,7 +44,7 @@ class EventMakeCommand extends MakeCommand
             : ($this->option('centrifugo') ? 'CentrifugoEvent' : 'Event');
         $use = $this->option('global')
             ? 'Egal\Core\Events\GlobalEvent'
-            : ($this->option('centrifugo') ? 'Egal\Core\Events\CentrifugoEvent' : 'Egal\Core\Events\Event');
+            : ($this->option('centrifugo') ? 'Egal\Centrifugo\CentrifugoEvent' : 'Egal\Core\Events\Event');
 
         $this->fileBaseName = str_ends_with($fileBaseName, $extends)
             ? $fileBaseName
