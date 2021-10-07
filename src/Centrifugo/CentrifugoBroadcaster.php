@@ -25,9 +25,7 @@ class CentrifugoBroadcaster extends Broadcaster
     public function broadcast(array $channels, $event, array $payload = [])
     {
         try {
-            Centrifugo::getClient()->broadcast($channels, [
-                'date' => Carbon::now()->toIso8601String()
-            ]);
+            Centrifugo::getClient()->broadcast($channels, $payload);
         } catch (Exception $exception) {
             throw CentrifugoPublishException::make($exception->getMessage());
         }
