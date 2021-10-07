@@ -1,28 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Centrifugo;
 
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class CentrifugoBroadcaster extends Broadcaster
 {
 
-    public function auth($request)
+    public function auth($request): void
     {
         // TODO: Implement auth() method.
     }
 
-    public function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result): void
     {
         // TODO: Implement validAuthenticationResponse() method.
     }
 
     /**
-     * @throws CentrifugoPublishException
+     * @throws \Egal\Centrifugo\CentrifugoPublishException
      */
-    public function broadcast(array $channels, $event, array $payload = [])
+    public function broadcast(array $channels, $event, array $payload = []): void
     {
         try {
             Centrifugo::getClient()->broadcast($channels, $payload);
@@ -30,4 +31,5 @@ class CentrifugoBroadcaster extends Broadcaster
             throw CentrifugoPublishException::make($exception->getMessage());
         }
     }
+
 }

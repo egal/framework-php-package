@@ -103,6 +103,9 @@
     <rule ref="Squiz.NamingConventions.ValidFunctionName.NotCamelCaps">
         <exclude-pattern>*/helpers.php</exclude-pattern>
     </rule>
+    <rule ref="Squiz.Commenting.ClassComment.TagNotAllowed">
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+    </rule>
 
     <rule ref="SlevomatCodingStandard">
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
@@ -187,6 +190,8 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
@@ -198,6 +203,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>
@@ -208,6 +214,10 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint">
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter">
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>

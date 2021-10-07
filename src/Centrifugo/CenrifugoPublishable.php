@@ -6,9 +6,8 @@ namespace Egal\Centrifugo;
 
 trait CenrifugoPublishable
 {
-    # TODO: payload должен формироваться автоматически (не делать привязку жесткую к модели)
 
-    public string $connection = 'sync';
+    protected string $connection = 'sync';
 
     public function broadcastOn(): array
     {
@@ -63,9 +62,8 @@ trait CenrifugoPublishable
             ];
     }
 
-    public function broadcastConnections()
+    public function broadcastConnections(): array
     {
-        # TODO: Не наравится, что жестко зашиваем. Если захотим несколько мест публикаций делать?
         return ['centrifugo'];
     }
 

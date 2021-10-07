@@ -11,18 +11,20 @@ use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
 class ServiceProvider extends IlluminateServiceProvider
 {
 
-    public function boot(BroadcastManager $broadcastManager)
+    public function boot(BroadcastManager $broadcastManager): void
     {
-        $broadcastManager->extend('centrifugo', function () {
-            return new CentrifugoBroadcaster();
-        });
+        $broadcastManager->extend(
+            'centrifugo',
+            static fn () => new CentrifugoBroadcaster()
+        );
     }
 
-    public function register()
+    public function register(): void
     {
-        $this->app->singleton(CentrifugoClient::class, function ($app) {
-            return new CentrifugoClient($app->make('config')->get('broadcasting.connections.centrifugo'));
-        });
+        $this->app->singleton(
+            CentrifugoClient::class,
+            static fn ($app) => new CentrifugoClient($app->make('config')->get('broadcasting.connections.centrifugo'))
+        );
 
         $this->mergeConfigs();
     }

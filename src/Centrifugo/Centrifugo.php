@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Centrifugo;
 
 use phpcent\Client as PHPCentClient;
@@ -15,16 +17,12 @@ class Centrifugo
     public function __construct(array $config)
     {
         $requiredKeys = ['api_url', 'api_key', 'secret'];
+
         if (array_intersect(array_keys($config), $requiredKeys) !== $requiredKeys) {
             CentrifugoInitException::make(...$requiredKeys);
         }
 
         $this->client = new PHPCentClient($config['api_url'], $config['api_key'], $config['secret']);
-    }
-
-    public static function __callStatic(string $name, array $arguments)
-    {
-        return static::getInstance()->client->{$name}(...$arguments);
     }
 
     public static function getInstance(): self
@@ -35,6 +33,11 @@ class Centrifugo
     public static function getClient(): PHPCentClient
     {
         return static::getInstance()->client;
+    }
+
+    public static function __callStatic(string $name, array $arguments)
+    {
+        return static::getInstance()->client->{$name}(...$arguments);
     }
 
 }

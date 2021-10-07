@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Centrifugo;
 
 use Exception;
@@ -21,4 +23,5 @@ class CentrifugoInitException extends Exception
 
         return $exception;
     }
+
 }
