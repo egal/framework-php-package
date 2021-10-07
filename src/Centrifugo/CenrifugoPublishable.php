@@ -12,31 +12,22 @@ trait CenrifugoPublishable
     public function broadcastOn(): array
     {
         $service = config('app.service_name');
-        $event = $this->getName();
+        $eventName = $this->getName();
 
         $channelNames = [
             $service,
-            $service . '@' . $event,
+            $service . '@' . $eventName,
         ];
 
         if (isset($this->model)) {
             $modelName = get_class_short_name($this->model);
+            $channelNames[] = $service . '@' . $modelName . '.' . $eventName;
+            $channelNames[] = $service . '@' . $modelName;
             $modelId = $this->model->getKey();
 
-            $modelChannelNames = [
-                $service . '@' . $modelName . '.' . $event,
-                $service . '@' . $modelName,
-            ];
-
-            $channelNames = array_merge($channelNames, $modelChannelNames);
-
             if (isset($modelId)) {
-                $modelIdChannelNames = [
-                    $service . '@' . $modelName . '.' . $modelId . '.' . $event,
-                    $service . '@' . $modelName . '.' . $modelId,
-                ];
-
-                $channelNames = array_merge($channelNames, $modelIdChannelNames);
+                $channelNames[] = $service . '@' . $modelName . '.' . $modelId . '.' . $eventName;
+                $channelNames[] = $service . '@' . $modelName . '.' . $modelId;
             }
         }
 
