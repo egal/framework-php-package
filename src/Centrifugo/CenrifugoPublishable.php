@@ -7,7 +7,7 @@ namespace Egal\Centrifugo;
 trait CenrifugoPublishable
 {
 
-    protected string $connection = 'sync';
+    public string $connection = 'sync';
 
     public function broadcastOn(): array
     {

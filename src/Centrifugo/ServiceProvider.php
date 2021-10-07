@@ -26,6 +26,10 @@ class ServiceProvider extends IlluminateServiceProvider
             static fn ($app) => new CentrifugoClient($app->make('config')->get('broadcasting.connections.centrifugo'))
         );
 
+        if (class_exists('Illuminate\Broadcasting\BroadcastServiceProvider')) {
+            $this->app->register('Illuminate\Broadcasting\BroadcastServiceProvider');
+        }
+
         $this->mergeConfigs();
     }
 

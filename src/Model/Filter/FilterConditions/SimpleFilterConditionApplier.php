@@ -59,7 +59,6 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         } else {
             throw new UnsupportedFilterConditionFieldFormException();
         }
-        $builder->toSql();
     }
 
     private static function getSqlOperator(string $operator): string
