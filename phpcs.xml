@@ -82,22 +82,29 @@
         <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
         <exclude-pattern>model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.BlockComment.LineIndent">
-        <exclude-pattern>core/config/*</exclude-pattern>
+        <exclude-pattern>*/config/*</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.BlockComment.FirstLineIndent">
-        <exclude-pattern>core/config/*</exclude-pattern>
+        <exclude-pattern>*/config/*</exclude-pattern>
     </rule>
     <rule ref="Squiz.NamingConventions.ValidFunctionName.NotCamelCaps">
         <exclude-pattern>*/helpers.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.ClassComment.TagNotAllowed">
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard">
@@ -125,6 +132,7 @@
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
         <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
         <exclude name="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired"/>
+        <exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
@@ -160,6 +168,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Model.php</exclude-pattern>
@@ -171,6 +180,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Builder.php</exclude-pattern>
         <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
@@ -180,17 +190,38 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
         <exclude-pattern>model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
         <exclude-pattern>*Exception.php</exclude-pattern>
     </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
+    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>
         <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion.RequiredConstructorPropertyPromotion">
+        <exclude-pattern>src/Centrifugo/CentrifugoEvent.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter">
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
+        <exclude-pattern>src/Centrifugo/CenrifugoBroadcastable.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>

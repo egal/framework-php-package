@@ -2,8 +2,7 @@
 
 namespace App\Events;
 
-use Egal\Core\Events\GlobalEvent;
-use Egal\Core\Events\Event;
+use {{ use }};
 
 class {{ class }} extends {{ extends }}
 {
