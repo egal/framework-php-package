@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
-use Egal\CodeGenerator\Exceptions\EventMakeExeception;
+use Egal\CodeGenerator\Exceptions\EventMakeException;
 
 /**
  * The class of the console command for generating the event.
@@ -34,11 +34,12 @@ class EventMakeCommand extends MakeCommand
     public function handle(): void
     {
         if ($this->option('global') && $this->option('centrifugo')) {
-            EventMakeExeception::make('Unacceptable to specify simultaneously flags --g and --с');
+            EventMakeException::make('Unacceptable to specify simultaneously flags --g and --с');
         }
 
         $fileBaseName = (string) $this->argument('event-name');
         $flagForExtends = $this->option('global') ?? $this->option('centrifugo');
+
         switch ($flagForExtends) {
             case 'a':
                 $extends = 'CentrifugoEvent';
@@ -50,7 +51,9 @@ class EventMakeCommand extends MakeCommand
 
             default:
                 $extends = 'Event';
+                break;
         }
+
         $this->fileBaseName = str_ends_with($fileBaseName, $extends)
             ? $fileBaseName
             : $fileBaseName . $extends;

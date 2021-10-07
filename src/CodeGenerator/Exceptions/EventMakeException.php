@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\CodeGenerator\Exceptions;
 
-class EventMakeExeception
+use Exception;
+
+class EventMakeException extends Exception
 {
+
     protected $code = 500;
 
     public static function make(string $error): self
@@ -17,4 +22,5 @@ class EventMakeExeception
 
         return $exception;
     }
+
 }
