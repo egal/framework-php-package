@@ -29,8 +29,6 @@ class ServiceProvider extends IlluminateServiceProvider
 
     private function mergeConfigs(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/centrifugo.php', 'centrifugo');
-
         $this->mergeConfigFrom(__DIR__ . '/config/broadcasting.php', 'broadcasting');
     }
 
