@@ -14,6 +14,11 @@ class Centrifugo
 
     public function __construct(array $config)
     {
+        $requiredKeys = ['api_url', 'api_key', 'secret'];
+        if (array_intersect(array_keys($config), $requiredKeys) !== $requiredKeys) {
+            CentrifugoInitException::make(...$requiredKeys);
+        }
+
         $this->client = new PHPCentClient($config['api_url'], $config['api_key'], $config['secret']);
         # TODO: Валидация содержания конфига
         # TODO: Доконфигурирование из файла конфига полностью клиента
