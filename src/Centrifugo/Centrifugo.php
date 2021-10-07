@@ -20,8 +20,6 @@ class Centrifugo
         }
 
         $this->client = new PHPCentClient($config['api_url'], $config['api_key'], $config['secret']);
-        # TODO: Валидация содержания конфига
-        # TODO: Доконфигурирование из файла конфига полностью клиента
     }
 
     public static function __callStatic(string $name, array $arguments)
