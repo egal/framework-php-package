@@ -29,30 +29,19 @@ class EventMakeCommand extends MakeCommand
     protected string $stubFileBaseName = 'event';
 
     /**
-     * @throws \Exception
+     * @throws \Exception|\Egal\CodeGenerator\Exceptions\EventMakeException
      */
     public function handle(): void
     {
         if ($this->option('global') && $this->option('centrifugo')) {
-            EventMakeException::make('Unacceptable to specify simultaneously flags --g and --с');
+            throw new EventMakeException('Unacceptable to specify simultaneously flags --g and --с');
         }
 
         $fileBaseName = (string) $this->argument('event-name');
-        $flagForExtends = $this->option('global') ?? $this->option('centrifugo');
 
-        switch ($flagForExtends) {
-            case 'a':
-                $extends = 'CentrifugoEvent';
-                break;
-
-            case 'b':
-                $extends = 'GlobalEvent';
-                break;
-
-            default:
-                $extends = 'Event';
-                break;
-        }
+        $extends = $this->option('global')
+            ? 'GlobalEvent'
+            : ($this->option('centrifugo') ? 'CentrifugoEvent' : 'Event');
 
         $this->fileBaseName = str_ends_with($fileBaseName, $extends)
             ? $fileBaseName
