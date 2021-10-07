@@ -13,9 +13,9 @@ abstract class CentrifugoEvent extends Event implements ShouldBroadcast
 
     use CenrifugoPublishable;
 
-    private Model $model;
+    protected Model $model;
 
-    private string $name;
+    protected string $name;
 
     public function __construct(Model $model)
     {
