@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Auth\Traits;
 
-use Illuminate\Database\Eloquent\Model;
-
 /**
- * @mixin Model
+ * @mixin \Illuminate\Database\Eloquent\Model
  * @deprecated since v2.0.0
  */
 trait Authenticatable
@@ -25,7 +25,6 @@ trait Authenticatable
      * Get the unique identifier for the user.
      *
      * @return mixed
-     *
      * @deprecated since v2.0.0
      */
     public function getAuthIdentifier()

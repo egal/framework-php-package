@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\AuthServiceDependencies\Models;
 
 use Egal\Auth\Tokens\ServiceMasterToken;
@@ -14,7 +16,7 @@ abstract class Service
 
     protected string $key;
 
-    public static function find($name): ?self
+    public static function find(string $name): ?self
     {
         $config = config('app.services.' . $name);
 
@@ -27,6 +29,16 @@ abstract class Service
         $result->key = $config['key'];
 
         return $result;
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public static function actionLogin(string $serviceName, string $key): string
@@ -46,12 +58,13 @@ abstract class Service
 
     public static function actionLoginToService(string $token, string $serviceName): string
     {
-        /** @var ServiceMasterToken $smt */
+        /** @var \Egal\Auth\Tokens\ServiceMasterToken $smt */
         $smt = ServiceMasterToken::fromJWT($token, config('app.service_key'));
         $smt->isAliveOrFail();
 
-        /** @var Service $senderService */
+        /** @var \Egal\AuthServiceDependencies\Models\Service $senderService */
         $senderService = static::find($smt->getAuthIdentification());
+
         if (!$senderService) {
             throw new ServiceNotFoundAuthException();
         }
@@ -75,16 +88,6 @@ abstract class Service
             'auth_identification' => $this->getName(),
             'service' => $this->getName(),
         ];
-    }
-
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
     }
 
 }

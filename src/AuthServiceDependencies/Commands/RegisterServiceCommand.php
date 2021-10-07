@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\AuthServiceDependencies\Commands;
 
 use Illuminate\Console\Command;
@@ -7,7 +9,7 @@ use Illuminate\Console\Command;
 /**
  * Register your service in auth-service.
  *
- * @deprecated replaced by automatic registration of services
+ * @deprecated since v2.0.0, replaced by automatic registration of services
  */
 class RegisterServiceCommand extends Command
 {
@@ -23,8 +25,8 @@ class RegisterServiceCommand extends Command
     {
         $this->error(
             'This command is deprecated and will be removed since version 2.0.0.'
-            .PHP_EOL
-            .'Deprecation\'s reason: Command is replaced by automatic registration of services'
+            . PHP_EOL
+            . 'Deprecation\'s reason: Command is replaced by automatic registration of services'
         );
     }
 

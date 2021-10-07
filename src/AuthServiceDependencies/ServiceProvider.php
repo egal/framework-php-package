@@ -12,7 +12,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 class ServiceProvider extends BaseServiceProvider
 {
 
-    public function register()
+    public function register(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([

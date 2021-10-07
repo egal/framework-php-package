@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Traits;
 
-use Egal\Model\Model;
-
 /**
- * @mixin Model
+ * @mixin \Egal\Model\Model
  * @depricated since v2.0.0, use {@see UsesUuidKey}
  */
 trait UsesUuid
@@ -13,7 +13,7 @@ trait UsesUuid
 
     use UsesUuidKey;
 
-    protected static function bootUsesUuid()
+    protected static function bootUsesUuid(): void
     {
         self::bootUsesUuidKey();
     }
