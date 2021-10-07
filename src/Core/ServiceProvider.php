@@ -59,6 +59,9 @@ class ServiceProvider extends IlluminateServiceProvider
             if (class_exists('Egal\Centrifugo\ServiceProvider')) {
                 $this->app->register('Egal\Centrifugo\ServiceProvider');
             }
+            if (class_exists('Illuminate\Broadcasting\BroadcastServiceProvider')) {
+                $this->app->register('Illuminate\Broadcasting\BroadcastServiceProvider');
+            }
 
             $this->commands([
                 EgalRunCommand::class,

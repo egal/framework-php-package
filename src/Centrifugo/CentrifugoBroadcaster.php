@@ -2,9 +2,9 @@
 
 namespace Egal\Centrifugo;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
-use phpcent\Client;
 
 class CentrifugoBroadcaster extends Broadcaster
 {
@@ -24,10 +24,10 @@ class CentrifugoBroadcaster extends Broadcaster
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-        $client = app('CentrifugoClient');
-
         try {
-            $client->broadcast($channels, $payload);
+            Centrifugo::getClient()->broadcast($channels, [
+                'date' => Carbon::now()->toIso8601String()
+            ]);
         } catch (Exception $exception) {
             throw CentrifugoPublishException::make($exception->getMessage());
         }

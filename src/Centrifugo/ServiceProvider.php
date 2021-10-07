@@ -4,32 +4,13 @@ declare(strict_types=1);
 
 namespace Egal\Centrifugo;
 
+use Egal\Centrifugo\Centrifugo as CentrifugoClient;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
-use phpcent\Client;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
 
-    /**
-     * Указывает, отложена ли загрузка провайдера.
-     *
-     * @noinspection PhpUnusedPropertyInspection
-     */
-    protected bool $defer = true;
-
-    /**
-     * Команды для регистрации.
-     *
-     * @var string[]
-     */
-    protected array $commands = [];
-
-    /**
-     * Add centrifugo broadcaster.
-     *
-     * @param BroadcastManager $broadcastManager
-     */
     public function boot(BroadcastManager $broadcastManager)
     {
         $broadcastManager->extend('centrifugo', function () {
@@ -37,22 +18,11 @@ class ServiceProvider extends IlluminateServiceProvider
         });
     }
 
-    public function register(): void
+    public function register()
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([]);
-        }
-
-        $this->app->singleton(
-            'CentrifugoClient',
-            static fn (): Client => new Client(
-                config('centrifugo.url'),
-                config('centrifugo.api_key'),
-                config('centrifugo.secret')
-            )
-        );
-
-        $this->commands([]);
+        $this->app->singleton(CentrifugoClient::class, function ($app) {
+            return new CentrifugoClient($app->make('config')->get('broadcasting.connections.centrifugo'));
+        });
 
         $this->mergeConfigs();
     }
