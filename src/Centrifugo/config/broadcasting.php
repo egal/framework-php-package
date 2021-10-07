@@ -33,7 +33,7 @@ return [
         'centrifugo' => [
             'driver' => 'centrifugo',
             'secret'  => env('CENTRIFUGO_SECRET'),
-            'apikey'  => env('CENTRIFUGO_API_KEY'),
+            'api_key'  => env('CENTRIFUGO_API_KEY'),
             'api_url' => env('CENTRIFUGO_API_URL', 'http://localhost:8000/api'), // centrifugo api url
             'verify'  => env('CENTRIFUGO_VERIFY', false), // Verify host ssl if centrifugo uses this
             'ssl_key' => env('CENTRIFUGO_SSL_KEY', null), // Self-Signed SSl Key for Host (require verify=true),
