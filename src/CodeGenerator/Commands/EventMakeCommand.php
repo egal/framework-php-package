@@ -6,9 +6,6 @@ namespace Egal\CodeGenerator\Commands;
 
 use Egal\CodeGenerator\Exceptions\EventMakeException;
 
-/**
- * The class of the console command for generating the event.
- */
 class EventMakeCommand extends MakeCommand
 {
 
@@ -28,13 +25,12 @@ class EventMakeCommand extends MakeCommand
 
     protected string $stubFileBaseName = 'event';
 
-    /**
-     * @throws \Exception|\Egal\CodeGenerator\Exceptions\EventMakeException
-     */
     public function handle(): void
     {
         if ($this->option('global') && $this->option('centrifugo')) {
-            throw new EventMakeException('Unacceptable to specify simultaneously flags --g and --с');
+            throw new EventMakeException(
+                'Unacceptable to specify simultaneously flags --global and --centrifugo'
+            );
         }
 
         $fileBaseName = (string) $this->argument('event-name');
