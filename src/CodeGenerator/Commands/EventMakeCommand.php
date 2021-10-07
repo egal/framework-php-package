@@ -42,6 +42,9 @@ class EventMakeCommand extends MakeCommand
         $extends = $this->option('global')
             ? 'GlobalEvent'
             : ($this->option('centrifugo') ? 'CentrifugoEvent' : 'Event');
+        $use = $this->option('global')
+            ? 'Egal\Core\Events\GlobalEvent'
+            : ($this->option('centrifugo') ? 'Egal\Core\Events\CentrifugoEvent' : 'Egal\Core\Events\Event');
 
         $this->fileBaseName = str_ends_with($fileBaseName, $extends)
             ? $fileBaseName
@@ -49,6 +52,7 @@ class EventMakeCommand extends MakeCommand
         $this->filePath = base_path('app/Events') . '/' . $this->fileBaseName . '.php';
         $this->setFileContents('{{ class }}', $this->fileBaseName);
         $this->setFileContents('{{ extends }}', $extends);
+        $this->setFileContents('{{ use }}', $use);
         $this->writeFile();
     }
 
