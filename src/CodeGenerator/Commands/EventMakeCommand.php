@@ -28,9 +28,7 @@ class EventMakeCommand extends MakeCommand
     public function handle(): void
     {
         if ($this->option('global') && $this->option('centrifugo')) {
-            throw new EventMakeException(
-                'Unacceptable to specify simultaneously flags --global and --centrifugo'
-            );
+            throw new EventMakeException('Unacceptable to specify simultaneously flags --global and --centrifugo');
         }
 
         $fileBaseName = (string) $this->argument('event-name');

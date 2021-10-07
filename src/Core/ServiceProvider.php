@@ -62,9 +62,9 @@ class ServiceProvider extends IlluminateServiceProvider
             ]);
         }
 
-        $this->app->singleton(Bus::class, static fn(): Bus => BusCreator::createBus());
-        $this->app->singleton(Session::class, static fn() => new Session());
-        $this->app->singleton(EventManager::class, static fn() => new EventManager());
+        $this->app->singleton(Bus::class, static fn (): Bus => BusCreator::createBus());
+        $this->app->singleton(Session::class, static fn () => new Session());
+        $this->app->singleton(EventManager::class, static fn () => new EventManager());
 
         $this->commands([]);
 
