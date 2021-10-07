@@ -11,7 +11,7 @@ trait CenrifugoPublishable
 
     public function broadcastOn(): array
     {
-        $service = config('app.name');
+        $service = config('app.service_name');
         $event = $this->getName();
 
         $channelNames = [
