@@ -35,9 +35,4 @@ class Centrifugo
         return static::getInstance()->client;
     }
 
-    public static function __callStatic(string $name, array $arguments)
-    {
-        return static::getInstance()->client->{$name}(...$arguments);
-    }
-
 }

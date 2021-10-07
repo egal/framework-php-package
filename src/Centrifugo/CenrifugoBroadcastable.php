@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Egal\Centrifugo;
 
-trait CenrifugoPublishable
+use Egal\Model\Model;
+
+trait CenrifugoBroadcastable
 {
 
     public string $connection = 'sync';
@@ -19,11 +21,13 @@ trait CenrifugoPublishable
             $service . '@' . $eventName,
         ];
 
-        if (isset($this->model)) {
-            $modelName = get_class_short_name($this->model);
+        $entity = $this->getEntity();
+
+        if (isset($entity)) {
+            $modelName = get_class_short_name($entity);
             $channelNames[] = $service . '@' . $modelName . '.' . $eventName;
             $channelNames[] = $service . '@' . $modelName;
-            $modelId = $this->model->getKey();
+            $modelId = $entity->getKey();
 
             if (isset($modelId)) {
                 $channelNames[] = $service . '@' . $modelName . '.' . $modelId . '.' . $eventName;
@@ -36,13 +40,15 @@ trait CenrifugoPublishable
 
     public function broadcastWith(): array
     {
-        return isset($this->model)
+        $entity = $this->getEntity();
+
+        return isset($entity)
             ? [
                 'type' => 'model_event',
                 'data' => [
                     'name' => $this->getName(),
-                    'model_name' => get_class_short_name($this->model),
-                    'model_id' => $this->model->getKey(),
+                    'model_name' => get_class_short_name($entity),
+                    'model_id' => $entity->getKey(),
                 ],
             ]
             : [
@@ -61,6 +67,11 @@ trait CenrifugoPublishable
     private function getName(): string
     {
         return $this->name ?? snake_case(get_class_short_name($this));
+    }
+
+    private function getEntity(): ?Model
+    {
+        return $this->entity ?? null;
     }
 
 }

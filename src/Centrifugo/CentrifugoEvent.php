@@ -11,15 +11,15 @@ use Illuminate\Support\Facades\Event;
 abstract class CentrifugoEvent extends Event implements ShouldBroadcast
 {
 
-    use CenrifugoPublishable;
+    use CenrifugoBroadcastable;
 
-    protected Model $model;
+    protected Model $entity;
 
     protected string $name;
 
-    public function __construct(Model $model)
+    public function __construct(Model $entity)
     {
-        $this->model = $model;
+        $this->entity = $entity;
     }
 
 }
