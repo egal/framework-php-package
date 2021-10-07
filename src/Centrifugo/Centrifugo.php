@@ -6,9 +6,6 @@ namespace Egal\Centrifugo;
 
 use phpcent\Client as PHPCentClient;
 
-/**
- * @mixin \phpcent\Client
- */
 class Centrifugo
 {
 

@@ -19,20 +19,15 @@ class ServiceProvider extends IlluminateServiceProvider
 {
 
     /**
-     * Указывает, отложена ли загрузка провайдера.
+     * Indicates if the download of the provider is pending.
      */
     protected bool $defer = true;
 
     /**
-     * Команды для регистрации.
-     *
      * @var string[]
      */
     protected array $commands = [];
 
-    /**
-     * @throws \Egal\Core\Exceptions\EgalCoreInitializationException
-     */
     public function register(): void
     {
         if (!($this->app instanceof Application)) {
@@ -67,20 +62,9 @@ class ServiceProvider extends IlluminateServiceProvider
             ]);
         }
 
-        $this->app->singleton(
-            Bus::class,
-            static fn (): Bus => BusCreator::createBus()
-        );
-
-        $this->app->singleton(
-            Session::class,
-            static fn () => new Session()
-        );
-
-        $this->app->singleton(
-            EventManager::class,
-            static fn () => new EventManager()
-        );
+        $this->app->singleton(Bus::class, static fn(): Bus => BusCreator::createBus());
+        $this->app->singleton(Session::class, static fn() => new Session());
+        $this->app->singleton(EventManager::class, static fn() => new EventManager());
 
         $this->commands([]);
 
@@ -90,11 +74,8 @@ class ServiceProvider extends IlluminateServiceProvider
     private function mergeConfigs(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/config/app.php', 'app');
-
         $this->mergeConfigFrom(__DIR__ . '/config/auth.php', 'auth');
-
         $this->mergeConfigFrom(__DIR__ . '/config/database.php', 'database');
-
         $this->mergeConfigFrom(__DIR__ . '/config/queue.php', 'queue');
     }
 
