@@ -135,6 +135,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     }
 
     /**
+     * @param mixed $value
      * @throws \ReflectionException
      * @throws \Egal\Model\Exceptions\UnsupportedFilterFieldException
      * @throws \Egal\Model\Exceptions\RelationNotFoundException
@@ -156,13 +157,11 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     }
 
     /**
+     * @param mixed $value
      * @throws \Egal\Model\Exceptions\UnsupportedFilterValueException
      */
-    private static function validateFieldValueByMetadata(
-        string $field,
-        string $value,
-        ModelMetadata $modelMetadata
-    ): void {
+    private static function validateFieldValueByMetadata(string $field, $value, ModelMetadata $modelMetadata): void
+    {
         $validator = Validator::make(
             [$field => $value],
             [$field => $modelMetadata->getValidationRules($field)]
@@ -184,6 +183,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     }
 
     /**
+     * @param mixed $value
      * @throws \ReflectionException
      * @throws \Egal\Model\Exceptions\UnsupportedFilterFieldException
      * @throws \Egal\Model\Exceptions\RelationNotFoundException

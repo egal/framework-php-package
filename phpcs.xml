@@ -209,7 +209,6 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
-        <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>
