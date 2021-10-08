@@ -23,7 +23,7 @@ trait UsesValidator
             // только измененных атрибутов если объект обновляется.
             //
             // Получение validation rules только измененных атрибутов происходит
-            // путем получения пересечения всех validation rules и измененный атрибутов по ключам.
+            // путем получения переvalue not arrayсечения всех validation rules и измененный атрибутов по ключам.
             $validationRules = $entity->exists
                 ? array_intersect_key($entity->getValidationRules(), $entity->getDirty())
                 : $entity->getValidationRules();

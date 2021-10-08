@@ -7,6 +7,8 @@ namespace Egal\Model;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\OrderException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
+use Egal\Model\Exceptions\UnsupportedFilterFieldException;
+use Egal\Model\Exceptions\UnsupportedFilterValueException;
 use Egal\Model\Filter\FilterCombiner;
 use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Filter\FilterPart;
@@ -17,6 +19,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use ReflectionMethod;
 
@@ -262,14 +265,30 @@ class Builder extends EloquentBuilder
      * Apply filter condition to the builder query
      *
      * @throws \ReflectionException|\Egal\Model\Exceptions\RelationNotFoundException|\Egal\Model\Exceptions\UnsupportedFilterConditionException
+     * @throws UnsupportedFilterFieldException
+     * @throws UnsupportedFilterValueException
      */
     private function applyFilterCondition(FilterCondition $condition, string $beforeOperator): void
     {
         $applier = 'apply' . studly_case($condition->getOperator()) . 'FilterCondition';
         $model = $this->getModel();
+        $field = $condition->getField();
+        $modelMetadata = $model->getModelMetadata();
+
+        if (!$modelMetadata->fieldExist($field)) {
+            throw new UnsupportedFilterFieldException();
+        }
 
         if (!method_exists($model, $applier)) {
             throw new UnsupportedFilterConditionException();
+        }
+
+        $validator = Validator::make(
+            [$field => $condition->getValue()],
+            [$field => $modelMetadata->getValidationRules($field)]
+        );
+        if($validator->fails()) {
+            throw new UnsupportedFilterValueException();
         }
 
         $model->$applier($this, $condition, $beforeOperator);
