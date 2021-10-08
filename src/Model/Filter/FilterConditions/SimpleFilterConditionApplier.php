@@ -7,7 +7,10 @@ namespace Egal\Model\Filter\FilterConditions;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
+use Egal\Model\Exceptions\UnsupportedFilterFieldException;
+use Egal\Model\Exceptions\UnsupportedFilterValueException;
 use Egal\Model\Filter\FilterCondition;
+use Illuminate\Support\Facades\Validator;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
 {
@@ -29,6 +32,14 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     private const END_WITH_OPERATOR = 'ew';
     private const END_WITH_IGNORE_CASE_OPERATOR = 'ewi';
 
+    /**
+     * @throws UnsupportedFilterFieldException
+     * @throws UnsupportedFilterValueException
+     * @throws FilterException
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     * @throws \ReflectionException
+     * @throws UnsupportedFilterConditionFieldFormException
+     */
     public static function apply(Builder &$builder, FilterCondition $condition, string $boolean): void
     {
         $operator = static::getSqlOperator($condition->getOperator());
@@ -39,22 +50,26 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $relation = $matches[1];
             $field = $matches[3];
             $types = explode(',', $matches[2]);
+            self::validateMorphRelationFieldAndValue($builder, $relation, $types, $field, $value);
             $clause = static function (Builder $query) use ($field, $operator, $value): void {
                 $query->where($field, $operator, $value);
             };
-            $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
             $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
             $relation = $matches[1];
             $field = $matches[2];
+            self::validateRelationFieldAndValue($builder, $relation, $field, $value);
             $clause = static function (Builder $query) use ($field, $operator, $value): void {
                 $query->where($field, $operator, $value);
             };
-            $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
             $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
+            $field = $condition->getField();
+            $modelMetadata = $builder->getModel()->getModelMetadata();
+            self::validateFieldByMetadata($field, $modelMetadata);
+            self::validateFieldValueByMetadata($field, $value, $modelMetadata);
             $builder->where($condition->getField(), $operator, $value, $boolean);
         } else {
             throw new UnsupportedFilterConditionFieldFormException();
@@ -116,6 +131,66 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             default:
                 return $value;
         }
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws UnsupportedFilterFieldException
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     * @throws UnsupportedFilterValueException
+     */
+    private static function validateMorphRelationFieldAndValue(Builder $builder, string $relation, array $types, string $field, $value)
+    {
+        $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+        foreach ($types as $type) {
+            $relationModelMetadata = (new $type)->getModelMetadata();
+            self::validateFieldByMetadata($field, $relationModelMetadata);
+            self::validateFieldValueByMetadata($field, $value, $relationModelMetadata);
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param $modelMetadata
+     * @throws UnsupportedFilterValueException
+     */
+    private static function validateFieldValueByMetadata(string $field, $value, $modelMetadata): void
+    {
+        $validator = Validator::make(
+            [$field => $value],
+            [$field => $modelMetadata->getValidationRules($field)]
+        );
+        if ($validator->fails()) {
+            throw new UnsupportedFilterValueException();
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param $modelMetadata
+     * @throws UnsupportedFilterFieldException
+     */
+    private static function validateFieldByMetadata(string $field, $modelMetadata): void
+    {
+        if (!in_array($field, $modelMetadata->getFields())) {
+            throw new UnsupportedFilterFieldException();
+        }
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws UnsupportedFilterFieldException
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     */
+    private static function validateRelationFieldAndValue(Builder $builder, string $relation, string $field, $value)
+    {
+        $model = $builder->getModel();
+        $model->getModelMetadata()->relationExistOrFail($relation);
+        $relationName = camel_case($relation);
+        $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
+        self::validateFieldByMetadata($field, $relationModelMetadata);
+        self::validateFieldValueByMetadata($field, $value, $relationModelMetadata);
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Closure;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -10,6 +11,7 @@ use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
+use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelActionGetItemsFilterByRelationTest extends TestCase
@@ -115,6 +117,9 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
      */
     public function testProductsFilter(?array $filter, ?string $expectException, $equalsExpect)
     {
+        $app = new Application(dirname(__DIR__));
+        $app->withFacades();
+
         $this->seedData();
 
         if ($expectException) {
@@ -141,7 +146,12 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
     }
 
 }
-
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property string $name       Название          {@property-type field}  {@validation-rules string}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ */
 class ModelTestCategory extends Model
 {
 
@@ -156,8 +166,14 @@ class ModelTestCategory extends Model
 }
 
 /**
- * @property $category {@property-type relation}
- * @property $category_with_word {@property-type relation}
+ * @property int    $id                            {@property-type field}  {@prymary-key}
+ * @property string $name        Название          {@property-type field}  {@validation-rules string}
+ * @property int    $category_id Категория         {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                    {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                    {@property-type field}  {@validation-rules date}
+ *
+ * @property ModelTestCategory $category           {@property-type relation}
+ * @property ModelTestCategory $category_with_word {@property-type relation}
  */
 class ModelTestProduct extends Model
 {

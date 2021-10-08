@@ -272,25 +272,10 @@ class Builder extends EloquentBuilder
     {
         $applier = 'apply' . studly_case($condition->getOperator()) . 'FilterCondition';
         $model = $this->getModel();
-        $field = $condition->getField();
-        $modelMetadata = $model->getModelMetadata();
-
-        if (!$modelMetadata->fieldExist($field)) {
-            throw new UnsupportedFilterFieldException();
-        }
 
         if (!method_exists($model, $applier)) {
             throw new UnsupportedFilterConditionException();
         }
-
-        $validator = Validator::make(
-            [$field => $condition->getValue()],
-            [$field => $modelMetadata->getValidationRules($field)]
-        );
-        if($validator->fails()) {
-            throw new UnsupportedFilterValueException();
-        }
-
         $model->$applier($this, $condition, $beforeOperator);
     }
 

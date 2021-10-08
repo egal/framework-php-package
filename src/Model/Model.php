@@ -21,6 +21,7 @@ use Egal\Model\Traits\UsesValidator;
 use Egal\Model\Traits\XssGuardable;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\DB;
 
