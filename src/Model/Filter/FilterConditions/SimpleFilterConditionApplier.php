@@ -10,6 +10,7 @@ use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
 use Egal\Model\Exceptions\UnsupportedFilterFieldException;
 use Egal\Model\Exceptions\UnsupportedFilterValueException;
 use Egal\Model\Filter\FilterCondition;
+use Egal\Model\Metadata\ModelMetadata;
 use Illuminate\Support\Facades\Validator;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
@@ -33,12 +34,12 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
     private const END_WITH_IGNORE_CASE_OPERATOR = 'ewi';
 
     /**
-     * @throws UnsupportedFilterFieldException
-     * @throws UnsupportedFilterValueException
-     * @throws FilterException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterValueException
      * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterFieldException
+     * @throws \Egal\Model\Exceptions\FilterException
      * @throws \ReflectionException
-     * @throws UnsupportedFilterConditionFieldFormException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException
      */
     public static function apply(Builder &$builder, FilterCondition $condition, string $boolean): void
     {
@@ -135,43 +136,47 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 
     /**
      * @throws \ReflectionException
-     * @throws UnsupportedFilterFieldException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterFieldException
      * @throws \Egal\Model\Exceptions\RelationNotFoundException
-     * @throws UnsupportedFilterValueException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterValueException
      */
-    private static function validateMorphRelationFieldAndValue(Builder $builder, string $relation, array $types, string $field, $value)
-    {
+    private static function validateMorphRelationFieldAndValue(
+        Builder $builder,
+        string $relation,
+        array $types,
+        string $field,
+        $value
+    ): void {
         $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
         foreach ($types as $type) {
-            $relationModelMetadata = (new $type)->getModelMetadata();
+            $relationModelMetadata = (new $type())->getModelMetadata();
             self::validateFieldByMetadata($field, $relationModelMetadata);
             self::validateFieldValueByMetadata($field, $value, $relationModelMetadata);
         }
     }
 
     /**
-     * @param string $field
-     * @param string $value
-     * @param $modelMetadata
-     * @throws UnsupportedFilterValueException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterValueException
      */
-    private static function validateFieldValueByMetadata(string $field, $value, $modelMetadata): void
-    {
+    private static function validateFieldValueByMetadata(
+        string $field,
+        string $value,
+        ModelMetadata $modelMetadata
+    ): void {
         $validator = Validator::make(
             [$field => $value],
             [$field => $modelMetadata->getValidationRules($field)]
         );
+
         if ($validator->fails()) {
             throw new UnsupportedFilterValueException();
         }
     }
 
     /**
-     * @param string $field
-     * @param $modelMetadata
-     * @throws UnsupportedFilterFieldException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterFieldException
      */
-    private static function validateFieldByMetadata(string $field, $modelMetadata): void
+    private static function validateFieldByMetadata(string $field, ModelMetadata $modelMetadata): void
     {
         if (!in_array($field, $modelMetadata->getFields())) {
             throw new UnsupportedFilterFieldException();
@@ -180,11 +185,15 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 
     /**
      * @throws \ReflectionException
-     * @throws UnsupportedFilterFieldException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterFieldException
      * @throws \Egal\Model\Exceptions\RelationNotFoundException
      */
-    private static function validateRelationFieldAndValue(Builder $builder, string $relation, string $field, $value)
-    {
+    private static function validateRelationFieldAndValue(
+        Builder $builder,
+        string $relation,
+        string $field,
+        $value
+    ): void {
         $model = $builder->getModel();
         $model->getModelMetadata()->relationExistOrFail($relation);
         $relationName = camel_case($relation);

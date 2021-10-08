@@ -100,6 +100,9 @@
     <rule ref="Squiz.Commenting.BlockComment.FirstLineIndent">
         <exclude-pattern>*/config/*</exclude-pattern>
     </rule>
+    <rule ref="Squiz.Commenting.FunctionCommentThrowTag.WrongNumber">
+        <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
+    </rule>
     <rule ref="Squiz.NamingConventions.ValidFunctionName.NotCamelCaps">
         <exclude-pattern>*/helpers.php</exclude-pattern>
     </rule>
@@ -192,6 +195,7 @@
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+        <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
@@ -205,6 +209,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
+        <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
         <exclude-pattern>*Command.php</exclude-pattern>

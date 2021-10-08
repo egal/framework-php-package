@@ -7,8 +7,6 @@ namespace Egal\Model;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\OrderException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
-use Egal\Model\Exceptions\UnsupportedFilterFieldException;
-use Egal\Model\Exceptions\UnsupportedFilterValueException;
 use Egal\Model\Filter\FilterCombiner;
 use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Filter\FilterPart;
@@ -19,7 +17,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use ReflectionMethod;
 
@@ -265,8 +262,6 @@ class Builder extends EloquentBuilder
      * Apply filter condition to the builder query
      *
      * @throws \ReflectionException|\Egal\Model\Exceptions\RelationNotFoundException|\Egal\Model\Exceptions\UnsupportedFilterConditionException
-     * @throws UnsupportedFilterFieldException
-     * @throws UnsupportedFilterValueException
      */
     private function applyFilterCondition(FilterCondition $condition, string $beforeOperator): void
     {
@@ -276,6 +271,7 @@ class Builder extends EloquentBuilder
         if (!method_exists($model, $applier)) {
             throw new UnsupportedFilterConditionException();
         }
+
         $model->$applier($this, $condition, $beforeOperator);
     }
 
