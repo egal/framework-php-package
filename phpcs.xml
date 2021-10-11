@@ -24,7 +24,6 @@
         <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
     </rule>
 
-
     <rule ref="PEAR.Functions.FunctionCallSignature">
         <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
@@ -80,6 +79,7 @@
         <exclude name="Squiz.ControlStructures.SwitchDeclaration.EmptyDefault"/>
         <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
         <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned"/>
+        <exclude name="Squiz.Commenting.ClassComment.TagNotAllowed"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
@@ -178,8 +178,10 @@
         <exclude-pattern>*FilterConditionApplier.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
-        <exclude-pattern>model/Builder.php</exclude-pattern>
-        <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
+        <exclude-pattern>src/Model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/Core/Exceptions/ExceptionHandler.php</exclude-pattern>
+        <exclude-pattern>src/Auth/Traits/Authenticatable.php</exclude-pattern>
+        <exclude-pattern>src/AuthServiceDependencies/Models/User.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
@@ -201,6 +203,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
         <exclude-pattern>*Exception.php</exclude-pattern>
+        <exclude-pattern>*Command.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>

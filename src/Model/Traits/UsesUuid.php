@@ -1,43 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Traits;
 
-use Egal\Model\Model;
-use Illuminate\Support\Str;
-
 /**
- * @mixin Model
+ * @mixin \Egal\Model\Model
+ * @depricated since v2.0.0, use {@see UsesUuidKey}
  */
 trait UsesUuid
 {
 
-    /**
-     * @noinspection PhpUnused
-     */
-    protected static function bootUsesUuid()
-    {
-        static::creating(function ($model) {
-            /** @var Model $model */
-            $model->{$model->getKeyName()} = (string)Str::uuid();
-        });
-    }
+    use UsesUuidKey;
 
-    /**
-     * @return bool
-     * @noinspection PhpUnused
-     */
-    public function getIncrementing(): bool
+    protected static function bootUsesUuid(): void
     {
-        return false;
-    }
-
-    /**
-     * @return string
-     * @noinspection PhpUnused
-     */
-    public function getKeyType(): string
-    {
-        return 'string';
+        self::bootUsesUuidKey();
     }
 
 }
