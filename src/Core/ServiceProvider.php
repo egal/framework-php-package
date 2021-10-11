@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core;
 
 use Egal\Core\Bus\Bus;
@@ -17,22 +19,15 @@ class ServiceProvider extends IlluminateServiceProvider
 {
 
     /**
-     * Указывает, отложена ли загрузка провайдера.
-     *
-     * @var bool
+     * Indicates if the download of the provider is pending.
      */
     protected bool $defer = true;
 
     /**
-     * Команды для регистрации.
-     *
-     * @var array
+     * @var string[]
      */
     protected array $commands = [];
 
-    /**
-     * @throws EgalCoreInitializationException
-     */
     public function register(): void
     {
         if (!($this->app instanceof Application)) {
@@ -56,6 +51,10 @@ class ServiceProvider extends IlluminateServiceProvider
                 $this->app->register('Egal\Model\ServiceProvider');
             }
 
+            if (class_exists('Egal\Centrifugo\ServiceProvider')) {
+                $this->app->register('Egal\Centrifugo\ServiceProvider');
+            }
+
             $this->commands([
                 EgalRunCommand::class,
                 EgalListenerRunCommand::class,
@@ -63,40 +62,21 @@ class ServiceProvider extends IlluminateServiceProvider
             ]);
         }
 
-        $this->app->singleton(Bus::class, function (): Bus {
-            return BusCreator::createBus();
-        });
-
-        $this->app->singleton(Session::class, function () {
-            return new Session();
-        });
-
-        $this->app->singleton(EventManager::class, function () {
-            return new EventManager();
-        });
+        $this->app->singleton(Bus::class, static fn (): Bus => BusCreator::createBus());
+        $this->app->singleton(Session::class, static fn () => new Session());
+        $this->app->singleton(EventManager::class, static fn () => new EventManager());
 
         $this->commands([]);
 
         $this->mergeConfigs();
     }
 
-    private function mergeConfigs()
+    private function mergeConfigs(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__ . '/config/app.php', 'app'
-        );
-
-        $this->mergeConfigFrom(
-            __DIR__ . '/config/auth.php', 'auth'
-        );
-
-        $this->mergeConfigFrom(
-            __DIR__ . '/config/database.php', 'database'
-        );
-
-        $this->mergeConfigFrom(
-            __DIR__ . '/config/queue.php', 'queue'
-        );
+        $this->mergeConfigFrom(__DIR__ . '/config/app.php', 'app');
+        $this->mergeConfigFrom(__DIR__ . '/config/auth.php', 'auth');
+        $this->mergeConfigFrom(__DIR__ . '/config/database.php', 'database');
+        $this->mergeConfigFrom(__DIR__ . '/config/queue.php', 'queue');
     }
 
 }
