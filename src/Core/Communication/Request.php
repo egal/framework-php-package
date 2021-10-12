@@ -113,8 +113,8 @@ class Request extends ActionMessage
             $this->connection->getChannel()->basic_consume(
                 $this->uuid,
                 '',
-                false,
                 true,
+                false,
                 false,
                 false,
                 fn($msg) => $this->collectRabbitMessageIntoResponse($msg->body)
