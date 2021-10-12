@@ -88,7 +88,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
             ],
             [
                 [
-                    ['category.id', 'eq', 1000],
+                    ['category.id', 'eq', 1],
                     'AND',
                     ['category_with_word.id', 'eq', 1000],
                 ],
@@ -117,8 +117,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
      */
     public function testProductsFilter(?array $filter, ?string $expectException, $equalsExpect)
     {
-        $app = new Application(dirname(__DIR__));
-        $app->withFacades();
+        new Application(dirname(__DIR__));
 
         $this->seedData();
 
@@ -147,7 +146,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
 
 }
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}

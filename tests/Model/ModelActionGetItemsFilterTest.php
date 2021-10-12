@@ -306,8 +306,7 @@ class ModelActionGetItemsFilterTest extends TestCase
      */
     public function testProductsFilter(?array $filter, ?string $expectException, array $equalsExpect)
     {
-        $app = new Application(dirname(__DIR__));
-        $app->withFacades();
+        new Application(dirname(__DIR__));
 
         if ($expectException) {
             $this->expectException($expectException);

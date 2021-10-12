@@ -95,8 +95,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
      */
     public function testFilter(?array $filter, ?string $expectException, ?array $equalsExpect)
     {
-        $app = new Application(dirname(__DIR__));
-        $app->withFacades();
+        new Application(dirname(__DIR__));
 
         if ($expectException) {
             $this->expectException($expectException);

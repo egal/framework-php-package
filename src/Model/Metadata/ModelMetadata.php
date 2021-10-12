@@ -10,6 +10,8 @@ use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
+use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
+use Illuminate\Support\Facades\Validator;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
@@ -259,6 +261,27 @@ class ModelMetadata
     public function getPrimaryKey(): ?string
     {
         return $this->primaryKey;
+    }
+
+    public function validateFieldValueType(string $field, $value)
+    {
+        $typeValidationRules = [
+            'integer',
+            'bool',
+            'boolean',
+            'date',
+            'json',
+            'string',
+            'numeric'
+        ];
+        $fieldTypeValidationRules = array_intersect($typeValidationRules, $this->getValidationRules($field));
+        $validator = app('validator')->make(
+            [$field => $value],
+            [$field => $fieldTypeValidationRules]
+        );
+        if ($validator->fails()) {
+            throw UnsupportedFilterValueTypeException::make($field, $validator->errors()->all());
+        }
     }
 
     protected function scanActions(): void

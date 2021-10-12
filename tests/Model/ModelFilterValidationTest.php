@@ -3,9 +3,9 @@
 namespace Egal\Tests\Model;
 
 use Carbon\Carbon;
+use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
-use Egal\Model\Exceptions\UnsupportedFilterFieldException;
-use Egal\Model\Exceptions\UnsupportedFilterValueException;
+use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
@@ -52,11 +52,11 @@ class ModelFilterValidationTest extends TestCase
             ],
             [
                 [["names", "eq", "bar"]],
-                UnsupportedFilterFieldException::class
+                FieldNotFoundException::class
             ],
             [
                 [["name", "eq", 34]],
-                UnsupportedFilterValueException::class
+                UnsupportedFilterValueTypeException::class
             ],
             [
                 [["name", "edq", "bar"]],
@@ -64,7 +64,7 @@ class ModelFilterValidationTest extends TestCase
             ],
             [
                 [["created_at", "eq", "2021-10-00T11:24:07.000000Z"]],
-                UnsupportedFilterValueException::class
+                UnsupportedFilterValueTypeException::class
             ],
         ];
     }
@@ -74,8 +74,7 @@ class ModelFilterValidationTest extends TestCase
      */
     public function testProductsFilterValidation(array $filter, ?string $expectException)
     {
-        $app = new Application(dirname(__DIR__));
-        $app->withFacades();
+        new Application(dirname(__DIR__));
 
         if ($expectException) {
             $this->expectException($expectException);

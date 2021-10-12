@@ -79,8 +79,7 @@ class ModelActionGetCountTest extends TestCase
      */
     public function testProductsFilter(?array $filter, ?string $expectException, int $equalsExpect)
     {
-        $app = new Application(dirname(__DIR__));
-        $app->withFacades();
+        new Application(dirname(__DIR__));
 
         if ($expectException) {
             $this->expectException($expectException);
