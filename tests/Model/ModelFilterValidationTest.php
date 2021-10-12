@@ -74,8 +74,6 @@ class ModelFilterValidationTest extends TestCase
      */
     public function testProductsFilterValidation(array $filter, ?string $expectException)
     {
-        new Application(dirname(__DIR__));
-
         if ($expectException) {
             $this->expectException($expectException);
         }

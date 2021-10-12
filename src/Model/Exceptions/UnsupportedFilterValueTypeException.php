@@ -11,16 +11,11 @@ class UnsupportedFilterValueTypeException extends Exception
 
     protected $code = 403;
 
-    public static function make($field, $errors): self
+    public static function make($field, $requiredType): self
     {
         $exception = new static();
-        $exception->message = 'Unsupported filter value type for field - ' . $field . '!';
-
-        if (config('app.debug')) {
-            foreach ($errors as $field => $error) {
-                $exception->message .= PHP_EOL . $error;
-            }
-        }
+        $exception->message = 'Unsupported filter value type for field - ' . $field . '!'
+            . PHP_EOL . 'Required type - ' . $requiredType;
 
         return $exception;
     }

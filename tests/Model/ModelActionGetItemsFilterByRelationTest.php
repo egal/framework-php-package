@@ -117,8 +117,6 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
      */
     public function testProductsFilter(?array $filter, ?string $expectException, $equalsExpect)
     {
-        new Application(dirname(__DIR__));
-
         $this->seedData();
 
         if ($expectException) {

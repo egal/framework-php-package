@@ -12,6 +12,7 @@ use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Concerns\ValidatesAttributes;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
@@ -21,6 +22,8 @@ use ReflectionClass;
  */
 class ModelMetadata
 {
+
+    use ValidatesAttributes;
 
     protected string $modelClass;
 
@@ -265,7 +268,7 @@ class ModelMetadata
 
     public function validateFieldValueType(string $field, $value)
     {
-        $typeValidationRules = [
+        $allTypeValidationRules = [
             'integer',
             'bool',
             'boolean',
@@ -274,13 +277,13 @@ class ModelMetadata
             'string',
             'numeric'
         ];
-        $fieldTypeValidationRules = array_intersect($typeValidationRules, $this->getValidationRules($field));
-        $validator = app('validator')->make(
-            [$field => $value],
-            [$field => $fieldTypeValidationRules]
-        );
-        if ($validator->fails()) {
-            throw UnsupportedFilterValueTypeException::make($field, $validator->errors()->all());
+        $fieldTypeValidationRules = array_intersect($allTypeValidationRules, $this->getValidationRules($field));
+        foreach ($fieldTypeValidationRules as $fieldTypeValidationRule) {
+            $validationMethod = camel_case('validate' . $fieldTypeValidationRule);
+            $fieldValidated  = $this->$validationMethod($field, $value);
+            if (!$fieldValidated) {
+                throw UnsupportedFilterValueTypeException::make($field, $fieldTypeValidationRule);
+            }
         }
     }
 

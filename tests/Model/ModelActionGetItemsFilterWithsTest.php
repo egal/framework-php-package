@@ -87,8 +87,6 @@ class ModelActionGetItemsFilterWithsTest extends TestCase
      */
     public function testFilterWiths(?array $withs, ?string $expectException, $equalsExpect)
     {
-        new Application(dirname(__DIR__));
-
         if ($expectException) {
             $this->expectException($expectException);
         }
