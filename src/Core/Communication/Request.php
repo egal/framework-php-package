@@ -15,14 +15,12 @@ use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
+use Exception;
 use Illuminate\Support\Carbon;
 use Throwable;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
-/**
- * Class Request
- */
 class Request extends ActionMessage
 {
 
@@ -112,15 +110,20 @@ class Request extends ActionMessage
         $mustDieAt = (clone $startedAt)->addSeconds(config('app.request.wait_reply_message_ttl'));
 
         try {
-            while (Carbon::now('UTC') < $mustDieAt) {
-                $this->collectRabbitMessageIntoResponse();
+            $this->connection->getChannel()->basic_consume(
+                $this->uuid,
+                '',
+                false,
+                true,
+                false,
+                false,
+                fn($msg) => $this->collectRabbitMessageIntoResponse($msg->body)
+            );
 
-                if ($this->response->getActionResultMessage() || $this->response->getActionErrorMessage()) {
-                    break;
-                }
-
-                usleep(config('app.request.wait_reply_message_delay'));
+            while (Carbon::now('UTC') < $mustDieAt && !($this->response->getActionResultMessage() || $this->response->getActionErrorMessage())) {
+                $this->connection->getChannel()->wait();
             }
+
         } catch (Throwable $exception) {
             $this->closeConnection();
 
@@ -196,7 +199,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\RequestException
+     * @throws RequestException
      */
     private function isConnectionOpenedOrFail(): void
     {
@@ -206,7 +209,7 @@ class Request extends ActionMessage
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     * @throws ImpossibilityDeterminingStatusOfResponseException
      */
     private function setResponseStatusCode(): void
     {
@@ -244,18 +247,12 @@ class Request extends ActionMessage
     /**
      * Gets data from rabbit channel and sets it into response
      *
-     * @throws \Egal\Core\Exceptions\UnableDetermineMessageTypeException
-     * @throws \Exception|\Egal\Core\Exceptions\UnsupportedMessageTypeException
+     * @throws UnableDetermineMessageTypeException
+     * @throws Exception|UnsupportedMessageTypeException
      */
-    private function collectRabbitMessageIntoResponse(): void
+    private function collectRabbitMessageIntoResponse(string $messageBody): void
     {
-        $result = $this->connection->getChannel()->basic_get($this->uuid);
-
-        if ($result === null) {
-            return;
-        }
-
-        $bodyArray = json_decode($result->getBody(), true);
+        $bodyArray = json_decode($messageBody, true);
 
         if (!array_key_exists('type', $bodyArray)) {
             throw new UnableDetermineMessageTypeException();
