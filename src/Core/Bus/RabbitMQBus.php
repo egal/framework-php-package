@@ -183,6 +183,18 @@ class RabbitMQBus extends Bus
 
     public function listenQueue(): void
     {
+//        RabbitMQBus::getConnection()->getChannel()->basic_consume(
+//            $actionMessage->getUuid(),
+//            '',
+//            true,
+//            false,
+//            false,
+//            false,
+//            fn($message) => $callback($convertJsonToMessage($message->body))
+//        );
+//
+//        RabbitMQBus::getConnection()->getChannel()->wait();
+
         Artisan::call('rabbitmq:consume', [
             '--queue' => $this->queueName,
             '--prefetch-count' => 1, # TODO: Разобраться сколько надо prefetch-count по стандарту
@@ -212,7 +224,7 @@ class RabbitMQBus extends Bus
             }
         };
 
-        RabbitMQBus::getConnection()->getChannel()->basic_consume(
+        $this->connection->getChannel()->basic_consume(
             $actionMessage->getUuid(),
             '',
             true,
@@ -222,7 +234,7 @@ class RabbitMQBus extends Bus
             fn($message) => $callback($convertJsonToMessage($message->body))
         );
 
-        RabbitMQBus::getConnection()->getChannel()->wait();
+        $this->connection->getChannel()->wait();
     }
 
 }
