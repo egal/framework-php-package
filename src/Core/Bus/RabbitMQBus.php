@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Bus;
 
+use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
@@ -26,29 +27,17 @@ class RabbitMQBus extends Bus
     private RabbitMQQueue $connection;
     public string $queueName;
 
-    /**
-     * RabbitMQBus constructor.
-     * @throws Exception
-     */
     public function __construct()
     {
         $this->connector = new RabbitMQConnector(app('events'));
         $this->connection = $this->connector->connect(config('queue.connections.rabbitmq'));
     }
 
-    /**
-     * @return RabbitMQQueue
-     * @noinspection PhpUnusedPrivateMethodInspection
-     */
     private static function getConnection(): RabbitMQQueue
     {
         return (app(Bus::class))->connection;
     }
 
-    /**
-     * @param Message $message
-     * @throws Exception
-     */
     public function publishMessage(Message $message): void
     {
         if (
@@ -106,11 +95,6 @@ class RabbitMQBus extends Bus
         $this->connection->getChannel()->basic_publish($AMQPMessage, $exchange, $routingKey);
     }
 
-    /**
-     * @param Message $message
-     * @return string
-     * @throws Exception
-     */
     protected function getExchange(Message $message): string
     {
         switch ($message->getType()) {
@@ -126,9 +110,6 @@ class RabbitMQBus extends Bus
         }
     }
 
-    /**
-     * @throws Exception
-     */
     protected function getRoutingKey(Message $message): string
     {
         switch ($message->getType()) {
@@ -195,9 +176,6 @@ class RabbitMQBus extends Bus
         );
     }
 
-    /**
-     * @throws AMQPProtocolChannelException
-     */
     public function destructEnvironment(): void
     {
         $this->connection->deleteQueue($this->queueName);
@@ -211,6 +189,40 @@ class RabbitMQBus extends Bus
             '--sleep' => (config('queue.connections.rabbitmq.options.consume.sleep')) / 1000,
             '--timeout' => 0,
         ]);
+    }
+
+    public function consumeReplyMessage(ActionMessage $actionMessage, callable $callback): void
+    {
+        $convertJsonToMessage = function (string $body) {
+            $body = json_decode($body, true);
+
+            if (!array_key_exists('type', $body)) {
+                throw new UnableDetermineMessageTypeException();
+            }
+
+            switch ($body['type']) {
+                case MessageType::START_PROCESSING:
+                    return StartProcessingMessage::fromArray($body);
+                case MessageType::ACTION_RESULT:
+                    return ActionResultMessage::fromArray($body);
+                case MessageType::ACTION_ERROR:
+                    return ActionErrorMessage::fromArray($body);
+                default:
+                    throw new UnsupportedMessageTypeException();
+            }
+        };
+
+        RabbitMQBus::getConnection()->getChannel()->basic_consume(
+            $actionMessage->getUuid(),
+            '',
+            true,
+            false,
+            false,
+            false,
+            fn($message) => $callback($convertJsonToMessage($message->body))
+        );
+
+        RabbitMQBus::getConnection()->getChannel()->wait();
     }
 
 }

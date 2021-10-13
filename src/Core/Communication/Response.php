@@ -3,9 +3,11 @@
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ResponseException;
+use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
+use Egal\Core\Messages\Message;
 use Egal\Core\Messages\StartProcessingMessage;
 
 /**
@@ -123,9 +125,6 @@ class Response
         return isset($this->actionErrorMessage);
     }
 
-    /**
-     * @throws ResponseException
-     */
     public function throwActionErrorMessageIfExists()
     {
         if ($this->isActionErrorMessageExists()) {
@@ -133,6 +132,19 @@ class Response
                 $this->getActionErrorMessage()->getMessage(),
                 $this->getActionErrorMessage()->getCode()
             );
+        }
+    }
+
+    public function setReplyMessage(Message $replyMessage)
+    {
+        if ($replyMessage instanceof ActionResultMessage) {
+            $this->setActionResultMessage($replyMessage);
+        } elseif ($replyMessage instanceof ActionErrorMessage) {
+            $this->setActionErrorMessage($replyMessage);
+        } elseif ($replyMessage instanceof StartProcessingMessage) {
+            $this->setStartProcessingMessage($replyMessage);
+        } else {
+            throw new UnsupportedReplyMessageTypeException();
         }
     }
 

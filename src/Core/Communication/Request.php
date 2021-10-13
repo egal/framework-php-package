@@ -5,20 +5,14 @@ declare(strict_types=1);
 namespace Egal\Core\Communication;
 
 use Egal\Core\ActionCaller\ActionCaller;
+use Egal\Core\Bus\Bus;
+use Egal\Core\Bus\RabbitMQBus;
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
-use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
-use Egal\Core\Exceptions\UnsupportedMessageTypeException;
-use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
-use Egal\Core\Messages\ActionResultMessage;
-use Egal\Core\Messages\MessageType;
-use Egal\Core\Messages\StartProcessingMessage;
+use Egal\Core\Messages\Message;
 use Egal\Core\Session\Session;
-use Exception;
 use Illuminate\Support\Carbon;
-use Throwable;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 class Request extends ActionMessage
@@ -30,11 +24,6 @@ class Request extends ActionMessage
     private Response $response;
 
     private RabbitMQQueue $connection;
-
-    /**
-     * Mark connection is opened or not.
-     */
-    private bool $isConnectionOpened;
 
     private string $authServiceName = 'auth';
 
@@ -49,8 +38,6 @@ class Request extends ActionMessage
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
-
-        $this->isConnectionOpened = false;
     }
 
     public function setAuthServiceName(string $authServiceName): void
@@ -73,64 +60,44 @@ class Request extends ActionMessage
         return $this->serviceAuthorization;
     }
 
-    public function openConnection(): void
+    public function waitResponse(): void
     {
-        $this->isConnectionNotOpenedOrFail();
-        $connector = new RabbitMQConnector(app('events'));
-        $this->connection = $connector->connect(config('queue.connections.rabbitmq'));
-        $this->isConnectionOpened = true;
-    }
+        $response = new Response();
+        $response->setActionMessage($this);
 
-    public function reopenConnection(): void
-    {
-        if ($this->isConnectionOpened) {
-            $this->connection->close();
-            $this->isConnectionOpened = false;
+        $mustDieAt = Carbon::now('UTC')->addSeconds(config('app.request.wait_reply_message_ttl'));
+
+        while (Carbon::now('UTC') < $mustDieAt && !($response->getActionResultMessage() || $response->getActionErrorMessage())) {
+            Bus::getInstance()->consumeReplyMessage($this, fn(Message $message) => $response->setReplyMessage($message));
         }
 
-        $this->openConnection();
-    }
-
-    public function closeConnection(): void
-    {
-        $this->connection->deleteQueue($this->uuid);
-        $this->connection->getChannel()->close();
-        $this->connection->close();
-        $this->isConnectionOpened = false;
-    }
-
-    public function waitReplyMessages(): void
-    {
-        $this->isConnectionOpenedOrFail();
-
-        $this->response = new Response();
-        $this->response->setActionMessage($this);
-
-        $startedAt = Carbon::now('UTC');
-        $mustDieAt = (clone $startedAt)->addSeconds(config('app.request.wait_reply_message_ttl'));
-
-        try {
-            $this->connection->getChannel()->basic_consume(
-                $this->uuid,
-                '',
-                true,
-                false,
-                false,
-                false,
-                fn($msg) => $this->collectRabbitMessageIntoResponse($msg->body)
-            );
-
-            while (Carbon::now('UTC') < $mustDieAt && !($this->response->getActionResultMessage() || $this->response->getActionErrorMessage())) {
-                $this->connection->getChannel()->wait();
-            }
-
-        } catch (Throwable $exception) {
-            $this->closeConnection();
-
-            throw $exception;
+        switch ([$response->getStartProcessingMessage() !== null, $response->getActionErrorMessage() !== null, $response->getActionResultMessage() !== null]) {
+            case [true, false, true]:
+                $response->setStatusCode(200);
+                break;
+            case [true, true, false]:
+                $response->setStatusCode($response->getActionErrorMessage()->getCode());
+                $response->setErrorMessage($response->getActionErrorMessage()->getMessage());
+                break;
+            case [true, false, false]:
+                $response->setStatusCode(500);
+                $response->setErrorMessage(
+                    'The service responded, but did not process the request within the allotted time!'
+                );
+                break;
+            case [false, false, false]:
+                $response->setStatusCode(500);
+                $response->setErrorMessage('Service not responding!');
+                break;
+            case [false, true, true]:
+            case [false, true, false]:
+            case [false, false, true]:
+            case [true, true, true]:
+            default:
+                throw new ImpossibilityDeterminingStatusOfResponseException();
         }
 
-        $this->setResponseStatusCode();
+        $this->response = $response;
     }
 
     /**
@@ -144,6 +111,8 @@ class Request extends ActionMessage
     /**
      * @param mixed $key
      * @return mixed[]
+     *
+     * @depricated since v2.0.0
      */
     public function getParameter($key): array
     {
@@ -152,27 +121,16 @@ class Request extends ActionMessage
 
     public function call(): Response
     {
-        $this->sendWithoutClosingConnection();
-        $this->waitReplyMessages();
-        $this->closeConnection();
+        $this->send();
+        $this->waitResponse();
 
-        return $this->response;
+        return $this->getResponse();
     }
 
     public function send(): void
     {
-        $this->sendWithoutClosingConnection();
-        $this->closeConnection();
-    }
-
-    private function sendWithoutClosingConnection(): void
-    {
         if ($this->isServiceAuthorizationEnabled()) {
             $this->authorizeService();
-        }
-
-        if (!$this->isConnectionOpened) {
-            $this->openConnection();
         }
 
         $this->publish();
@@ -189,88 +147,6 @@ class Request extends ActionMessage
                 ? $this->getItselfServiceServiceToken()
                 : $this->getServiceServiceToken()
         );
-    }
-
-    private function isConnectionNotOpenedOrFail(): void
-    {
-        if ($this->isConnectionOpened) {
-            throw new RequestException('The connection is already open!');
-        }
-    }
-
-    /**
-     * @throws RequestException
-     */
-    private function isConnectionOpenedOrFail(): void
-    {
-        if (!$this->isConnectionOpened) {
-            throw new RequestException('The connection not open!');
-        }
-    }
-
-    /**
-     * @throws ImpossibilityDeterminingStatusOfResponseException
-     */
-    private function setResponseStatusCode(): void
-    {
-        $startProcessingMessage = $this->response->getStartProcessingMessage();
-        $actionErrorMessage = $this->response->getActionErrorMessage();
-        $actionResultMessage = $this->response->getActionResultMessage();
-
-        switch ([$startProcessingMessage !== null, $actionErrorMessage !== null, $actionResultMessage !== null]) {
-            case [true, false, true]:
-                $this->response->setStatusCode(200);
-                break;
-            case [true, true, false]:
-                $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
-                $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
-                break;
-            case [true, false, false]:
-                $this->response->setStatusCode(500);
-                $this->response->setErrorMessage(
-                    'The service responded, but did not process the request within the allotted time!'
-                );
-                break;
-            case [false, false, false]:
-                $this->response->setStatusCode(500);
-                $this->response->setErrorMessage('Service not responding!');
-                break;
-            case [false, true, true]:
-            case [false, true, false]:
-            case [false, false, true]:
-            case [true, true, true]:
-            default:
-                throw new ImpossibilityDeterminingStatusOfResponseException();
-        }
-    }
-
-    /**
-     * Gets data from rabbit channel and sets it into response
-     *
-     * @throws UnableDetermineMessageTypeException
-     * @throws Exception|UnsupportedMessageTypeException
-     */
-    private function collectRabbitMessageIntoResponse(string $messageBody): void
-    {
-        $bodyArray = json_decode($messageBody, true);
-
-        if (!array_key_exists('type', $bodyArray)) {
-            throw new UnableDetermineMessageTypeException();
-        }
-
-        switch ($bodyArray['type']) {
-            case MessageType::START_PROCESSING:
-                $this->response->setStartProcessingMessage(StartProcessingMessage::fromArray($bodyArray));
-                break;
-            case MessageType::ACTION_RESULT:
-                $this->response->setActionResultMessage(ActionResultMessage::fromArray($bodyArray));
-                break;
-            case MessageType::ACTION_ERROR:
-                $this->response->setActionErrorMessage(ActionErrorMessage::fromArray($bodyArray));
-                break;
-            default:
-                throw new UnsupportedMessageTypeException();
-        }
     }
 
     private function getItselfServiceServiceToken(): string

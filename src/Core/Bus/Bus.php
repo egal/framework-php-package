@@ -2,12 +2,9 @@
 
 namespace Egal\Core\Bus;
 
+use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 
-/**
- * Class Bus
- * @package Egal\Core\Bus
- */
 abstract class Bus
 {
 
@@ -23,5 +20,7 @@ abstract class Bus
     abstract public function destructEnvironment(): void;
 
     abstract public function listenQueue(): void;
+
+    abstract public function consumeReplyMessage(ActionMessage $actionMessage, callable $callback): void;
 
 }
