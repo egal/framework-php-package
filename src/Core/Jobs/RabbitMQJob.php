@@ -8,6 +8,9 @@ use Egal\Core\Messages\MessageType;
 use Exception;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Jobs\RabbitMQJob as BaseRabbitMQJob;
 
+/**
+ * @depricated
+ */
 class RabbitMQJob extends BaseRabbitMQJob
 {
 

@@ -9,6 +9,9 @@ use Egal\Core\Exceptions\EventHandlingException;
 use Egal\Core\Messages\EventMessage;
 use Throwable;
 
+/**
+ * @depricated
+ */
 class EventJob extends Job
 {
 

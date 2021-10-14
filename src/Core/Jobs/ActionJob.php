@@ -17,6 +17,7 @@ use Throwable;
 
 /**
  * Class ActionJob
+ * @depricated
  */
 class ActionJob extends Job
 {

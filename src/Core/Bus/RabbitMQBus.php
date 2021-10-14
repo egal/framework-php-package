@@ -2,8 +2,16 @@
 
 namespace Egal\Core\Bus;
 
+use Egal\Core\ActionCaller\ActionCaller;
+use Egal\Core\Events\EventManager;
+use Egal\Core\Exceptions\EventHandlingException;
+use Egal\Core\Exceptions\EventProcessingException;
+use Egal\Core\Exceptions\MessageProcessingException;
+use Egal\Core\Exceptions\QueueProcessingException;
 use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
+use Egal\Core\Jobs\ActionJob;
+use Egal\Core\Jobs\EventJob;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -11,12 +19,15 @@ use Egal\Core\Messages\EventMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
+use Egal\Core\Session\Session;
+use Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException;
 use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use Throwable;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
@@ -183,24 +194,37 @@ class RabbitMQBus extends Bus
 
     public function listenQueue(): void
     {
-//        RabbitMQBus::getConnection()->getChannel()->basic_consume(
-//            $actionMessage->getUuid(),
-//            '',
-//            true,
-//            false,
-//            false,
-//            false,
-//            fn($message) => $callback($convertJsonToMessage($message->body))
-//        );
-//
-//        RabbitMQBus::getConnection()->getChannel()->wait();
+        RabbitMQBus::getConnection()->getChannel()->basic_consume(
+            $this->queueName,
+            '',
+            true,
+            false,
+            false,
+            false,
+            fn($message) => $this->processMessage(json_decode($message->body, true))
+        );
 
-        Artisan::call('rabbitmq:consume', [
-            '--queue' => $this->queueName,
-            '--prefetch-count' => 1, # TODO: Разобраться сколько надо prefetch-count по стандарту
-            '--sleep' => (config('queue.connections.rabbitmq.options.consume.sleep')) / 1000,
-            '--timeout' => 0,
-        ]);
+        while (true) {
+            RabbitMQBus::getConnection()->getChannel()->wait();
+        }
+    }
+
+    private function processMessage(array $body)
+    {
+        if (!isset($body['type'])) {
+            throw new MessageProcessingException();
+        }
+
+        switch ($body['type']) {
+            case MessageType::ACTION:
+                $this->processActionMessage(ActionMessage::fromArray($body));
+                break;
+            case MessageType::EVENT:
+                $this->processEventMessage(EventMessage::fromArray($body));
+                throw new MessageProcessingException('НЕ РЕАЛИЗОВАНО!'); # TODO: Реализовать.
+            default:
+                throw new MessageProcessingException('Error processing queue message! ' . json_encode($body));
+        }
     }
 
     public function consumeReplyMessage(ActionMessage $actionMessage, callable $callback): void
@@ -235,6 +259,52 @@ class RabbitMQBus extends Bus
         );
 
         $this->connection->getChannel()->wait();
+    }
+
+    private function processActionMessage(ActionMessage $actionMessage)
+    {
+        try {
+            $startProcessingMessage = new StartProcessingMessage();
+            $startProcessingMessage->setActionMessage($actionMessage);
+            Bus::getInstance()->publishMessage($startProcessingMessage);
+
+            Session::setActionMessage($actionMessage);
+            $actionResultMessage = new ActionResultMessage();
+            $actionResultMessage->setActionMessage($actionMessage);
+            $actionCaller = new ActionCaller(
+                $actionMessage->getModelName(),
+                $actionMessage->getActionName(),
+                $actionMessage->getParameters()
+            );
+            $actionResultMessage->setData($actionCaller->call());
+            Bus::getInstance()->publishMessage($actionResultMessage);
+        } catch (Throwable $exception) {
+            report($exception);
+        }
+
+        Session::unsetActionMessage();
+    }
+
+    private function processEventMessage(EventMessage $eventMessage)
+    {
+        try {
+            $listenerClasses = EventManager::getListeners(
+                $eventMessage->getServiceName(),
+                $eventMessage->getModelName(),
+                $eventMessage->getName()
+            );
+
+            foreach ($listenerClasses as $listenerClass) {
+                if (!class_exists($listenerClass)) {
+                    throw new EventHandlingException();
+                }
+
+                $listener = new $listenerClass();
+                $listener->{'handle'}($eventMessage->getData() ?? []);
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
 }

@@ -62,4 +62,12 @@ class EventMessage extends Message
         return $this->id;
     }
 
+    /**
+     * @return array|null
+     */
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
 }
