@@ -154,14 +154,14 @@ class Response
         $result = [
             MessageType::ACTION => $this->getActionMessage()->toArray(),
             MessageType::START_PROCESSING => isset($this->startProcessingMessage)
-                ? null
-                : $this->getStartProcessingMessage()->toArray(),
+                ? $this->getStartProcessingMessage()->toArray()
+                : null,
             MessageType::ACTION_RESULT => isset($this->actionResultMessage)
-                ? null
-                : $this->getActionResultMessage()->toArray(),
+                ? $this->getActionResultMessage()->toArray()
+                : null,
             MessageType::ACTION_ERROR => isset($this->actionErrorMessage)
-                ? null
-                : $this->getActionErrorMessage()->toArray()
+                ? $this->getActionErrorMessage()->toArray()
+                : null
         ];
 
         if ($this->isActionErrorMessageExists()) {
