@@ -6,6 +6,7 @@ use Egal\Core\Bus\Bus;
 use Egal\Core\Traits\PcntlSignal;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 /**
  * Class EgalListenerRunCommand

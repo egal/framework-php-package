@@ -5,13 +5,9 @@ namespace Egal\Core\Bus;
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Events\EventManager;
 use Egal\Core\Exceptions\EventHandlingException;
-use Egal\Core\Exceptions\EventProcessingException;
 use Egal\Core\Exceptions\MessageProcessingException;
-use Egal\Core\Exceptions\QueueProcessingException;
 use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
-use Egal\Core\Jobs\ActionJob;
-use Egal\Core\Jobs\EventJob;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
@@ -20,11 +16,7 @@ use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
-use Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException;
 use Exception;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Str;
-use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Throwable;
@@ -153,43 +145,33 @@ class RabbitMQBus extends Bus
 
     public function constructEnvironment(): void
     {
-        $processUuid = Str::uuid()->toString();
-        $this->queueName = words_to_dot_case(config('app.service_name'), $processUuid, 'queue');
-        $exchangeBalancerName = words_to_dot_case(config('app.service_name'), 'balancer', 'exchange');
+        $serviceName = config('app.service_name');
+        $this->queueName = "{$serviceName}.queue";
 
         $this->connection->declareQueue(
             $this->queueName,
             false,
-            true,
+            false,
             ["x-queue-mode" => "default"]
         );
-        $this->connection->declareExchange(
-            $exchangeBalancerName,
-            'x-consistent-hash',
-            false,
-            false,
-            ['hash-header' => 'hash-on']
-        );
-        $this->connection->bindQueue($this->queueName, $exchangeBalancerName, '100');
 
         // Привязываем actions и balancer
-        $this->connection->getChannel()->exchange_bind(
-            $exchangeBalancerName,
+        $this->connection->getChannel()->queue_bind(
+            $this->queueName,
             'amq.topic',
-            words_to_dot_case(config('app.service_name'), '*', '*', 'action')
+            "$serviceName.*.*.action"
         );
 
         // Привязываем events и balancer
-        $this->connection->getChannel()->exchange_bind(
-            $exchangeBalancerName,
+        $this->connection->getChannel()->queue_bind(
+            $this->queueName,
             'amq.topic',
-            words_to_dot_case('*', '*', '*', '*', 'event')
+            "*.*.*.*.event"
         );
     }
 
     public function destructEnvironment(): void
     {
-        $this->connection->deleteQueue($this->queueName);
     }
 
     public function listenQueue(): void
@@ -198,10 +180,10 @@ class RabbitMQBus extends Bus
             $this->queueName,
             '',
             true,
+            true,
             false,
             false,
-            false,
-            fn($message) => $this->processMessage(json_decode($message->body, true))
+            fn(AMQPMessage $message) => $this->processMessage(json_decode($message->body, true))
         );
 
         while (true) {
@@ -252,10 +234,10 @@ class RabbitMQBus extends Bus
             $actionMessage->getUuid(),
             '',
             true,
+            true,
             false,
             false,
-            false,
-            fn($message) => $callback($convertJsonToMessage($message->body))
+            fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body))
         );
 
         $this->connection->getChannel()->wait();
