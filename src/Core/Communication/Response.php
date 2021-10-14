@@ -8,6 +8,7 @@ use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\Message;
+use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 
 /**
@@ -146,6 +147,28 @@ class Response
         } else {
             throw new UnsupportedReplyMessageTypeException();
         }
+    }
+
+    public function toArray(): array
+    {
+        $result = [
+            MessageType::ACTION => $this->getActionMessage()->toArray(),
+            MessageType::START_PROCESSING => isset($this->startProcessingMessage)
+                ? null
+                : $this->getStartProcessingMessage()->toArray(),
+            MessageType::ACTION_RESULT => isset($this->actionResultMessage)
+                ? null
+                : $this->getActionResultMessage()->toArray(),
+            MessageType::ACTION_ERROR => isset($this->actionErrorMessage)
+                ? null
+                : $this->getActionErrorMessage()->toArray()
+        ];
+
+        if ($this->isActionErrorMessageExists()) {
+            $result['error_message'] = $this->getErrorMessage();
+        }
+
+        return $result;
     }
 
 }
