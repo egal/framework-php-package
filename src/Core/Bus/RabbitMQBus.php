@@ -50,51 +50,25 @@ class RabbitMQBus extends Bus
             throw  new Exception('Невозможно опубликовать ' . get_class($message));
         }
 
-        /* Additional actions before publish */
-        switch ($message->getType()) {
-            case MessageType::ACTION_ERROR:
-            case MessageType::ACTION_RESULT:
-            case MessageType::START_PROCESSING:
-                /** @var ActionErrorMessage|ActionResultMessage|StartProcessingMessage $message */
-                $this->connection->getChannel()->queue_declare(
-                    $message->getActionMessage()->getUuid(),
-                    true,
-                    false,
-                    false,
-                    true,
-                    false,
-                    new AMQPTable(["x-queue-mode" => "default"]),
-                    null
-                );
-                $this->connection->getChannel()->queue_bind(
-                    $message->getActionMessage()->getUuid(),
-                    'amq.direct',
-                    $message->getActionMessage()->getUuid()
-                );
-                break;
-            case MessageType::ACTION:
-                /** @var ActionMessage $message */
-                $this->connection->getChannel()->queue_declare(
-                    $message->getUuid(),
-                    false,
-                    false,
-                    false,
-                    true,
-                    false,
-                    new AMQPTable(["x-queue-mode" => "default"]),
-                    null
-                );
-                break;
+        if ($message instanceof ActionMessage) {
+            $this->connection->getChannel()->queue_declare(
+                $message->getUuid(),
+                false,
+                false,
+                false,
+                true,
+                false,
+                new AMQPTable(["x-queue-mode" => "default"]),
+                null
+            );
+            $this->connection->getChannel()->queue_bind(
+                $message->getUuid(),
+                'amq.direct',
+                $message->getUuid()
+            );
         }
 
-        $AMQPMessage = new AMQPMessage(
-            $message->toJson(),
-            [
-                'delivery_mode' => 1,
-                'application_headers' => new AMQPTable(['hash-on' => $message->getUuid()])
-            ]
-        );
-
+        $AMQPMessage = new AMQPMessage($message->toJson(), ['delivery_mode' => 1]);
         $this->connection->getChannel()->basic_publish($AMQPMessage, $exchange, $routingKey);
     }
 
