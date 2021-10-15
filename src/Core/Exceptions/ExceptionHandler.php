@@ -35,9 +35,11 @@ class ExceptionHandler extends BaseExceptionHandler
             }
 
             $actionErrorMessage->setActionMessage(Session::getActionMessage());
+
             if ($exception instanceof HasDomainCode) {
                 $actionErrorMessage->setDomainCode($exception->getDomainCode());
             }
+
             Bus::getInstance()->publishMessage($actionErrorMessage);
         }
 

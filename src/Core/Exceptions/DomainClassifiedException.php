@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Exceptions;
 
 use Exception;
@@ -7,14 +9,17 @@ use Throwable;
 
 abstract class DomainClassifiedException extends Exception implements HasDomainCode
 {
-    static private $allDomainCodes = [];
+
     private string $domainCode;
 
-    public function __construct($domainCode, $message = "", $code = 0, Throwable $previous = null)
+    static private $allDomainCodes = [];
+
+    public function __construct($domainCode, $message = '', $code = 0, ?Throwable $previous = null)
     {
         if (in_array($domainCode, self::$allDomainCodes)) {
             throw NonUniqueDomainCodeException::make($domainCode);
         }
+
         $this->setDomainCode($domainCode);
 
         parent::__construct($message, $code, $previous);
@@ -31,4 +36,5 @@ abstract class DomainClassifiedException extends Exception implements HasDomainC
     {
         return $this->domainCode;
     }
+
 }

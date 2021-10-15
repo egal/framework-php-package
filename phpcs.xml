@@ -192,6 +192,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/ActionErrorMessage.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
@@ -206,6 +207,7 @@
         <exclude-pattern>*Command.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>src/Core/Exceptions/DomainClassifiedException.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
@@ -225,6 +227,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
         <exclude-pattern>src/Centrifugo/CenrifugoBroadcastable.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/ActionErrorMessage.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
