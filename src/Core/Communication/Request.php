@@ -60,9 +60,14 @@ class Request extends ActionMessage
         return $this->serviceAuthorization;
     }
 
+    private function newResponse(): Response
+    {
+        return new Response();
+    }
+
     public function waitResponse(): void
     {
-        $response = new Response();
+        $response = $this->newResponse();
         $response->setActionMessage($this);
 
         $mustDieAt = Carbon::now('UTC')->addSeconds(config('app.request.wait_reply_message_ttl'));

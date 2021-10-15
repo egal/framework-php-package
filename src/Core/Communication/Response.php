@@ -149,26 +149,4 @@ class Response
         }
     }
 
-    public function toArray(): array
-    {
-        $result = [
-            MessageType::ACTION => $this->getActionMessage()->toArray(),
-            MessageType::START_PROCESSING => isset($this->startProcessingMessage)
-                ? $this->getStartProcessingMessage()->toArray()
-                : null,
-            MessageType::ACTION_RESULT => isset($this->actionResultMessage)
-                ? $this->getActionResultMessage()->toArray()
-                : null,
-            MessageType::ACTION_ERROR => isset($this->actionErrorMessage)
-                ? $this->getActionErrorMessage()->toArray()
-                : null
-        ];
-
-        if ($this->isActionErrorMessageExists()) {
-            $result['error_message'] = $this->getErrorMessage();
-        }
-
-        return $result;
-    }
-
 }
