@@ -14,6 +14,7 @@ class ActionErrorMessage extends Message
     protected string $type = MessageType::ACTION_ERROR;
     public int $code;
     public string $message;
+    public string $domainCode;
 
     public function __construct(string $message = '', int $code = 500)
     {
@@ -40,6 +41,7 @@ class ActionErrorMessage extends Message
         $result->uuid = $array['uuid'];
         $result->message = $array['message'];
         $result->code = $array['code'];
+        $result->domainCode = $array['domainCode'] ?? null;
 
         if (isset($array['action_message'])) {
             $result->actionMessage = ActionMessage::fromArray($array['action_message']);
@@ -78,6 +80,11 @@ class ActionErrorMessage extends Message
     public function setCode(int $code): void
     {
         $this->code = $code;
+    }
+
+    public function setDomainCode(string $domainCode)
+    {
+        $this->domainCode = $domainCode;
     }
 
 }
