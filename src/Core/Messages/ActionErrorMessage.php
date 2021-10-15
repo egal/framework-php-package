@@ -16,7 +16,7 @@ class ActionErrorMessage extends Message
 
     public string $message;
 
-    public string $domainCode;
+    public string $internalCode;
 
     protected string $type = MessageType::ACTION_ERROR;
 
@@ -42,7 +42,7 @@ class ActionErrorMessage extends Message
         $result->uuid = $array['uuid'];
         $result->message = $array['message'];
         $result->code = $array['code'];
-        $result->domainCode = $array['domainCode'] ?? null;
+        $result->internalCode = $array['internal_code'] ?? null;
 
         if (isset($array['action_message'])) {
             $result->actionMessage = ActionMessage::fromArray($array['action_message']);
@@ -71,9 +71,9 @@ class ActionErrorMessage extends Message
         $this->code = $code;
     }
 
-    public function setDomainCode(string $domainCode): void
+    public function setInternalCode(string $internalCode): void
     {
-        $this->domainCode = $domainCode;
+        $this->internalCode = $internalCode;
     }
 
 }

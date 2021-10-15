@@ -9,8 +9,8 @@ use Exception;
 class InitializeMessageFromArrayException extends Exception
 {
 
-    protected $message = 'Initialize message from array exception!';
+    protected $message = 'Impossible to create InternalException without internal code!';
 
-    protected $code = 400;
+    protected $code = 500;
 
 }

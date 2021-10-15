@@ -207,7 +207,7 @@
         <exclude-pattern>*Command.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
-        <exclude-pattern>src/Core/Exceptions/DomainClassifiedException.php</exclude-pattern>
+        <exclude-pattern>src/Core/Exceptions/InternalException.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
