@@ -126,7 +126,6 @@ abstract class Model extends EloquentModel
         $instance->validateKey($id);
 
         return $instance->newQuery()
-            ->needFireModelActionEvents()
             ->where('id', '=', $id)
             ->with($withs)
             ->firstOrFail()
@@ -195,7 +194,6 @@ abstract class Model extends EloquentModel
     ): array {
         $builder = static::newInstanceForAction()
             ->newQuery()
-            ->needFireModelActionEvents()
             ->setOrderFromArray($order)
             ->setFilterFromArray($filter)
             ->setWithFromArray($withs);
@@ -225,7 +223,6 @@ abstract class Model extends EloquentModel
     {
         $count = static::newInstanceForAction()
             ->newQuery()
-            ->needFireModelActionEvents()
             ->setFilterFromArray($filter)
             ->count();
 
@@ -242,7 +239,6 @@ abstract class Model extends EloquentModel
     {
         $entity = static::newInstanceForAction();
         $entity->fill($attributes);
-        $entity->needFireActionEvents();
         $entity->save();
 
         return $entity->toArray();
@@ -264,7 +260,6 @@ abstract class Model extends EloquentModel
 
         foreach ($objects as $attributes) {
             $entity = $instance->newInstance();
-            $entity->needFireActionEvents();
             $entity->fill($attributes);
 
             try {
@@ -309,7 +304,6 @@ abstract class Model extends EloquentModel
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->findOrFail($id);
-        $entity->needFireActionEvents();
         $entity->update($attributes);
 
         return $entity->toArray();
@@ -349,7 +343,6 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not found with ' . $objectIndex . ' index!');
             }
 
-            $entity->needFireActionEvents();
             $entity->fill($attributes);
             $entity->save();
             $collection->add($entity);
@@ -378,7 +371,6 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($entities as $key => $entity) {
-            $entity->needFireActionEvents();
             $entity->fill($attributes);
 
             try {
@@ -417,7 +409,6 @@ abstract class Model extends EloquentModel
             throw new NotFoundException();
         }
 
-        $entity->needFireActionEvents();
         $entity->delete();
 
         return ['message' => 'Entity deleted!'];
@@ -450,7 +441,6 @@ abstract class Model extends EloquentModel
             }
 
             try {
-                $entity->needFireActionEvents();
                 $entity->delete();
             } catch (Exception $e) {
                 DB::rollBack();

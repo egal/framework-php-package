@@ -62,16 +62,7 @@ trait HasEvents
     public function newInstance($attributes = [], $exists = false)
     {
         $instance = parent::newInstance($attributes, $exists);
-        if ($this->isNeedFireActionEvents()) {
-            $instance->needFireActionEvents();
-        }
         return $instance;
-    }
-
-    public function needFireActionEvents(): self
-    {
-        $this->needFireActionEvents = true;
-        return $this;
     }
 
     /**
@@ -102,9 +93,12 @@ trait HasEvents
         parent::fireModelEvent($event, $halt);
     }
 
+    /**
+     * @deprecated since v.2.0.0
+     */
     public function isNeedFireActionEvents(): bool
     {
-        return $this->needFireActionEvents;
+        return $this->isInstanceForAction;
     }
 
     protected function fireActionEvent($event, $halt = true)

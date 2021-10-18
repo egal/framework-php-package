@@ -249,16 +249,6 @@ class Builder extends EloquentBuilder
     }
 
     /**
-     * @return $this
-     */
-    public function needFireModelActionEvents(): Builder
-    {
-        $this->model->needFireActionEvents();
-
-        return $this;
-    }
-
-    /**
      * Apply filter condition to the builder query
      *
      * @throws \ReflectionException|\Egal\Model\Exceptions\RelationNotFoundException|\Egal\Model\Exceptions\UnsupportedFilterConditionException
