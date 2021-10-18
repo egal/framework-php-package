@@ -59,12 +59,6 @@ trait HasEvents
         static::registerModelEvent('deleted.action', $callback);
     }
 
-    public function newInstance($attributes = [], $exists = false)
-    {
-        $instance = parent::newInstance($attributes, $exists);
-        return $instance;
-    }
-
     /**
      * Запустить событие пользовательской модели для данного события.
      *
