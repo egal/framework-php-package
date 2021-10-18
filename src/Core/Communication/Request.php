@@ -6,7 +6,6 @@ namespace Egal\Core\Communication;
 
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
-use Egal\Core\Bus\RabbitMQBus;
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
 use Egal\Core\Messages\ActionMessage;
@@ -60,14 +59,9 @@ class Request extends ActionMessage
         return $this->serviceAuthorization;
     }
 
-    private function newResponse(): Response
-    {
-        return new Response();
-    }
-
     public function waitResponse(): void
     {
-        $response = $this->newResponse();
+        $response = new Response();
         $response->setActionMessage($this);
 
         $mustDieAt = Carbon::now('UTC')->addSeconds(config('app.request.wait_reply_message_ttl'));
