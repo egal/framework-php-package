@@ -11,7 +11,6 @@ use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -266,7 +265,7 @@ class ModelMetadata
         return $this->primaryKey;
     }
 
-    public function validateFieldValueType(string $field, $value)
+    public function validateFieldValueType(string $field, $value): void
     {
         $allTypeValidationRules = [
             'integer',
@@ -275,12 +274,13 @@ class ModelMetadata
             'date',
             'json',
             'string',
-            'numeric'
+            'numeric',
         ];
         $fieldTypeValidationRules = array_intersect($allTypeValidationRules, $this->getValidationRules($field));
         foreach ($fieldTypeValidationRules as $fieldTypeValidationRule) {
             $validationMethod = camel_case('validate' . $fieldTypeValidationRule);
-            $fieldValidated  = $this->$validationMethod($field, $value);
+            $fieldValidated = $this->$validationMethod($field, $value);
+
             if (!$fieldValidated) {
                 throw UnsupportedFilterValueTypeException::make($field, $fieldTypeValidationRule);
             }
