@@ -147,7 +147,7 @@ class ModelActionMetadata
 
                 $pattern = '/[^\s]+/';
 
-                if (!preg_match($pattern, (string)$tagDescription, $matches) || $matches[0] !== $tagDescription) {
+                if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
                     throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
                 }
 
@@ -157,7 +157,7 @@ class ModelActionMetadata
             case self::PERMISSIONS_ACCESS_TAG_NAME:
                 $pattern = '/[^\s]+/';
 
-                if (!preg_match($pattern, (string)$tagDescription, $matches) || $matches[0] !== $tagDescription) {
+                if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
                     throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
                 }
 
