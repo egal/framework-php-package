@@ -8,7 +8,6 @@ use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
-use Egal\Model\Exceptions\IncorrectMetadataPatternException;
 use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -271,7 +270,6 @@ class ModelMetadata
     /**
      * Разбирает все property в phpDoc и отбирает field, relation и правила валидации
      *
-     * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
      * @throws \Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException
      */
     protected function scanProperties(DocBlock $docBlock): void
@@ -279,51 +277,15 @@ class ModelMetadata
         /** @var \phpDocumentor\Reflection\DocBlock\Tags\Property $property */
         foreach ($docBlock->getTagsByName('property') as $property) {
             $propertyTags = $property->getDescription()->getTags();
+            $propertyVariableName = $property->getVariableName();
 
-            if ($property->getVariableName() !== snake_case($property->getVariableName())) {
-                throw IncorrectCaseOfPropertyVariableNameException::make(
-                    $this->modelClass,
-                    $property->getVariableName()
-                );
+            if ($propertyVariableName !== snake_case($propertyVariableName)) {
+                throw IncorrectCaseOfPropertyVariableNameException::make($this->modelClass, $propertyVariableName);
             }
 
             /** @var \phpDocumentor\Reflection\DocBlock\Tags\Generic $propertyTag */
             foreach ($propertyTags as $propertyTag) {
-                $bodyTemplate = $propertyTag->getDescription()
-                    ? $propertyTag->getDescription()->getBodyTemplate()
-                    : '';
-                $tagName = $propertyTag->getName();
-
-                switch ($tagName) {
-                    case 'validation-rules':
-                        $pattern = '/[^\s]+/';
-                        if (!preg_match($pattern, $bodyTemplate, $matches) || $matches[0] !== $bodyTemplate) {
-                            throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
-                        }
-                        $this->validationRules[$property->getVariableName()] = explode('|', $bodyTemplate);
-                        break;
-                    case 'primary-key':
-                        if (isset($this->primaryKey)) {
-                            throw new DuplicatePrimaryKeyModelMetadataException();
-                        }
-
-                        if ($property->getVariableName()) {
-                            $this->primaryKey = (string) $property->getVariableName();
-                        }
-
-                        break;
-                    case 'property-type':
-                        if ($bodyTemplate === 'field') {
-                            $this->fields[] = $property->getVariableName();
-                            $this->fieldsWithTypes[$property->getVariableName()] = $property->getType();
-                        } elseif ($bodyTemplate === 'relation') {
-                            $this->relations[] = $property->getVariableName();
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
+                $this->scanPropertyTag($propertyTag, $propertyVariableName, $property);
             }
         }
     }
@@ -373,6 +335,55 @@ class ModelMetadata
         }
 
         $this->actionsMetadata[$modelActionMetadata->getActionName()] = $modelActionMetadata;
+    }
+
+    /**
+     * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
+     * @throws \Egal\Model\Exceptions\MetadataTagNotMatchPatternException
+     */
+    protected function scanPropertyTag(
+        DocBlock\Tag $propertyTag,
+        ?string $propertyVariableName,
+        DocBlock\Tags\Property $property
+    ): void {
+        $bodyTemplate = $propertyTag->getDescription()
+            ? $propertyTag->getDescription()->getBodyTemplate()
+            : '';
+        $tagName = $propertyTag->getName();
+
+        switch ($tagName) {
+            case 'validation-rules':
+                $pattern = '/[^\s]+/';
+
+                if (!preg_match($pattern, $bodyTemplate, $matches) || $matches[0] !== $bodyTemplate) {
+                    throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                }
+
+                $this->validationRules[$propertyVariableName] = explode('|', $bodyTemplate);
+
+                break;
+            case 'primary-key':
+                if (isset($this->primaryKey)) {
+                    throw new DuplicatePrimaryKeyModelMetadataException();
+                }
+
+                if ($propertyVariableName) {
+                    $this->primaryKey = (string) $propertyVariableName;
+                }
+
+                break;
+            case 'property-type':
+                if ($bodyTemplate === 'field') {
+                    $this->fields[] = $propertyVariableName;
+                    $this->fieldsWithTypes[$propertyVariableName] = $property->getType();
+                } elseif ($bodyTemplate === 'relation') {
+                    $this->relations[] = $propertyVariableName;
+                }
+
+                break;
+            default:
+                break;
+        }
     }
 
 }
