@@ -91,6 +91,7 @@ class ModelActionGetCountTest extends TestCase
     }
 
 }
+
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}

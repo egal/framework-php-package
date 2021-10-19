@@ -104,6 +104,7 @@ class ModelActionGetItemsFilterWithsTest extends TestCase
     }
 
 }
+
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property ModelActionGetItemsFilterWithsTestProductStub[] $products {@property-type relation}
@@ -128,6 +129,7 @@ class ModelActionGetItemsFilterWithsTestCategoryStub extends Model
     }
 
 }
+
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property int    $category_id                  {@property-type field}  {@validation-rules int}

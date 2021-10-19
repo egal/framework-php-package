@@ -88,7 +88,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
             ],
             [
                 [
-                    ['category.id', 'eq', 1],
+                    ['category.id', 'eq', 1000],
                     'AND',
                     ['category_with_word.id', 'eq', 1000],
                 ],
@@ -143,6 +143,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
     }
 
 }
+
 /**
  * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}

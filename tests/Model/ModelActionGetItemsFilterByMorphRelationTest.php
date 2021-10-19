@@ -112,6 +112,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
     }
 
 }
+
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
@@ -141,6 +142,7 @@ class ModelActionGetItemsFilterByMorphRelationTestProduct extends Model
     }
 
 }
+
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}

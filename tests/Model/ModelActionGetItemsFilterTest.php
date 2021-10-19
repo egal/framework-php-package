@@ -327,6 +327,7 @@ class ModelActionGetItemsFilterTest extends TestCase
     }
 
 }
+
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
