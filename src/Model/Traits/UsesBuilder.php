@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Model\Traits;
 
 use Egal\Model\Builder;
+use Egal\Model\Model;
 
 /**
  * Trait UsesBuilder
@@ -43,7 +44,11 @@ trait UsesBuilder
      */
     public function newQueryForAction()
     {
-        return parent::newQuery();
+        $query = parent::newQuery();
+        /** @var Model $model */
+        $model = $query->getModel();
+        $model->makeIsInstanceForAction();
+        return $query;
     }
 
 }

@@ -304,7 +304,6 @@ abstract class Model extends EloquentModel
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->findOrFail($id);
-        $entity->makeIsInstanceForAction();
         $entity->update($attributes);
 
         return $entity->toArray();
@@ -337,7 +336,6 @@ abstract class Model extends EloquentModel
 
             /** @var \Egal\Model\Model $entity */
             $entity = $instance->newQuery()->find($key);
-            $entity->makeIsInstanceForAction();
 
             if (!$entity) {
                 DB::rollBack();
@@ -373,7 +371,6 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($entities as $key => $entity) {
-            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
 
             try {
@@ -407,7 +404,6 @@ abstract class Model extends EloquentModel
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->find($id);
-        $entity->makeIsInstanceForAction();
 
         if (!$entity) {
             throw new NotFoundException();
@@ -437,7 +433,6 @@ abstract class Model extends EloquentModel
 
             /** @var \Egal\Model\Model $entity */
             $entity = $instance->newQuery()->find($id);
-            $entity->makeIsInstanceForAction();
 
             if (!$entity) {
                 DB::rollBack();
@@ -477,7 +472,6 @@ abstract class Model extends EloquentModel
 
         foreach ($entities as $entity) {
             try {
-                $entity->makeIsInstanceForAction();
                 $entity->delete();
             } catch (Exception $exception) {
                 DB::rollBack();
