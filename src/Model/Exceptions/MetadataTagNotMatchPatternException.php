@@ -15,7 +15,7 @@ class MetadataTagNotMatchPatternException extends Exception
         $exception->message = 'Metadata tag not match pattern!';
 
         if (config('app.debug')) {
-            $exception->message .= PHP_EOL . 'Tag ' . $tag . 'should match pattern ' . $pattern;
+            $exception->message .= PHP_EOL . 'Tag ' . $tag . ' should match pattern ' . $pattern;
         }
 
         return $exception;
