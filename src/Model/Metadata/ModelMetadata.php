@@ -8,6 +8,8 @@ use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
+use Egal\Model\Exceptions\IncorrectMetadataPatternException;
+use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
 use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use phpDocumentor\Reflection\DocBlock;
@@ -294,6 +296,9 @@ class ModelMetadata
 
                 switch ($tagName) {
                     case 'validation-rules':
+                        if (!preg_match('/^(\w+):(.+)$/', $bodyTemplate, $matches)) {
+                            throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                        }
                         $this->validationRules[$property->getVariableName()] = explode('|', $bodyTemplate);
                         break;
                     case 'primary-key':
