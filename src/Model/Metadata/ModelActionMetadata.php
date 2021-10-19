@@ -3,6 +3,7 @@
 namespace Egal\Model\Metadata;
 
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
 use Egal\Model\Exceptions\ModelActionMetadataException;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic as RefGenericTag;
@@ -156,23 +157,33 @@ class ModelActionMetadata
      */
     public function supplementFromTag(RefGenericTag $tag)
     {
-        switch ($tag->getName()) {
+        $tagDescription = $tag->getDescription();
+        $tagName = $tag->getName();
+        switch ($tagName) {
             case self::STATUSES_ACCESS_TAG_NAME:
             case self::SERVICES_ACCESS_TAG_NAME:
-                if (str_contains($tag->getDescription(), self::AND_TAG_SEPARATOR)) {
+                if (str_contains($tagDescription, self::AND_TAG_SEPARATOR)) {
                     throw new ModelActionMetadataException(
                         'Services and Statuses accesses don\'t supported AND operator!'
                     );
                 }
-                $this->{Str::camel($tag->getName())} = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
+                $pattern = '/[^\s]+/';
+                if (!preg_match($pattern, $tagDescription, $matches) || $matches[0] !== $tagDescription) {
+                    throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                }
+                $this->{Str::camel($tagName)} = explode(self::OR_TAG_SEPARATOR, $tagDescription);
                 break;
             case self::ROLES_ACCESS_TAG_NAME:
             case self::PERMISSIONS_ACCESS_TAG_NAME:
-                foreach (explode(self::OR_TAG_SEPARATOR, $tag->getDescription()) as $rawOrValue) {
-                    $this->{Str::camel($tag->getName())}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
-                    if (in_array(StatusAccess::GUEST, $this->{Str::camel($tag->getName())})) {
+                $pattern = '/[^\s]+/';
+                if (!preg_match($pattern, $tagDescription, $matches) || $matches[0] !== $tagDescription) {
+                    throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                }
+                foreach (explode(self::OR_TAG_SEPARATOR, $tagDescription) as $rawOrValue) {
+                    $this->{Str::camel($tagName)}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
+                    if (in_array(StatusAccess::GUEST, $this->{Str::camel($tagName)})) {
                         throw new ModelActionMetadataException(
-                            $tag->getName() . ' don\'t supports with ' . StatusAccess::GUEST . ' auth status!'
+                            $tagName . ' don\'t supports with ' . StatusAccess::GUEST . ' auth status!'
                         );
                     }
                 }

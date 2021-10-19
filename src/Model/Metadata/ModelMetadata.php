@@ -296,7 +296,8 @@ class ModelMetadata
 
                 switch ($tagName) {
                     case 'validation-rules':
-                        if (!preg_match('/^(\w+):(.+)$/', $bodyTemplate, $matches)) {
+                        $pattern = '/[^\s]+/';
+                        if (!preg_match($pattern, $bodyTemplate, $matches) || $matches[0] !== $bodyTemplate) {
                             throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
                         }
                         $this->validationRules[$property->getVariableName()] = explode('|', $bodyTemplate);
