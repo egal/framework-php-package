@@ -27,28 +27,4 @@ trait UsesBuilder
         return new Builder($query);
     }
 
-    /**
-     * @return \Egal\Model\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function newQuery()
-    {
-        if ($this->isInstanceForAction) {
-            return $this->newQueryForAction();
-        }
-
-        return parent::newQuery();
-    }
-
-    /**
-     * @return \Egal\Model\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function newQueryForAction()
-    {
-        $query = parent::newQuery();
-        /** @var Model $model */
-        $model = $query->getModel();
-        $model->makeIsInstanceForAction();
-        return $query;
-    }
-
 }

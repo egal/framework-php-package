@@ -39,4 +39,15 @@ trait InstanceForAction
         return $instance;
     }
 
+
+    public function newInstance($attributes = [], $exists = false)
+    {
+        $instance = parent::newInstance($attributes, $exists);
+        if ($this->isNeedFireActionEvents()) {
+            $instance->makeIsInstanceForAction();
+        }
+        return $instance;
+    }
+
+
 }
