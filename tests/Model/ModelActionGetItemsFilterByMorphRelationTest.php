@@ -2,13 +2,9 @@
 
 namespace Egal\Tests\Model;
 
-use Closure;
-use Egal\Model\Builder;
-use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;

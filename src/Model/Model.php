@@ -291,16 +291,15 @@ abstract class Model extends EloquentModel
     public static function actionUpdate($id = null, array $attributes = []): array
     {
         if (!isset($id)) {
-            $modelInstance = new static();
+            $instance = new static();
 
-            if (!isset($attributes[$modelInstance->getKeyName()])) {
+            if (!isset($attributes[$instance->getKeyName()])) {
                 throw new UpdateException('The identifier of the entity being updated is not specified!');
             }
 
-            $id = $attributes[$modelInstance->getKeyName()];
+            $id = $attributes[$instance->getKeyName()];
         }
 
-        $instance = static::newInstanceForAction();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -321,7 +320,7 @@ abstract class Model extends EloquentModel
     public static function actionUpdateMany(array $objects = []): array
     {
         $collection = new Collection();
-        $instance = static::newInstanceForAction();
+        $instance = (new static());
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
@@ -365,7 +364,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        $builder = static::newInstanceForAction()->newQuery();
+        $builder = (new static())->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
         $entities = $builder->get();
@@ -384,7 +383,6 @@ abstract class Model extends EloquentModel
                 throw $exception;
             }
 
-            $entity->refresh();
             $entities[$key] = $entity;
         }
 
@@ -402,7 +400,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDelete($id): array
     {
-        $instance = static::newInstanceForAction();
+        $instance = new static();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -426,7 +424,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
-        $instance = static::newInstanceForAction();
+        $instance = new static();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
         DB::beginTransaction();
 
@@ -466,7 +464,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
-        $builder = static::newInstanceForAction()->newQuery();
+        $builder = (new static())->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
         $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
