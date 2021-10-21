@@ -15,10 +15,8 @@ class Centrifugo
     {
         $requiredKeys = ['api_url', 'api_key', 'secret'];
 
-        $configKeys = array_intersect(array_keys($config), $requiredKeys);
-
-        if (sort($configKeys) !== sort($requiredKeys)) {
-            CentrifugoInitException::make(...$requiredKeys);
+        if (array_intersect(array_keys($config), $requiredKeys) !== $requiredKeys) {
+            throw CentrifugoInitException::make(...$requiredKeys);
         }
 
         $this->client = new PHPCentClient($config['api_url'], $config['api_key'], $config['secret']);
