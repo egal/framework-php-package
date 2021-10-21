@@ -80,7 +80,7 @@ trait HasEvents
     {
         $result = parent::fireCustomModelEvent($event, $method);
 
-        $dispatchesEvent = $this->dispatchesEvents[$event];
+        $dispatchesEvent = $this->dispatchesEvents[$event] ?? null;
 
         if (isset($dispatchesEvent) && is_subclass_of($dispatchesEvent, GlobalEvent::class)) {
             (new $dispatchesEvent($this))->publish();
