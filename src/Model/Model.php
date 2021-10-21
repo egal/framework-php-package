@@ -261,6 +261,7 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($objects as $attributes) {
+            $entity = static::newInstanceForAction();
             $entity->fill($attributes);
 
             try {
