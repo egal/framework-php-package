@@ -265,4 +265,11 @@ class Builder extends EloquentBuilder
         $model->$applier($this, $condition, $beforeOperator);
     }
 
+    public function makeModelIsInstanceForAction(): Builder
+    {
+        $this->model->makeIsInstanceForAction();
+
+        return $this;
+    }
+
 }

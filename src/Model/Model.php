@@ -126,6 +126,7 @@ abstract class Model extends EloquentModel
         $instance->validateKey($id);
 
         return $instance->newQuery()
+            ->makeModelIsInstanceForAction()
             ->where('id', '=', $id)
             ->with($withs)
             ->firstOrFail()
@@ -194,6 +195,7 @@ abstract class Model extends EloquentModel
     ): array {
         $builder = static::newInstanceForAction()
             ->newQuery()
+            ->makeModelIsInstanceForAction()
             ->setOrderFromArray($order)
             ->setFilterFromArray($filter)
             ->setWithFromArray($withs);
