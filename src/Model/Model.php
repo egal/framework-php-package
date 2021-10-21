@@ -410,6 +410,7 @@ abstract class Model extends EloquentModel
         if (!$entity) {
             throw new NotFoundException();
         }
+
         $entity->makeIsInstanceForAction();
         $entity->delete();
 

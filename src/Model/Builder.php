@@ -248,6 +248,13 @@ class Builder extends EloquentBuilder
         return $this->model;
     }
 
+    public function makeModelIsInstanceForAction(): Builder
+    {
+        $this->model->makeIsInstanceForAction();
+
+        return $this;
+    }
+
     /**
      * Apply filter condition to the builder query
      *
@@ -263,13 +270,6 @@ class Builder extends EloquentBuilder
         }
 
         $model->$applier($this, $condition, $beforeOperator);
-    }
-
-    public function makeModelIsInstanceForAction(): Builder
-    {
-        $this->model->makeIsInstanceForAction();
-
-        return $this;
     }
 
 }
