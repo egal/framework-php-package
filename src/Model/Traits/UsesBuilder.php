@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Egal\Model\Traits;
 
 use Egal\Model\Builder;
-use Egal\Model\Model;
 
 /**
  * Trait UsesBuilder
@@ -25,6 +24,26 @@ trait UsesBuilder
     public function newEloquentBuilder($query)
     {
         return new Builder($query);
+    }
+
+    /**
+     * @return \Egal\Model\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function newQuery()
+    {
+        if ($this->isInstanceForAction) {
+            return $this->newQueryForAction();
+        }
+
+        return parent::newQuery();
+    }
+
+    /**
+     * @return \Egal\Model\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryForAction()
+    {
+        return parent::newQuery();
     }
 
 }

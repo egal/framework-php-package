@@ -28,6 +28,17 @@ trait InstanceForAction
         return $this;
     }
 
+    public function newInstance($attributes = [], $exists = false): self
+    {
+        $instance = parent::newInstance($attributes, $exists);
+
+        if ($this->isNeedFireActionEvents()) {
+            $instance->makeIsInstanceForAction();
+        }
+
+        return $instance;
+    }
+
     /**
      * Make new instance of current class as being used in actions.
      */
@@ -36,15 +47,6 @@ trait InstanceForAction
         $instance = new static();
         $instance->makeIsInstanceForAction();
 
-        return $instance;
-    }
-
-    public function newInstance($attributes = [], $exists = false)
-    {
-        $instance = parent::newInstance($attributes, $exists);
-        if ($this->isNeedFireActionEvents()) {
-            $instance->makeIsInstanceForAction();
-        }
         return $instance;
     }
 

@@ -1,18 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Traits;
 
 use Egal\Core\Events\GlobalEvent;
-use Egal\Model\Model;
 
 /**
  * @package Egal\Model
- * @mixin Model
+ * @mixin \Egal\Model\Model
  */
 trait HasEvents
 {
 
     private bool $needFireActionEvents = false;
+
+    /**
+     * @deprecated since v.2.0.0
+     */
+    public function isNeedFireActionEvents(): bool
+    {
+        return $this->isInstanceForAction;
+    }
 
     public static function retrievedWithAction($callback)
     {
@@ -70,12 +79,13 @@ trait HasEvents
     protected function fireCustomModelEvent($event, $method)
     {
         $result = parent::fireCustomModelEvent($event, $method);
-        if (
-            isset($this->dispatchesEvents[$event])
-            && is_subclass_of($this->dispatchesEvents[$event], GlobalEvent::class)
-        ) {
-            (new $this->dispatchesEvents[$event]($this))->publish();
+
+        $dispatchesEvent = $this->dispatchesEvents[$event];
+
+        if (isset($dispatchesEvent) && is_subclass_of($dispatchesEvent, GlobalEvent::class)) {
+            (new $dispatchesEvent($this))->publish();
         }
+
         return $result;
     }
 
@@ -84,15 +94,8 @@ trait HasEvents
         if ($this->isNeedFireActionEvents()) {
             $this->fireActionEvent($event, $halt);
         }
-        parent::fireModelEvent($event, $halt);
-    }
 
-    /**
-     * @deprecated since v.2.0.0
-     */
-    public function isNeedFireActionEvents(): bool
-    {
-        return $this->isInstanceForAction;
+        parent::fireModelEvent($event, $halt);
     }
 
     protected function fireActionEvent($event, $halt = true)
