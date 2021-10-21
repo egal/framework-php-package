@@ -21,7 +21,7 @@ trait InstanceForAction
     /**
      * Mark the current instance as being used in actions.
      */
-    protected function makeIsInstanceForAction(): self
+    public function makeIsInstanceForAction(): self
     {
         $this->isInstanceForAction = true;
 
