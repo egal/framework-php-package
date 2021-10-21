@@ -253,13 +253,12 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreateMany(array $objects = []): array
     {
-        $instance = static::newInstanceForAction();
-        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
+        $entity = static::newInstanceForAction();
+        $entity->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
         DB::beginTransaction();
 
         foreach ($objects as $attributes) {
-            $entity = static::newInstanceForAction();
             $entity->fill($attributes);
 
             try {
@@ -304,6 +303,7 @@ abstract class Model extends EloquentModel
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->findOrFail($id);
+        $entity->makeIsInstanceForAction();
         $entity->update($attributes);
 
         return $entity->toArray();
@@ -331,7 +331,6 @@ abstract class Model extends EloquentModel
             }
 
             $key = $attributes[$instance->getKeyName()];
-            $instance = static::newInstanceForAction();
             $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
@@ -343,6 +342,7 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not found with ' . $objectIndex . ' index!');
             }
 
+            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
             $entity->save();
             $collection->add($entity);
@@ -371,6 +371,7 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($entities as $key => $entity) {
+            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
 
             try {
@@ -404,6 +405,7 @@ abstract class Model extends EloquentModel
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->find($id);
+        $entity->makeIsInstanceForAction();
 
         if (!$entity) {
             throw new NotFoundException();
@@ -428,11 +430,11 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($ids as $id) {
-            $instance = static::newInstanceForAction();
             $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
             $entity = $instance->newQuery()->find($id);
+            $entity->makeIsInstanceForAction();
 
             if (!$entity) {
                 DB::rollBack();
@@ -472,6 +474,7 @@ abstract class Model extends EloquentModel
 
         foreach ($entities as $entity) {
             try {
+                $entity->makeIsInstanceForAction();
                 $entity->delete();
             } catch (Exception $exception) {
                 DB::rollBack();
