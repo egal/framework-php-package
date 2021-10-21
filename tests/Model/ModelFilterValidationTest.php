@@ -66,6 +66,18 @@ class ModelFilterValidationTest extends TestCase
                 [["created_at", "eq", "2021-10-00T11:24:07.000000Z"]],
                 UnsupportedFilterValueTypeException::class
             ],
+            [
+                [["created_at", "eq", "2021-10-01T11:24:07.000000Z"]],
+                null
+            ],
+            [
+                [["count", "eq", 2]],
+                null
+            ],
+            [
+                [["count", "eq", "two"]],
+                UnsupportedFilterValueTypeException::class
+            ],
         ];
     }
 
@@ -91,7 +103,7 @@ class ModelFilterValidationTest extends TestCase
 /**
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
- * @property string $count      Количество        {@property-type field}  {@validation-rules int}
+ * @property int $count      Количество        {@property-type field}  {@validation-rules integer}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
  *

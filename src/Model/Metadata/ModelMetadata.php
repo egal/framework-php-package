@@ -269,10 +269,8 @@ class ModelMetadata
     {
         $allTypeValidationRules = [
             'integer',
-            'bool',
             'boolean',
             'date',
-            'json',
             'string',
             'numeric',
         ];
