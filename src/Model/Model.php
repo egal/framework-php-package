@@ -407,12 +407,11 @@ abstract class Model extends EloquentModel
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->find($id);
-        $entity->makeIsInstanceForAction();
 
         if (!$entity) {
             throw new NotFoundException();
         }
-
+        $entity->makeIsInstanceForAction();
         $entity->delete();
 
         return ['message' => 'Entity deleted!'];
@@ -436,7 +435,6 @@ abstract class Model extends EloquentModel
 
             /** @var \Egal\Model\Model $entity */
             $entity = $instance->newQuery()->find($id);
-            $entity->makeIsInstanceForAction();
 
             if (!$entity) {
                 DB::rollBack();
@@ -445,6 +443,7 @@ abstract class Model extends EloquentModel
             }
 
             try {
+                $entity->makeIsInstanceForAction();
                 $entity->delete();
             } catch (Exception $e) {
                 DB::rollBack();
