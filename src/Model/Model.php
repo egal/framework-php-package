@@ -271,7 +271,6 @@ abstract class Model extends EloquentModel
                 throw $exception;
             }
 
-            $entity->refresh();
             $collection->add($entity);
         }
 
