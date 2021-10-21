@@ -15,7 +15,9 @@ class Centrifugo
     {
         $requiredKeys = ['api_url', 'api_key', 'secret'];
 
-        if (array_intersect(array_keys($config), $requiredKeys) !== $requiredKeys) {
+        $configKeys = array_intersect(array_keys($config), $requiredKeys);
+
+        if (sort($configKeys) !== sort($requiredKeys)) {
             throw CentrifugoInitException::make(...$requiredKeys);
         }
 
