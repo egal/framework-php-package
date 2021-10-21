@@ -291,15 +291,16 @@ abstract class Model extends EloquentModel
     public static function actionUpdate($id = null, array $attributes = []): array
     {
         if (!isset($id)) {
-            $instance = new static();
+            $modelInstance = new static();
 
-            if (!isset($attributes[$instance->getKeyName()])) {
+            if (!isset($attributes[$modelInstance->getKeyName()])) {
                 throw new UpdateException('The identifier of the entity being updated is not specified!');
             }
 
-            $id = $attributes[$instance->getKeyName()];
+            $id = $attributes[$modelInstance->getKeyName()];
         }
 
+        $instance = new static();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
