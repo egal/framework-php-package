@@ -2,15 +2,15 @@
 
 namespace Egal\Tests\Model;
 
-use Carbon\Carbon;
+use Egal\Model\Builder;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
+use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
 use Illuminate\Database\Schema\Blueprint;
-use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelFilterValidationTest extends TestCase
@@ -95,15 +95,11 @@ class ModelFilterValidationTest extends TestCase
                 null,
             ],
             [
-                [['numeric', 'eq', '1.1']],
+                [['numeric', 'eq', '0x539']],
                 UnsupportedFilterValueTypeException::class,
             ],
             [
-                [['array', 'eq', ['foo']]],
-                null,
-            ],
-            [
-                [['array', 'eq', '["foo"]']],
+                [['array', 'foo', ['foo']]],
                 null,
             ],
             [
@@ -111,7 +107,7 @@ class ModelFilterValidationTest extends TestCase
                 UnsupportedFilterValueTypeException::class,
             ],
             [
-                [['json', 'eq', '{"fourth":["fourth"]}']],
+                [['json', 'foo', '{"fourth":["fourth"]}']],
                 null,
             ],
             [
@@ -159,6 +155,10 @@ class ModelFilterValidationTestModel extends Model
     public function getModelMetadata(): ModelMetadata
     {
         return new ModelMetadata(static::class);
+    }
+    public static function applyFooFilterCondition(Builder &$builder, FilterCondition $condition, string $beforeOperator): void
+    {
+
     }
 
 }
