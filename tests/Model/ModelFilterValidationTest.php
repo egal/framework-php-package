@@ -26,14 +26,15 @@ class ModelFilterValidationTest extends TestCase
             $table->double('numeric');
             $table->boolean('boolean');
             $table->json('array');
+            $table->json('json');
             $table->timestamps();
         });
 
         $productsAttributes = [
-            ['id' => 1, 'string' => 'first', 'integer' => 1, 'numeric' => 1.1, 'boolean' => true, 'array' => ['first']],
-            ['id' => 2, 'string' => 'second', 'integer' => 2, 'numeric' => 2.2, 'boolean' => false, 'array' => ['second']],
-            ['id' => 3, 'string' => 'third', 'integer' => 3, 'numeric' => 3.3, 'boolean' => true, 'array' => ['third']],
-            ['id' => 4, 'string' => 'fourth', 'integer' => 4, 'numeric' => 4.4, 'boolean' => false, 'array' => ['fourth']],
+            ['id' => 1, 'string' => 'first', 'integer' => 1, 'numeric' => 1.1, 'boolean' => true, 'array' => ['first'], 'json' => '{"first":["first"]}'],
+            ['id' => 2, 'string' => 'second', 'integer' => 2, 'numeric' => 2.2, 'boolean' => false, 'array' => ['second'], 'json' => '{"second":["second"]}'],
+            ['id' => 3, 'string' => 'third', 'integer' => 3, 'numeric' => 3.3, 'boolean' => true, 'array' => ['third'], 'json' => '{"third":["third"]}'],
+            ['id' => 4, 'string' => 'fourth', 'integer' => 4, 'numeric' => 4.4, 'boolean' => false, 'array' => ['fourth'], 'json' => '{"fourth":["fourth"]}'],
         ];
 
         foreach ($productsAttributes as $attributes) {
@@ -109,6 +110,14 @@ class ModelFilterValidationTest extends TestCase
                 [['array', 'eq', 'foo']],
                 UnsupportedFilterValueTypeException::class,
             ],
+            [
+                [['json', 'eq', '{"fourth":["fourth"]}']],
+                null,
+            ],
+            [
+                [['json', 'eq', 'foo']],
+                UnsupportedFilterValueTypeException::class,
+            ],
         ];
     }
 
@@ -133,6 +142,7 @@ class ModelFilterValidationTest extends TestCase
  * @property $numeric       {@property-type field}  {@validation-rules numeric}
  * @property $boolean       {@property-type field}  {@validation-rules boolean}
  * @property $array         {@property-type field}  {@validation-rules array}
+ * @property $json          {@property-type field}  {@validation-rules json}
  * @property $created_at    {@property-type field}  {@validation-rules date}
  * @property $updated_at    {@property-type field}  {@validation-rules date}
  */
