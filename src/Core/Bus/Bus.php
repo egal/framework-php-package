@@ -23,4 +23,6 @@ abstract class Bus
 
     abstract public function consumeReplyMessage(ActionMessage $actionMessage, callable $callback): void;
 
+    abstract public function waitReplyMessages(): void;
+
 }

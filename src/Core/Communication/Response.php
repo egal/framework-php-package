@@ -136,7 +136,7 @@ class Response
         }
     }
 
-    public function setReplyMessage(Message $replyMessage)
+    public function collectReplyMessage(Message $replyMessage): void
     {
         if ($replyMessage instanceof ActionResultMessage) {
             $this->setActionResultMessage($replyMessage);
@@ -147,6 +147,11 @@ class Response
         } else {
             throw new UnsupportedReplyMessageTypeException();
         }
+    }
+
+    public function isReplyMessagesCollected(): bool
+    {
+        return isset($this->actionErrorMessage) || isset($this->actionResultMessage);
     }
 
 }

@@ -66,11 +66,24 @@ class Request extends ActionMessage
 
         $mustDieAt = Carbon::now('UTC')->addSeconds(config('app.request.wait_reply_message_ttl'));
 
-        while (Carbon::now('UTC') < $mustDieAt && !($response->getActionResultMessage() || $response->getActionErrorMessage())) {
-            Bus::getInstance()->consumeReplyMessage($this, fn(Message $message) => $response->setReplyMessage($message));
+        $bus = Bus::getInstance();
+        $bus->consumeReplyMessage(
+            $this,
+            function (Message $message) use ($response) {
+                $response->collectReplyMessage($message);
+                return !$response->isReplyMessagesCollected();
+            }
+        );
+
+        while (Carbon::now('UTC') < $mustDieAt && !$response->isReplyMessagesCollected()) {
+            $bus->waitReplyMessages();
         }
 
-        switch ([$response->getStartProcessingMessage() !== null, $response->getActionErrorMessage() !== null, $response->getActionResultMessage() !== null]) {
+        switch ([
+            $response->getStartProcessingMessage() !== null,
+            $response->getActionErrorMessage() !== null,
+            $response->getActionResultMessage() !== null
+        ]) {
             case [true, false, true]:
                 $response->setStatusCode(200);
                 break;

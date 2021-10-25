@@ -206,14 +206,23 @@ class RabbitMQBus extends Bus
 
         $this->connection->getChannel()->basic_consume(
             $actionMessage->getUuid(),
-            '',
+            $actionMessage->getUuid(),
             true,
             true,
             false,
             false,
-            fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body))
-        );
+            function (AMQPMessage $message) use ($callback, $convertJsonToMessage, $actionMessage) {
+                $needContinue = $callback($convertJsonToMessage($message->body));
 
+                if (!$needContinue) {
+                    $this->connection->getChannel()->basic_cancel($actionMessage->getUuid());
+                }
+            }
+        );
+    }
+
+    public function waitReplyMessages(): void
+    {
         $this->connection->getChannel()->wait();
     }
 
