@@ -275,6 +275,7 @@ class ModelMetadata
             'numeric',
         ];
         $fieldTypeValidationRules = array_intersect($allTypeValidationRules, $this->getValidationRules($field));
+
         foreach ($fieldTypeValidationRules as $fieldTypeValidationRule) {
             $validationMethod = camel_case('validate' . $fieldTypeValidationRule);
             $fieldValidated = $this->$validationMethod($field, $value);

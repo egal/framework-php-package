@@ -41,6 +41,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $types = explode(',', $matches[2]);
 
             $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+
             foreach ($types as $type) {
                 $relationModelMetadata = (new $type())->getModelMetadata();
                 $relationModelMetadata->fieldExistOrFail($field);
