@@ -274,7 +274,7 @@ class ModelMetadata
             'string',
             'numeric',
             'array',
-            'json'
+            'json',
         ];
         $fieldTypeValidationRules = array_intersect($allTypeValidationRules, $this->getValidationRules($field));
 

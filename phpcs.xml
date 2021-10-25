@@ -138,6 +138,9 @@
         <properties>
             <property name="controlStructures" type="array">
                 <element value="if"/>
+                <element value="foreach"/>
+                <element value="for"/>
+                <element value="while"/>
                 <element value="switch"/>
                 <element value="try"/>
             </property>
