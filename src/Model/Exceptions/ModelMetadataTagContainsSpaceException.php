@@ -14,7 +14,7 @@ class ModelMetadataTagContainsSpaceException extends Exception
     public static function make(string $tag): self
     {
         $exception = new static();
-        $exception->message = 'Metadata' . $tag . 'tag\'s description must not contain spaces!';
+        $exception->message = "Metadata $tag tag\'s description must not contain spaces!";
 
         return $exception;
     }

@@ -68,14 +68,14 @@ class ModelMetadataTest extends TestCase
                 null,
             ],
             [
-                fn() => (new ModelMetadata(ModelMetadataTestSeven::class))->getAction('getMetadata')->getStatusesAccess(),
+                fn() => (new ModelMetadata(ModelMetadataTestSeven::class)),
                 [],
                 ModelActionMetadataException::class,
             ],
             [
-                fn() => (new ModelMetadata(ModelMetadataTestEight::class))->getAction('getMetadata')->getStatusesAccess(),
+                fn() => (new ModelMetadata(ModelMetadataTestEight::class)),
                 [],
-                ModelMetadataTagContainsSpaceException::class,
+                null,
             ],
         ];
     }
@@ -156,7 +156,7 @@ class ModelMetadataTestSeven extends Model
 }
 
 /**
- * @action getMetadata {@statuses-access guest|   logged}
+ * @action getMetadata {@statuses-access    guest|logged}
  */
 class ModelMetadataTestEight extends Model
 {
