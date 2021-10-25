@@ -58,7 +58,10 @@ class RabbitMQBus extends Bus
                 false,
                 true,
                 false,
-                new AMQPTable(["x-queue-mode" => "default"]),
+                new AMQPTable([
+                    'x-queue-mode' => 'default',
+                    'x-expires' => config('app.request.wait_reply_message_ttl') * 1000,
+                ]),
                 null
             );
             $this->connection->getChannel()->queue_bind(
@@ -148,7 +151,7 @@ class RabbitMQBus extends Bus
     {
     }
 
-    public function listenQueue(): void
+    public function processMessages(): void
     {
         RabbitMQBus::getConnection()->getChannel()->basic_consume(
             $this->queueName,
@@ -183,7 +186,7 @@ class RabbitMQBus extends Bus
         }
     }
 
-    public function consumeReplyMessage(ActionMessage $actionMessage, callable $callback): void
+    public function consumeReplyMessages(ActionMessage $actionMessage, callable $callback): void
     {
         $convertJsonToMessage = function (string $body) {
             $body = json_decode($body, true);
@@ -211,14 +214,13 @@ class RabbitMQBus extends Bus
             true,
             false,
             false,
-            function (AMQPMessage $message) use ($callback, $convertJsonToMessage, $actionMessage) {
-                $needContinue = $callback($convertJsonToMessage($message->body));
-
-                if (!$needContinue) {
-                    $this->connection->getChannel()->basic_cancel($actionMessage->getUuid());
-                }
-            }
+            fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body))
         );
+    }
+
+    public function cancelConsumeReplyMessages(ActionMessage $actionMessage): void
+    {
+        $this->connection->getChannel()->basic_cancel($actionMessage->getUuid());
     }
 
     public function waitReplyMessages(): void

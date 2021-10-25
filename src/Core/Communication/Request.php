@@ -64,10 +64,10 @@ class Request extends ActionMessage
         $response = new Response();
         $response->setActionMessage($this);
 
-        $mustDieAt = Carbon::now('UTC')->addSeconds(config('app.request.wait_reply_message_ttl'));
+        $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
 
         $bus = Bus::getInstance();
-        $bus->consumeReplyMessage(
+        $bus->consumeReplyMessages(
             $this,
             function (Message $message) use ($response) {
                 $response->collectReplyMessage($message);
@@ -75,9 +75,11 @@ class Request extends ActionMessage
             }
         );
 
-        while (Carbon::now('UTC') < $mustDieAt && !$response->isReplyMessagesCollected()) {
+        while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
             $bus->waitReplyMessages();
         }
+
+        $bus->cancelConsumeReplyMessages($this);
 
         switch ([
             $response->getStartProcessingMessage() !== null,

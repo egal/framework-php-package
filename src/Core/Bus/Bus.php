@@ -19,9 +19,11 @@ abstract class Bus
 
     abstract public function destructEnvironment(): void;
 
-    abstract public function listenQueue(): void;
+    abstract public function processMessages(): void;
 
-    abstract public function consumeReplyMessage(ActionMessage $actionMessage, callable $callback): void;
+    abstract public function consumeReplyMessages(ActionMessage $actionMessage, callable $callback): void;
+
+    abstract public function cancelConsumeReplyMessages(ActionMessage $actionMessage): void;
 
     abstract public function waitReplyMessages(): void;
 

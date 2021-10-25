@@ -26,14 +26,14 @@ class EgalListenerRunCommand extends Command
      */
     public function handle(): void
     {
-        $this->info('Killing Listener!');
+        $this->info('Starting Listener!');
 
         cli_set_process_title(
             words_to_separated_lower_case(config('app.service_name'), 'listener' . '#' . getmypid())
         );
 
         Bus::getInstance()->constructEnvironment();
-        Bus::getInstance()->listenQueue();
+        Bus::getInstance()->processMessages();
     }
 
     public function stopCommand()
