@@ -186,7 +186,7 @@ class RabbitMQBus extends Bus
         }
     }
 
-    public function consumeReplyMessages(ActionMessage $actionMessage, callable $callback): void
+    public function startConsumeReplyMessages(ActionMessage $actionMessage, callable $callback): void
     {
         $convertJsonToMessage = function (string $body) {
             $body = json_decode($body, true);
@@ -218,14 +218,14 @@ class RabbitMQBus extends Bus
         );
     }
 
-    public function cancelConsumeReplyMessages(ActionMessage $actionMessage): void
+    public function stopConsumeReplyMessages(ActionMessage $actionMessage): void
     {
-        $this->connection->getChannel()->basic_cancel($actionMessage->getUuid());
+        $this->connection->getChannel()->basic_cancel($actionMessage->getUuid(), true, true);
     }
 
-    public function waitReplyMessages(): void
+    public function consumeReplyMessages($timeout = 0): void
     {
-        $this->connection->getChannel()->wait();
+        $this->connection->getChannel()->wait(null, false, $timeout);
     }
 
     private function processActionMessage(ActionMessage $actionMessage)

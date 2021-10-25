@@ -21,10 +21,10 @@ abstract class Bus
 
     abstract public function processMessages(): void;
 
-    abstract public function consumeReplyMessages(ActionMessage $actionMessage, callable $callback): void;
+    abstract public function startConsumeReplyMessages(ActionMessage $actionMessage, callable $callback): void;
 
-    abstract public function cancelConsumeReplyMessages(ActionMessage $actionMessage): void;
+    abstract public function stopConsumeReplyMessages(ActionMessage $actionMessage): void;
 
-    abstract public function waitReplyMessages(): void;
+    abstract public function consumeReplyMessages($timeout = 0): void;
 
 }
