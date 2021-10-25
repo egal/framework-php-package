@@ -19,18 +19,21 @@ class ModelFilterValidationTest extends TestCase
 
     protected function createSchema(): void
     {
-        $this->schema()->create('products', function (Blueprint $table) {
+        $this->schema()->create('models', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->integer('count');
+            $table->string('string');
+            $table->integer('integer');
+            $table->double('numeric');
+            $table->boolean('boolean');
+            $table->json('array');
             $table->timestamps();
         });
 
         $productsAttributes = [
-            ['id' => 1, 'name' => 'first_product', 'count' => 1],
-            ['id' => 2, 'name' => 'second_product', 'count' => 2],
-            ['id' => 3, 'name' => 'product_third', 'count' => 3],
-            ['id' => 4, 'name' => 'product_fourth', 'count' => 4],
+            ['id' => 1, 'string' => 'first', 'integer' => 1, 'numeric' => 1.1, 'boolean' => true, 'array' => ['first']],
+            ['id' => 2, 'string' => 'second', 'integer' => 2, 'numeric' => 2.2, 'boolean' => false, 'array' => ['second']],
+            ['id' => 3, 'string' => 'third', 'integer' => 3, 'numeric' => 3.3, 'boolean' => true, 'array' => ['third']],
+            ['id' => 4, 'string' => 'fourth', 'integer' => 4, 'numeric' => 4.4, 'boolean' => false, 'array' => ['fourth']],
         ];
 
         foreach ($productsAttributes as $attributes) {
@@ -40,43 +43,71 @@ class ModelFilterValidationTest extends TestCase
 
     protected function dropSchema(): void
     {
-        $this->schema()->drop('products');
+        $this->schema()->drop('models');
     }
 
     public function productsValidationFilterDataProvider()
     {
         return [
             [
-                [["name", "eq", "bar"]],
-                null
+                [['foo', 'eq', 'bar']],
+                FieldNotFoundException::class,
             ],
             [
-                [["names", "eq", "bar"]],
-                FieldNotFoundException::class
+                [['string', 'eq', 'bar']],
+                null,
             ],
             [
-                [["name", "eq", 34]],
-                UnsupportedFilterValueTypeException::class
+                [['string', 'eq', 34]],
+                UnsupportedFilterValueTypeException::class,
             ],
             [
-                [["name", "edq", "bar"]],
-                UnsupportedFilterConditionException::class
+                [['string', 'edq', 'bar']],
+                UnsupportedFilterConditionException::class,
             ],
             [
-                [["created_at", "eq", "2021-10-00T11:24:07.000000Z"]],
-                UnsupportedFilterValueTypeException::class
+                [['created_at', 'eq', '2021-10-00T11:24:07.000000Z']],
+                UnsupportedFilterValueTypeException::class,
             ],
             [
-                [["created_at", "eq", "2021-10-01T11:24:07.000000Z"]],
-                null
+                [['created_at', 'eq', '2021-10-01T11:24:07.000000Z']],
+                null,
             ],
             [
-                [["count", "eq", 2]],
-                null
+                [['integer', 'eq', 2]],
+                null,
             ],
             [
-                [["count", "eq", "two"]],
-                UnsupportedFilterValueTypeException::class
+                [['integer', 'eq', 'two']],
+                UnsupportedFilterValueTypeException::class,
+            ],
+            [
+                [['boolean', 'eq', true]],
+                null,
+            ],
+            [
+                [['boolean', 'eq', 'true']],
+                UnsupportedFilterValueTypeException::class,
+            ],
+            [
+                [['numeric', 'eq', 1.1]],
+                null,
+            ],
+            [
+                [['numeric', 'eq', '1.1']],
+                UnsupportedFilterValueTypeException::class,
+            ],
+            [
+                [['array', 'eq', ['foo']]],
+                null,
+            ],
+            [
+                [['array', 'eq', '["foo"]']],
+                null,
+            ],
+            [
+                [['array', 'eq', 'foo']],
+                UnsupportedFilterValueTypeException::class,
             ],
         ];
     }
@@ -90,34 +121,29 @@ class ModelFilterValidationTest extends TestCase
             $this->expectException($expectException);
         }
 
-        ModelFilterValidationTestModel::actionGetItems(
-            null,
-            [],
-            $filter,
-            []
-        );
+        ModelFilterValidationTestModel::actionGetItems(null, [], $filter, []);
     }
 
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
- * @property string $name       Название          {@property-type field}  {@validation-rules string}
- * @property int $count      Количество        {@property-type field}  {@validation-rules integer}
- * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
- * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
- *
- * @action create         {@statuses-access guest}
- * @action getItems       {@statuses-access guest}
+ * @property $id            {@property-type field}  {@prymary-key}
+ * @property $string        {@property-type field}  {@validation-rules string}
+ * @property $integer       {@property-type field}  {@validation-rules integer}
+ * @property $numeric       {@property-type field}  {@validation-rules numeric}
+ * @property $boolean       {@property-type field}  {@validation-rules boolean}
+ * @property $array         {@property-type field}  {@validation-rules array}
+ * @property $created_at    {@property-type field}  {@validation-rules date}
+ * @property $updated_at    {@property-type field}  {@validation-rules date}
  */
 class ModelFilterValidationTestModel extends Model
 {
 
-    protected $table = 'products';
-
-    protected $fillable = [
-      'name',
-      'count'
+    protected $table = 'models';
+    protected $guarded = [];
+    protected $fillable = [];
+    protected $casts = [
+        'array' => 'array',
     ];
 
     public function getModelMetadata(): ModelMetadata
