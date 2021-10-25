@@ -45,6 +45,26 @@ class ModelMetadataTest extends TestCase
                 null,
                 IncorrectCaseOfPropertyVariableNameException::class,
             ],
+            [
+                fn() => (new ModelMetadata(ModelMetadataTestThird::class))->getAction('getMetadata')->getActionName(),
+                'getMetadata',
+                null,
+            ],
+            [
+                fn() => (new ModelMetadata(ModelMetadataTestThird::class))->getAction('getMetadata')->getStatusesAccess(),
+                ['guest', 'logged'],
+                null,
+            ],
+            [
+                fn() => new ModelMetadata(ModelMetadataTestFifth::class),
+                null,
+                \Throwable::class, # TODO: Заменить на нормальное исключение. Там есть пробел в списке, должно вызываться исключение.
+            ],
+            [
+                fn() => (new ModelMetadata(ModelMetadataTestSixth::class))->getAction('getMetadata')->getStatusesAccess(),
+                [],
+                null,
+            ],
         ];
     }
 
@@ -60,6 +80,14 @@ class ModelMetadataTest extends TestCase
         $result = $getMetadataFunc();
 
         if ($expectResult) {
+            if (is_array($expectResult)) {
+                $expectResult = sort($expectResult);
+            }
+
+            if (is_array($result)) {
+                $result = sort($result);
+            }
+
             $this->assertEquals($expectResult, $result);
         }
     }
@@ -79,6 +107,30 @@ class ModelMetadataTestFirst extends Model
  * @property $fooBar  {@property-type field}
  */
 class ModelMetadataTestSecond extends Model
+{
+
+}
+
+/**
+ * @action getMetadata {@statuses-access guest,logged}
+ */
+class ModelMetadataTestThird extends Model
+{
+
+}
+
+/**
+ * @action getMetadata {@statuses-access guest, logged}
+ */
+class ModelMetadataTestFifth extends Model
+{
+
+}
+
+/**
+ * @action getMetadata {@statusesAccess guest,logged}
+ */
+class ModelMetadataTestSixth extends Model
 {
 
 }
