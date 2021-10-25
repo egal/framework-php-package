@@ -145,6 +145,7 @@ class ModelActionMetadata
                     );
                 }
 
+                // Check string not contain spaces.
                 $pattern = '/[^\s]+/';
 
                 if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
@@ -155,6 +156,7 @@ class ModelActionMetadata
                 break;
             case self::ROLES_ACCESS_TAG_NAME:
             case self::PERMISSIONS_ACCESS_TAG_NAME:
+                // Check string not contain spaces.
                 $pattern = '/[^\s]+/';
 
                 if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {

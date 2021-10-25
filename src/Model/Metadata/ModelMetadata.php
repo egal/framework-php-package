@@ -353,6 +353,7 @@ class ModelMetadata
 
         switch ($tagName) {
             case 'validation-rules':
+                // Check string not contain spaces.
                 $pattern = '/[^\s]+/';
 
                 if (!preg_match($pattern, $bodyTemplate, $matches) || $matches[0] !== $bodyTemplate) {
