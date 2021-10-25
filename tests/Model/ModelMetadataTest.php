@@ -4,6 +4,7 @@ namespace Egal\Tests\Model;
 
 use Egal\Core\Application;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
+use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Illuminate\Support\Facades\Config;
@@ -58,7 +59,7 @@ class ModelMetadataTest extends TestCase
             [
                 fn() => new ModelMetadata(ModelMetadataTestFifth::class),
                 null,
-                \Throwable::class, # TODO: Заменить на нормальное исключение. Там есть пробел в списке, должно вызываться исключение.
+                MetadataTagNotMatchPatternException::class
             ],
             [
                 fn() => (new ModelMetadata(ModelMetadataTestSixth::class))->getAction('getMetadata')->getStatusesAccess(),
@@ -112,7 +113,7 @@ class ModelMetadataTestSecond extends Model
 }
 
 /**
- * @action getMetadata {@statuses-access guest,logged}
+ * @action getMetadata {@statuses-access guest|logged}
  */
 class ModelMetadataTestThird extends Model
 {
@@ -120,7 +121,7 @@ class ModelMetadataTestThird extends Model
 }
 
 /**
- * @action getMetadata {@statuses-access guest, logged}
+ * @action getMetadata {@statuses-access guest| logged}
  */
 class ModelMetadataTestFifth extends Model
 {
@@ -128,7 +129,7 @@ class ModelMetadataTestFifth extends Model
 }
 
 /**
- * @action getMetadata {@statusesAccess guest,logged}
+ * @action getMetadata {@statusesAccess guest|logged}
  */
 class ModelMetadataTestSixth extends Model
 {

@@ -133,13 +133,14 @@ class ModelActionMetadata
 
     public function supplementFromTag(RefGenericTag $tag): void
     {
-        $tagDescription = $tag->getDescription();
+        $tagDescription = $tag->getDescription()->render();
         $tagName = $tag->getName();
 
         switch ($tagName) {
             case self::STATUSES_ACCESS_TAG_NAME:
             case self::SERVICES_ACCESS_TAG_NAME:
                 if (str_contains($tagDescription, self::AND_TAG_SEPARATOR)) {
+                    dump($tagDescription);
                     throw new ModelActionMetadataException(
                         'Services and Statuses accesses don\'t supported AND operator!'
                     );
