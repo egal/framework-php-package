@@ -81,12 +81,12 @@ trait UsesValidator
         }
     }
 
-    public function validating($callback)
+    public static function validating($callback)
     {
         static::registerModelEvent('validating', $callback);
     }
 
-    public function validated($callback)
+    public static function validated($callback)
     {
         static::registerModelEvent('validated', $callback);
     }
