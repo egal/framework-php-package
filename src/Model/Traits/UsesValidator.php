@@ -20,7 +20,7 @@ trait UsesValidator
         static::saving(static function (Model $entity): void {
             $entity->fireModelEvent('validating', true);
             self::validate($entity);
-            $this->fireModelEvent('validated', true);
+            $entity->fireModelEvent('validated', true);
         });
     }
 
