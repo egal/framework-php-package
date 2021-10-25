@@ -57,7 +57,7 @@ class RabbitMQBus extends Bus
                 false,
                 false,
                 true,
-                false,
+                true,
                 new AMQPTable([
                     'x-queue-mode' => 'default',
                     'x-expires' => config('app.request.wait_reply_message_ttl') * 1000,
