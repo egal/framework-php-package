@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Egal\Model\Metadata;
 
 use Egal\Auth\Accesses\StatusAccess;
-use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
 use Egal\Model\Exceptions\ModelActionMetadataException;
+use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic as RefGenericTag;
 
@@ -140,7 +140,6 @@ class ModelActionMetadata
             case self::STATUSES_ACCESS_TAG_NAME:
             case self::SERVICES_ACCESS_TAG_NAME:
                 if (str_contains($tagDescription, self::AND_TAG_SEPARATOR)) {
-                    dump($tagDescription);
                     throw new ModelActionMetadataException(
                         'Services and Statuses accesses don\'t supported AND operator!'
                     );
@@ -150,7 +149,7 @@ class ModelActionMetadata
                 $pattern = '/[^\s]+/';
 
                 if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
-                    throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                    throw ModelMetadataTagContainsSpaceException::make($tagName);
                 }
 
                 $this->{Str::camel($tagName)} = explode(self::OR_TAG_SEPARATOR, $tagDescription);
@@ -161,7 +160,7 @@ class ModelActionMetadata
                 $pattern = '/[^\s]+/';
 
                 if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
-                    throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                    throw ModelMetadataTagContainsSpaceException::make($tagName);
                 }
 
                 foreach (explode(self::OR_TAG_SEPARATOR, $tagDescription) as $rawOrValue) {

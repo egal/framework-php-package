@@ -4,7 +4,8 @@ namespace Egal\Tests\Model;
 
 use Egal\Core\Application;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
-use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
+use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
+use Egal\Model\Exceptions\ModelActionMetadataException;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Illuminate\Support\Facades\Config;
@@ -59,12 +60,22 @@ class ModelMetadataTest extends TestCase
             [
                 fn() => new ModelMetadata(ModelMetadataTestFifth::class),
                 null,
-                MetadataTagNotMatchPatternException::class
+                ModelMetadataTagContainsSpaceException::class
             ],
             [
                 fn() => (new ModelMetadata(ModelMetadataTestSixth::class))->getAction('getMetadata')->getStatusesAccess(),
                 [],
                 null,
+            ],
+            [
+                fn() => (new ModelMetadata(ModelMetadataTestSeven::class))->getAction('getMetadata')->getStatusesAccess(),
+                [],
+                ModelActionMetadataException::class,
+            ],
+            [
+                fn() => (new ModelMetadata(ModelMetadataTestEight::class))->getAction('getMetadata')->getStatusesAccess(),
+                [],
+                ModelMetadataTagContainsSpaceException::class,
             ],
         ];
     }
@@ -132,6 +143,22 @@ class ModelMetadataTestFifth extends Model
  * @action getMetadata {@statusesAccess guest|logged}
  */
 class ModelMetadataTestSixth extends Model
+{
+
+}
+
+/**
+ * @action getMetadata {@statuses-access guest,logged}
+ */
+class ModelMetadataTestSeven extends Model
+{
+
+}
+
+/**
+ * @action getMetadata {@statuses-access guest|   logged}
+ */
+class ModelMetadataTestEight extends Model
 {
 
 }

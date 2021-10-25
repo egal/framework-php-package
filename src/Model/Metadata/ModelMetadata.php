@@ -8,8 +8,8 @@ use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
-use Egal\Model\Exceptions\MetadataTagNotMatchPatternException;
 use Egal\Model\Exceptions\ModelMetadataException;
+use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -339,7 +339,7 @@ class ModelMetadata
 
     /**
      * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
-     * @throws \Egal\Model\Exceptions\MetadataTagNotMatchPatternException
+     * @throws \Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException
      */
     protected function scanPropertyTag(
         DocBlock\Tag $propertyTag,
@@ -357,7 +357,7 @@ class ModelMetadata
                 $pattern = '/[^\s]+/';
 
                 if (!preg_match($pattern, $bodyTemplate, $matches) || $matches[0] !== $bodyTemplate) {
-                    throw MetadataTagNotMatchPatternException::make($tagName, $pattern);
+                    throw ModelMetadataTagContainsSpaceException::make($tagName);
                 }
 
                 $this->validationRules[$propertyVariableName] = explode('|', $bodyTemplate);
