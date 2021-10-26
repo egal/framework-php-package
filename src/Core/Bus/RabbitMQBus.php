@@ -17,6 +17,8 @@ use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
 use Exception;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Throwable;
@@ -26,19 +28,16 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 class RabbitMQBus extends Bus
 {
 
-    private RabbitMQConnector $connector;
     private RabbitMQQueue $connection;
     public string $queueName;
+    private string $replyQueueName;
+    private bool $replyQueueExists = false;
 
     public function __construct()
     {
-        $this->connector = new RabbitMQConnector(app('events'));
-        $this->connection = $this->connector->connect(config('queue.connections.rabbitmq'));
-    }
-
-    private static function getConnection(): RabbitMQQueue
-    {
-        return (app(Bus::class))->connection;
+        $connector = new RabbitMQConnector(app('events'));
+        $this->connection = $connector->connect(config('queue.connections.rabbitmq'));
+        $this->replyQueueName = config('app.service_name') . '.' . Str::uuid() . '.reply_queue';
     }
 
     public function publishMessage(Message $message): void
@@ -47,31 +46,16 @@ class RabbitMQBus extends Bus
             !($routingKey = $this->getRoutingKey($message))
             || !($exchange = $this->getExchange($message))
         ) {
-            throw  new Exception('Невозможно опубликовать ' . get_class($message));
+            throw new Exception('Невозможно опубликовать ' . get_class($message));
         }
+
+        $properties = ['delivery_mode' => 1];
 
         if ($message instanceof ActionMessage) {
-            $this->connection->getChannel()->queue_declare(
-                $message->getUuid(),
-                false,
-                false,
-                false,
-                true,
-                true,
-                new AMQPTable([
-                    'x-queue-mode' => 'default',
-                    'x-expires' => config('app.request.wait_reply_message_ttl') * 1000,
-                ]),
-                null
-            );
-            $this->connection->getChannel()->queue_bind(
-                $message->getUuid(),
-                'amq.direct',
-                $message->getUuid()
-            );
+            $properties['reply_to'] = $this->replyQueueName;
         }
 
-        $AMQPMessage = new AMQPMessage($message->toJson(), ['delivery_mode' => 1]);
+        $AMQPMessage = new AMQPMessage($message->toJson(), $properties);
         $this->connection->getChannel()->basic_publish($AMQPMessage, $exchange, $routingKey);
     }
 
@@ -120,66 +104,107 @@ class RabbitMQBus extends Bus
         }
     }
 
-    public function constructEnvironment(): void
+    public function startProcessingMessages(): void
     {
         $serviceName = config('app.service_name');
         $this->queueName = "{$serviceName}.queue";
-
         $this->connection->declareQueue(
             $this->queueName,
             false,
             false,
-            ["x-queue-mode" => "default"]
+            ['x-queue-mode' => 'default']
         );
-
-        // Привязываем actions и balancer
         $this->connection->getChannel()->queue_bind(
             $this->queueName,
             'amq.topic',
             "$serviceName.*.*.action"
         );
-
-        // Привязываем events и balancer
         $this->connection->getChannel()->queue_bind(
             $this->queueName,
             'amq.topic',
-            "*.*.*.*.event"
+            '*.*.*.*.event'
         );
     }
 
-    public function destructEnvironment(): void
+    public function stopProcessingMessages(): void
     {
     }
 
     public function processMessages(): void
     {
-        RabbitMQBus::getConnection()->getChannel()->basic_consume(
+        $this->connection->getChannel()->basic_consume(
             $this->queueName,
             '',
             true,
             true,
             false,
             false,
-            fn(AMQPMessage $message) => $this->processMessage(json_decode($message->body, true))
+            fn(AMQPMessage $message) => $this->processMessage($message)
         );
 
         while (true) {
-            RabbitMQBus::getConnection()->getChannel()->wait();
+            $this->connection->getChannel()->wait();
         }
     }
 
-    private function processMessage(array $body)
+    private function processMessage(AMQPMessage $message)
     {
+        $body = json_decode($message->body, true);
         if (!isset($body['type'])) {
             throw new MessageProcessingException();
         }
 
         switch ($body['type']) {
             case MessageType::ACTION:
-                $this->processActionMessage(ActionMessage::fromArray($body));
+                $actionMessage = ActionMessage::fromArray($body);
+
+                try {
+                    $startProcessingMessage = new StartProcessingMessage();
+                    $startProcessingMessage->setActionMessage($actionMessage);
+                    $this->connection->getChannel()->basic_publish(
+                        new AMQPMessage($startProcessingMessage->toJson(), ['delivery_mode' => 1]),
+                        '',
+                        $message->get('reply_to')
+                    );
+
+                    Session::setActionMessage($actionMessage);
+                    $actionResultMessage = new ActionResultMessage();
+                    $actionResultMessage->setActionMessage($actionMessage);
+                    $actionCaller = new ActionCaller(
+                        $actionMessage->getModelName(),
+                        $actionMessage->getActionName(),
+                        $actionMessage->getParameters()
+                    );
+                    $actionResultMessage->setData($actionCaller->call());
+                    $this->connection->getChannel()->basic_publish(
+                        new AMQPMessage($actionResultMessage->toJson(), ['delivery_mode' => 1]),
+                        '',
+                        $message->get('reply_to')
+                    );
+                } catch (Throwable $exception) {
+                    $actionErrorMessage = new ActionErrorMessage();
+                    $actionErrorMessage->setMessage($exception->getMessage());
+
+                    switch (get_class($exception)) {
+                        case QueryException::class:
+                            $actionErrorMessage->setCode(500);
+                            break;
+                        default:
+                            $actionErrorMessage->setCode($exception->getCode());
+                            break;
+                    }
+
+                    $actionErrorMessage->setActionMessage(Session::getActionMessage());
+                    $this->connection->getChannel()->basic_publish(
+                        new AMQPMessage($actionErrorMessage->toJson(), ['delivery_mode' => 1]),
+                        '',
+                        $message->get('reply_to')
+                    );
+                }
+
+                Session::unsetActionMessage();
                 break;
             case MessageType::EVENT:
-                $this->processEventMessage(EventMessage::fromArray($body));
                 throw new MessageProcessingException('НЕ РЕАЛИЗОВАНО!'); # TODO: Реализовать.
             default:
                 throw new MessageProcessingException('Error processing queue message! ' . json_encode($body));
@@ -188,6 +213,35 @@ class RabbitMQBus extends Bus
 
     public function startConsumeReplyMessages(ActionMessage $actionMessage, callable $callback): void
     {
+        if (!$this->replyQueueExists) {
+            $this->connection->getChannel()->queue_declare(
+                $this->replyQueueName,
+                false,
+                false,
+                true,
+                true,
+                true,
+                new AMQPTable([
+                    'x-queue-mode' => 'default',
+                    'x-expires' => config('app.request.wait_reply_message_ttl') * 1000,
+                ]),
+                null
+            );
+
+            $this->connection->getChannel()->basic_consume(
+                $this->replyQueueName,
+                $this->replyQueueName,
+                true,
+                true,
+                true,
+                false,
+                function (AMQPMessage $message) {
+                }
+            );
+
+            $this->replyQueueExists = true;
+        }
+
         $convertJsonToMessage = function (string $body) {
             $body = json_decode($body, true);
 
@@ -207,71 +261,17 @@ class RabbitMQBus extends Bus
             }
         };
 
-        $this->connection->getChannel()->basic_consume(
-            $actionMessage->getUuid(),
-            $actionMessage->getUuid(),
-            true,
-            true,
-            false,
-            false,
-            fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body))
-        );
+        $this->connection->getChannel()->callbacks[$this->replyQueueName] =
+            fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body));
     }
 
     public function stopConsumeReplyMessages(ActionMessage $actionMessage): void
     {
-        $this->connection->getChannel()->basic_cancel($actionMessage->getUuid(), true, true);
     }
 
     public function consumeReplyMessages($timeout = 0): void
     {
         $this->connection->getChannel()->wait(null, false, $timeout);
-    }
-
-    private function processActionMessage(ActionMessage $actionMessage)
-    {
-        try {
-            $startProcessingMessage = new StartProcessingMessage();
-            $startProcessingMessage->setActionMessage($actionMessage);
-            Bus::getInstance()->publishMessage($startProcessingMessage);
-
-            Session::setActionMessage($actionMessage);
-            $actionResultMessage = new ActionResultMessage();
-            $actionResultMessage->setActionMessage($actionMessage);
-            $actionCaller = new ActionCaller(
-                $actionMessage->getModelName(),
-                $actionMessage->getActionName(),
-                $actionMessage->getParameters()
-            );
-            $actionResultMessage->setData($actionCaller->call());
-            Bus::getInstance()->publishMessage($actionResultMessage);
-        } catch (Throwable $exception) {
-            report($exception);
-        }
-
-        Session::unsetActionMessage();
-    }
-
-    private function processEventMessage(EventMessage $eventMessage)
-    {
-        try {
-            $listenerClasses = EventManager::getListeners(
-                $eventMessage->getServiceName(),
-                $eventMessage->getModelName(),
-                $eventMessage->getName()
-            );
-
-            foreach ($listenerClasses as $listenerClass) {
-                if (!class_exists($listenerClass)) {
-                    throw new EventHandlingException();
-                }
-
-                $listener = new $listenerClass();
-                $listener->{'handle'}($eventMessage->getData() ?? []);
-            }
-        } catch (Throwable $exception) {
-            report($exception);
-        }
     }
 
 }

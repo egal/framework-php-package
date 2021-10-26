@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Communication;
 
+use Egal\Core\Exceptions\ReplyMessageNotBelongToRequestException;
 use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
@@ -138,11 +139,21 @@ class Response
 
     public function collectReplyMessage(Message $replyMessage): void
     {
+        $checkAffiliation = function ($message) {
+            /** @var ActionResultMessage|ActionErrorMessage|StartProcessingMessage $message */
+            if ($message->getActionMessage()->getUuid() !== $this->getActionMessage()->getUuid()) {
+                throw new ReplyMessageNotBelongToRequestException();
+            }
+        };
+
         if ($replyMessage instanceof ActionResultMessage) {
+            $checkAffiliation($replyMessage);
             $this->setActionResultMessage($replyMessage);
         } elseif ($replyMessage instanceof ActionErrorMessage) {
+            $checkAffiliation($replyMessage);
             $this->setActionErrorMessage($replyMessage);
         } elseif ($replyMessage instanceof StartProcessingMessage) {
+            $checkAffiliation($replyMessage);
             $this->setStartProcessingMessage($replyMessage);
         } else {
             throw new UnsupportedReplyMessageTypeException();

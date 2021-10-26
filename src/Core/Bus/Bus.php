@@ -15,9 +15,9 @@ abstract class Bus
 
     abstract public function publishMessage(Message $message): void;
 
-    abstract public function constructEnvironment(): void;
+    abstract public function startProcessingMessages(): void;
 
-    abstract public function destructEnvironment(): void;
+    abstract public function stopProcessingMessages(): void;
 
     abstract public function processMessages(): void;
 

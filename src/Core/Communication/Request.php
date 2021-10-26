@@ -76,7 +76,7 @@ class Request extends ActionMessage
         );
 
         while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
-            $bus->consumeReplyMessages(microtime(true) - $mustDieAt);
+            $bus->consumeReplyMessages($mustDieAt - microtime(true));
         }
 
         $bus->stopConsumeReplyMessages($this);

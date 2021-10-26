@@ -32,14 +32,14 @@ class EgalListenerRunCommand extends Command
             words_to_separated_lower_case(config('app.service_name'), 'listener' . '#' . getmypid())
         );
 
-        Bus::getInstance()->constructEnvironment();
+        Bus::getInstance()->startProcessingMessages();
         Bus::getInstance()->processMessages();
     }
 
     public function stopCommand()
     {
         $this->info('Killing Listener!');
-        Bus::getInstance()->destructEnvironment();
+        Bus::getInstance()->stopProcessingMessages();
         exit;
     }
 
