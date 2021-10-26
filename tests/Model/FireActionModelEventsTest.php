@@ -85,7 +85,7 @@ class FireActionModelEventsTestProductStub extends Model
             dump('retrieved');
         });
         static::updating(function (self $stub) {
-            dump('updating');
+            $dump = dump('updating');
         });
         static::updatedWithAction(function (self $stub) {
             dump('here');
