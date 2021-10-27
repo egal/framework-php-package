@@ -2,6 +2,7 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Closure;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -84,6 +85,13 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
             [
                 [
                     ['commentable[' . ModelActionGetItemsFilterByMorphRelationTestProduct::class . '].name', 'eq', 'first'],
+                ],
+                null,
+                [1]
+            ],
+            [
+                [
+                    ['commentable[' . ModelActionGetItemsFilterByMorphRelationTestProduct::class . '].created_at', 'le', Carbon::now()->toDateTimeString()],
                 ],
                 null,
                 [1]

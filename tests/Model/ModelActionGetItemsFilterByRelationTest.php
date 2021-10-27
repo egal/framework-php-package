@@ -2,6 +2,7 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Closure;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -103,6 +104,15 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
                 function () {
                     return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
                         $query->where('id', '=', 1);
+                    })->get()->toArray();
+                },
+            ],
+            [
+                [['category_with_word.created_at', 'le', Carbon::now()->toDateTimeString()],],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('created_at', '<=', Carbon::now()->toDateTimeString());
                     })->get()->toArray();
                 },
             ],
