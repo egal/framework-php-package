@@ -20,14 +20,15 @@ class ModelActionGetItemsFilterTest extends TestCase
             $table->increments('id');
             $table->string('name');
             $table->integer('count');
+            $table->integer('sale')->nullable();
             $table->timestamps();
         });
 
         $productsAttributes = [
             ['id' => 1, 'name' => 'first_product', 'count' => 1],
-            ['id' => 2, 'name' => 'second_product', 'count' => 2],
+            ['id' => 2, 'name' => 'second_product', 'count' => 2, 'sale' => 30],
             ['id' => 3, 'name' => 'product_third', 'count' => 3],
-            ['id' => 4, 'name' => 'product_fourth', 'count' => 4],
+            ['id' => 4, 'name' => 'product_fourth', 'count' => 4, 'sale'  => 50],
         ];
 
         foreach ($productsAttributes as $attributes) {
@@ -67,6 +68,11 @@ class ModelActionGetItemsFilterTest extends TestCase
                 ],
                 null,
                 [1]
+            ],
+            [
+                [['sale', 'eq', null]],
+                null,
+                [1, 3]
             ],
         ];
     }

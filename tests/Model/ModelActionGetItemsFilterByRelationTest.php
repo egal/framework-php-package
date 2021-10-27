@@ -27,6 +27,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
         $this->schema()->create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->integer('sale')->nullable();
             $table->timestamps();
         });
 
@@ -50,10 +51,20 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
             'id' => 1,
             'name' => 'first_category',
         ]);
+        ModelTestCategory::create([
+            'id' => 2,
+            'name' => 'first_category',
+            'sale' => 30
+        ]);
         ModelTestProduct::create([
             'id' => 1,
             'name' => 'first_product',
             'category_id' => 1,
+        ]);
+        ModelTestProduct::create([
+            'id' => 2,
+            'name' => 'second_product',
+            'category_id' => 2,
         ]);
     }
 
@@ -103,6 +114,24 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
                 function () {
                     return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
                         $query->where('id', '=', 1);
+                    })->get()->toArray();
+                },
+            ],
+            [
+                [['category.sale', 'eq', null]],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('sale', '=', null);
+                    })->get()->toArray();
+                },
+            ],
+            [
+                [['category.sale', 'ne', null]],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('sale', '!=', null);
                     })->get()->toArray();
                 },
             ],

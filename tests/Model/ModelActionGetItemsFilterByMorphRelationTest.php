@@ -29,11 +29,17 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
         $this->schema()->create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->integer('sale')->nullable();
             $table->timestamps();
         });
         ModelActionGetItemsFilterByMorphRelationTestProduct::create([
             'id' => 1,
             'name' => 'first',
+        ]);
+        ModelActionGetItemsFilterByMorphRelationTestProduct::create([
+            'id' => 2,
+            'name' => 'second',
+            'sale' => 30
         ]);
 
         $this->schema()->create('orders', function (Blueprint $table) {
@@ -57,6 +63,11 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
             'commentable_type' => ModelActionGetItemsFilterByMorphRelationTestOrder::class,
             'commentable_id' => 1,
         ]);
+        ModelActionGetItemsFilterByMorphRelationTestComment::create([
+            'id' => 3,
+            'commentable_type' => ModelActionGetItemsFilterByMorphRelationTestProduct::class,
+            'commentable_id' => 2,
+        ]);
     }
 
     protected function dropSchema(): void
@@ -72,7 +83,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
             [
                 [],
                 null,
-                [1, 2]
+                [1, 2, 3]
             ],
             [
                 [
@@ -87,6 +98,13 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
                 ],
                 null,
                 [1]
+            ],
+            [
+                [
+                    ['commentable[' . ModelActionGetItemsFilterByMorphRelationTestProduct::class . '].sale', 'ne', null],
+                ],
+                null,
+                [3]
             ],
         ];
     }
