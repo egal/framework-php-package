@@ -70,7 +70,7 @@ abstract class User extends Model
         $umt->setAuthIdentification($oldUmrt->getAuthIdentification());
 
         $umrt = new UserMasterRefreshToken();
-        $umt->setSigningKey(config('app.service_key'));
+        $umrt->setSigningKey(config('app.service_key'));
         $umrt->setAuthIdentification($oldUmrt->getAuthIdentification());
 
         return json_encode([
