@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\AuthServiceDependencies\Models;
 
+use Egal\Auth\Tokens\UserMasterRefreshToken;
 use Egal\Auth\Tokens\UserMasterToken;
 use Egal\Auth\Tokens\UserServiceToken;
 use Egal\AuthServiceDependencies\Exceptions\LoginException;
@@ -58,6 +59,16 @@ abstract class User extends Model
         $ust->setAuthInformation($user->generateAuthInformation());
 
         return $ust->generateJWT();
+    }
+
+    public static function actionRefreshUserMasterToken(string $token): string
+    {
+        $umrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
+        $umt = new UserMasterToken();
+        $umt->setSigningKey(config('app.service_key'));
+        $umt->setAuthIdentification($umrt->getAuthIdentification());
+
+        return $umt->generateJWT();
     }
 
     protected function generateAuthInformation(): array
