@@ -47,7 +47,7 @@ abstract class Token
         if ($this->isAlive()) {
             return true;
         } else {
-            throw new TokenExpiredException();
+            throw TokenExpiredException::make($this->getType());
         }
     }
 
