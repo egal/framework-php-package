@@ -63,12 +63,20 @@ abstract class User extends Model
 
     public static function actionRefreshUserMasterToken(string $token): string
     {
-        $umrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
+        $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
+
         $umt = new UserMasterToken();
         $umt->setSigningKey(config('app.service_key'));
-        $umt->setAuthIdentification($umrt->getAuthIdentification());
+        $umt->setAuthIdentification($oldUmrt->getAuthIdentification());
 
-        return $umt->generateJWT();
+        $umrt = new UserMasterRefreshToken();
+        $umt->setSigningKey(config('app.service_key'));
+        $umrt->setAuthIdentification($oldUmrt->getAuthIdentification());
+
+        return json_encode([
+            'user_master_token' => $umt->generateJWT(),
+            'user_master_refresh_token' => $umrt->generateJWT()
+            ]);
     }
 
     protected function generateAuthInformation(): array
