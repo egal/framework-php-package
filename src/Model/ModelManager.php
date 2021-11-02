@@ -8,38 +8,19 @@ use Egal\Core\Exceptions\ModelNotFoundException;
 use Egal\Model\Exceptions\LoadModelImpossiblyException;
 use Egal\Model\Metadata\ModelMetadata;
 
-/**
- * Класс-одиночка менеджера моделей.
- *
- * Содержит в себе все {@see ModelMetadata} каждой {@see Model} хранящейся в app/Models.
- *
- * @package Egal\Model
- */
 class ModelManager
 {
 
     /**
-     * Ассоциативный массив всех метаданных моделей
-     *
      * @var \Egal\Model\Metadata\ModelMetadata[]
      */
     protected array $modelsMetadata = [];
 
-    /**
-     * ModelManager конструктор.
-     *
-     * Автоматически сканирует все модели с помощью {@see ModelManager::scanModels()}
-     *
-     * @throws \ReflectionException
-     */
     public function __construct()
     {
         $this->scanModels();
     }
 
-    /**
-     * Получение экземпляра класса-одиночки.
-     */
     public static function getInstance(): ModelManager
     {
         return app(self::class);
@@ -53,10 +34,6 @@ class ModelManager
         return $this->modelsMetadata;
     }
 
-    /**
-     * @statuses-access guest,logged
-     * TODO: Сделать доступным для вызова
-     */
     public static function actionGetAllModelsMetadata(): array
     {
         $result = [];
@@ -67,12 +44,6 @@ class ModelManager
         return $result;
     }
 
-    /**
-     * Получение метаданных модели.
-     *
-     * @param string $model Название модели либо короткое название модели.
-     * @throws \Egal\Core\Exceptions\ModelNotFoundException
-     */
     public static function getModelMetadata(string $model): ModelMetadata
     {
         if (class_exists($model)) {
@@ -98,9 +69,6 @@ class ModelManager
         $instance->modelsMetadata[$classShortName] = new ModelMetadata($class);
     }
 
-    /**
-     * Сканирование директории app/Models, формирование метаданных найденных моделей.
-     */
     protected function scanModels(?string $dir = null): void
     {
         $baseDir = base_path('app/Models/');
