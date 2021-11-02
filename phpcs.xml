@@ -192,6 +192,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
