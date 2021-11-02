@@ -45,7 +45,7 @@ abstract class User extends Model
 
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
         $user = static::find($umt->getAuthIdentification());
-        $service = Service::find($serviceName);
+        $service = self::getServiceModel()::find($serviceName);
 
         if (!$user) {
             throw new UserNotIdentifiedException();

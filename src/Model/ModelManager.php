@@ -64,7 +64,7 @@ class ModelManager
         } elseif (isset(ModelManager::getInstance()->modelsMetadata[$model])) {
             return ModelManager::getInstance()->modelsMetadata[$model];
         } else {
-            throw new ModelNotFoundException();
+            throw ModelNotFoundException::make($model);
         }
     }
 
