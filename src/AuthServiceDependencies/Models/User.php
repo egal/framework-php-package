@@ -10,6 +10,7 @@ use Egal\Auth\Tokens\UserServiceToken;
 use Egal\AuthServiceDependencies\Exceptions\LoginException;
 use Egal\AuthServiceDependencies\Exceptions\UserNotIdentifiedException;
 use Egal\Model\Model;
+use Egal\Model\ModelManager;
 
 abstract class User extends Model
 {
@@ -43,7 +44,7 @@ abstract class User extends Model
         $umt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
-        $user = static::query()->find($umt->getAuthIdentification());
+        $user = static::find($umt->getAuthIdentification());
         $service = Service::find($serviceName);
 
         if (!$user) {
@@ -65,6 +66,13 @@ abstract class User extends Model
     {
         $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
 
+        /** @var \Egal\AuthServiceDependencies\Models\User $user */
+        $user = static::find($oldUmrt->getAuthIdentification());
+
+        if (!$user) {
+            throw new UserNotIdentifiedException();
+        }
+
         $umt = new UserMasterToken();
         $umt->setSigningKey(config('app.service_key'));
         $umt->setAuthIdentification($oldUmrt->getAuthIdentification());
@@ -77,6 +85,11 @@ abstract class User extends Model
             'user_master_token' => $umt->generateJWT(),
             'user_master_refresh_token' => $umrt->generateJWT(),
         ];
+    }
+
+    public static function getServiceModel(): string
+    {
+        return ModelManager::getModelMetadata('Service')->getModelClass();
     }
 
     protected function generateAuthInformation(): array

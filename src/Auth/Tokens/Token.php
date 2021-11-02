@@ -32,7 +32,7 @@ abstract class Token
         $this->aliveUntil = Carbon::now('UTC')
             ->addSeconds(config(
                 'auth.tokens.' . Str::snake(get_class_short_name($this)) . '.ttl',
-                self::DEFAULT_TTL
+                static::DEFAULT_TTL
             ));
     }
 
