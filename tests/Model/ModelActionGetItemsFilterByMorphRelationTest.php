@@ -2,16 +2,14 @@
 
 namespace Egal\Tests\Model;
 
-use Closure;
-use Egal\Model\Builder;
-use Egal\Model\Exceptions\RelationNotFoundException;
+use Carbon\Carbon;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
+use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
@@ -87,7 +85,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
                 ],
                 null,
                 [1]
-            ],
+            ]
         ];
     }
 
@@ -115,6 +113,17 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
 
 }
 
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property string $name       Название          {@property-type field}  {@validation-rules string}
+ * @property string $count      Количество        {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ * @property ModelActionGetItemsFilterByMorphRelationTestComment $comment {@property-type relation}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
+ */
 class ModelActionGetItemsFilterByMorphRelationTestProduct extends Model
 {
 
@@ -134,6 +143,15 @@ class ModelActionGetItemsFilterByMorphRelationTestProduct extends Model
 
 }
 
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ * @property ModelActionGetItemsFilterByMorphRelationTestComment $comment {@property-type relation}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
+ */
 class ModelActionGetItemsFilterByMorphRelationTestOrder extends Model
 {
 
@@ -154,7 +172,10 @@ class ModelActionGetItemsFilterByMorphRelationTestOrder extends Model
 }
 
 /**
- * @property $commentable {@property-type relation}
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ * @property        $commentable                  {@property-type relation}
  */
 class ModelActionGetItemsFilterByMorphRelationTestComment extends Model
 {

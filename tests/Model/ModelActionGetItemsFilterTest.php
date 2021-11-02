@@ -2,11 +2,13 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
 use Illuminate\Database\Schema\Blueprint;
+use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelActionGetItemsFilterTest extends TestCase
@@ -326,6 +328,16 @@ class ModelActionGetItemsFilterTest extends TestCase
 
 }
 
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property string $name       Название          {@property-type field}  {@validation-rules string}
+ * @property string $count      Количество        {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
+ */
 class ModelActionGetItemsFilterTestProductStub extends Model
 {
 
