@@ -14,7 +14,7 @@ class ModelNotFoundException extends Exception
     public static function make(string $modelClassName): self
     {
         $exception = new static();
-        $exception->message = 'Model '.$modelClassName.' not found!';
+        $exception->message = 'Model ' . $modelClassName . ' not found!';
 
         return $exception;
     }

@@ -227,6 +227,9 @@
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
         <exclude-pattern>src/Centrifugo/CenrifugoBroadcastable.php</exclude-pattern>
     </rule>
+    <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant">
+        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
+    </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
