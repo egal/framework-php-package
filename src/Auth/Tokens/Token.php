@@ -21,7 +21,7 @@ abstract class Token
     private string $signingKey;
 
     /**
-     * @param array $array
+     * @param mixed[] $array
      */
     abstract public static function fromArray(array $array): Token;
 
@@ -51,9 +51,6 @@ abstract class Token
         return Carbon::now('UTC') < $this->aliveUntil;
     }
 
-    /**
-     * @throws \Egal\Auth\Exceptions\TokenExpiredException
-     */
     public function isAliveOrFail(): bool
     {
         if ($this->isAlive()) {
@@ -89,7 +86,7 @@ abstract class Token
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function decode(string $encodedJWT, string $key): array
     {
