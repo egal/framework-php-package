@@ -12,10 +12,10 @@ class ActionErrorMessage extends Message
     use HasActionMessage;
 
     protected string $type = MessageType::ACTION_ERROR;
-    public int $code;
+    public string $code;
     public string $message;
 
-    public function __construct(string $message = '', int $code = 500)
+    public function __construct(string $message = '', string $code = '')
     {
         parent::__construct();
         $this->code = $code;
@@ -65,17 +65,17 @@ class ActionErrorMessage extends Message
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getCode(): int
+    public function getCode(): string
     {
         return $this->code;
     }
 
     /**
-     * @param int $code
+     * @param string $code
      */
-    public function setCode(int $code): void
+    public function setCode(string $code): void
     {
         $this->code = $code;
     }
