@@ -118,8 +118,7 @@ class Builder extends EloquentBuilder
      */
     public function setFilter(FilterPart $filterPart): Builder
     {
-
-        $this->where(function ($query) use ($filterPart) {
+        $this->where(static function ($query) use ($filterPart) {
             $filterPartContent = $filterPart->getContent();
             foreach ($filterPartContent as $key => $filterItem) {
                 if ($filterItem instanceof FilterCombiner) {
