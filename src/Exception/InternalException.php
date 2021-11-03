@@ -10,17 +10,15 @@ use Throwable;
 abstract class InternalException extends Exception implements HasInternalCode
 {
 
-    private string $internalCode;
+    protected string $internalCode;
 
     public function __construct($message = '', $code = 0, $internalCode = null, ?Throwable $previous = null)
     {
-        if (isset($internalCode)) {
-            $this->internalCode = $internalCode;
-        }
-
         parent::__construct($message, $code, $previous);
 
-        if (!isset($this->internalCode)) {
+        if (isset($internalCode)) {
+            $this->internalCode = $internalCode;
+        } elseif (!isset($this->internalCode)) {
             throw new NoInternalCodeSetException();
         }
     }
