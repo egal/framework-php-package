@@ -1,37 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
-use Exception;
 
 class ActionErrorMessage extends Message
 {
 
     use HasActionMessage;
 
-    protected string $type = MessageType::ACTION_ERROR;
-    public string $code;
+    public string $internalCode;
+
     public string $message;
+
+
+    protected string $type = MessageType::ACTION_ERROR;
 
     public function __construct(string $message = '', string $code = '')
     {
         parent::__construct();
-        $this->code = $code;
+
+        $this->internalCode = $code;
         $this->message = $message;
     }
 
-    /**
-     * @param array $array
-     * @return ActionErrorMessage
-     * @throws Exception
-     */
     public static function fromArray(array $array): ActionErrorMessage
     {
         if (!isset($array['type'])) {
             throw new UndefinedTypeOfMessageException();
         }
+
         if ($array['type'] !== MessageType::ACTION_ERROR) {
             throw new InitializeMessageFromArrayException('Invalid type substitution!');
         }
@@ -39,7 +40,7 @@ class ActionErrorMessage extends Message
         $result = new ActionErrorMessage();
         $result->uuid = $array['uuid'];
         $result->message = $array['message'];
-        $result->code = $array['code'];
+        $result->internalCode = $array['internal_code'];
 
         if (isset($array['action_message'])) {
             $result->actionMessage = ActionMessage::fromArray($array['action_message']);
@@ -48,36 +49,24 @@ class ActionErrorMessage extends Message
         return $result;
     }
 
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @param string $message
-     */
     public function setMessage(string $message): void
     {
         $this->message = $message;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode(): string
+    public function getInternalCode(): string
     {
-        return $this->code;
+        return $this->internalCode;
     }
 
-    /**
-     * @param string $code
-     */
-    public function setCode(string $code): void
+    public function setInternalCode(string $internalCode): void
     {
-        $this->code = $code;
+        $this->internalCode = $internalCode;
     }
 
 }

@@ -14,12 +14,14 @@ use Egal\Core\Messages\StartProcessingMessage;
  */
 class Response
 {
+    const OK_STATUS_CODE = 'OK';
+    const INTERNAL_SERVER_ERROR_STATUS_CODE = 'Internal Server Error';
 
     private ActionMessage $actionMessage;
     private ?StartProcessingMessage $startProcessingMessage = null;
     private ?ActionResultMessage $actionResultMessage = null;
     private ?ActionErrorMessage $actionErrorMessage = null;
-    private int $statusCode = 500;
+    private ?string $statusCode = null;
     private ?string $errorMessage = null;
 
     /**
@@ -71,17 +73,17 @@ class Response
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getStatusCode(): int
+    public function getStatusCode(): ?string
     {
-        return $this->statusCode !== 0 ? $this->statusCode : 500;
+        return $this->statusCode;
     }
 
     /**
-     * @param int $statusCode
+     * @param string|null $statusCode
      */
-    public function setStatusCode(int $statusCode): void
+    public function setStatusCode(?string $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -131,7 +133,7 @@ class Response
         if ($this->isActionErrorMessageExists()) {
             throw new ResponseException(
                 $this->getActionErrorMessage()->getMessage(),
-                $this->getActionErrorMessage()->getCode()
+                $this->getActionErrorMessage()->getInternalCode()
             );
         }
     }
