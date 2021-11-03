@@ -14,14 +14,13 @@ use Egal\Core\Messages\StartProcessingMessage;
  */
 class Response
 {
-    const OK_STATUS_CODE = 'OK';
-    const INTERNAL_SERVER_ERROR_STATUS_CODE = 'Internal Server Error';
 
     private ActionMessage $actionMessage;
     private ?StartProcessingMessage $startProcessingMessage = null;
     private ?ActionResultMessage $actionResultMessage = null;
     private ?ActionErrorMessage $actionErrorMessage = null;
-    private ?string $statusCode = null;
+    private int $statusCode = 500;
+    private ?string $internalCode = null;
     private ?string $errorMessage = null;
 
     /**
@@ -73,17 +72,17 @@ class Response
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getStatusCode(): ?string
+    public function getStatusCode(): int
     {
-        return $this->statusCode;
+        return $this->statusCode !== 0 ? $this->statusCode : 500;
     }
 
     /**
-     * @param string|null $statusCode
+     * @param int $statusCode
      */
-    public function setStatusCode(?string $statusCode): void
+    public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -102,6 +101,22 @@ class Response
     public function setErrorMessage(?string $errorMessage): void
     {
         $this->errorMessage = $errorMessage;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInternalCode(): ?string
+    {
+        return $this->internalCode;
+    }
+
+    /**
+     * @param string|null $internalCode
+     */
+    public function setInternalCode(?string $internalCode): void
+    {
+        $this->internalCode = $internalCode;
     }
 
     /**
@@ -133,7 +148,7 @@ class Response
         if ($this->isActionErrorMessageExists()) {
             throw new ResponseException(
                 $this->getActionErrorMessage()->getMessage(),
-                $this->getActionErrorMessage()->getInternalCode()
+                $this->getActionErrorMessage()->getCode()
             );
         }
     }

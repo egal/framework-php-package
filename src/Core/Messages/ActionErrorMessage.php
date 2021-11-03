@@ -12,18 +12,19 @@ class ActionErrorMessage extends Message
 
     use HasActionMessage;
 
-    public string $internalCode;
+    public int $code;
 
     public string $message;
 
+    public ?string $internalCode;
 
     protected string $type = MessageType::ACTION_ERROR;
 
-    public function __construct(string $message = '', string $code = '')
+    public function __construct(string $message = '', int $code = 500)
     {
         parent::__construct();
 
-        $this->internalCode = $code;
+        $this->code = $code;
         $this->message = $message;
     }
 
@@ -40,7 +41,8 @@ class ActionErrorMessage extends Message
         $result = new ActionErrorMessage();
         $result->uuid = $array['uuid'];
         $result->message = $array['message'];
-        $result->internalCode = $array['internal_code'];
+        $result->code = $array['code'];
+        $result->internalCode = $array['internal_code'] ?? null;
 
         if (isset($array['action_message'])) {
             $result->actionMessage = ActionMessage::fromArray($array['action_message']);
@@ -59,14 +61,24 @@ class ActionErrorMessage extends Message
         $this->message = $message;
     }
 
-    public function getInternalCode(): string
+    public function getCode(): int
     {
-        return $this->internalCode;
+        return $this->code;
+    }
+
+    public function setCode(int $code): void
+    {
+        $this->code = $code;
     }
 
     public function setInternalCode(string $internalCode): void
     {
         $this->internalCode = $internalCode;
+    }
+
+    public function getInternalCode(): ?string
+    {
+        return $this->internalCode;
     }
 
 }

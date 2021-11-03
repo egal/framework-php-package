@@ -29,19 +29,19 @@ class ExceptionHandler extends BaseExceptionHandler
 
             switch (get_class($exception)) {
                 case QueryException::class:
-                    $actionErrorMessage->setInternalCode(Response::INTERNAL_SERVER_ERROR_STATUS_CODE);
+                    $actionErrorMessage->setCode(500);
                     break;
                 default:
-                    if ($exception instanceof HasInternalCode) {
-                        $actionErrorMessage->setInternalCode($exception->getInternalCode());
-
-                    } else {
-                        $actionErrorMessage->setInternalCode(Response::INTERNAL_SERVER_ERROR_STATUS_CODE);
-                    }
+                    $actionErrorMessage->setCode($exception->getCode());
                     break;
             }
 
             $actionErrorMessage->setActionMessage(Session::getActionMessage());
+
+            if ($exception instanceof HasInternalCode) {
+                $actionErrorMessage->setInternalCode($exception->getInternalCode());
+            }
+
             Bus::getInstance()->publishMessage($actionErrorMessage);
         }
 

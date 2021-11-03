@@ -216,20 +216,21 @@ class Request extends ActionMessage
 
         switch ([$startProcessingMessage !== null, $actionErrorMessage !== null, $actionResultMessage !== null]) {
             case [true, false, true]:
-                $this->response->setStatusCode(Response::OK_STATUS_CODE);
+                $this->response->setStatusCode(200);
                 break;
             case [true, true, false]:
-                $this->response->setStatusCode($this->response->getActionErrorMessage()->getInternalCode());
+                $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
                 $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
+                $this->response->setInternalCode($this->response->getActionErrorMessage()->getInternalCode());
                 break;
             case [true, false, false]:
-                $this->response->setStatusCode(Response::INTERNAL_SERVER_ERROR_STATUS_CODE);
+                $this->response->setStatusCode(500);
                 $this->response->setErrorMessage(
                     'The service responded, but did not process the request within the allotted time!'
                 );
                 break;
             case [false, false, false]:
-                $this->response->setStatusCode(Response::INTERNAL_SERVER_ERROR_STATUS_CODE);
+                $this->response->setStatusCode(500);
                 $this->response->setErrorMessage('Service not responding!');
                 break;
             case [false, true, true]:
