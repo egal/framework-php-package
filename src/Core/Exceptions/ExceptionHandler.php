@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Egal\Core\Exceptions;
 
 use Egal\Core\Bus\Bus;
-use Egal\Core\Communication\Response;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Session\Session;
 use Egal\Exception\HasInternalCode;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Egal\Tests\Model;
+namespace Egal\Tests\Exception;
 
-use Egal\Core\Exceptions\InternalException;
-use Egal\Core\Exceptions\NoInternalCodeSetException;
+use Egal\Exception\InternalException;
+use Egal\Exception\NoInternalCodeSetException;
 use PHPUnit\Framework\TestCase;
 
 class InternalExceptionTest extends TestCase

@@ -12,11 +12,11 @@ class ActionErrorMessage extends Message
 
     use HasActionMessage;
 
-    public int $code;
+    protected int $code;
 
-    public string $message;
+    protected string $message;
 
-    public ?string $internalCode;
+    protected ?string $internalCode;
 
     protected string $type = MessageType::ACTION_ERROR;
 
