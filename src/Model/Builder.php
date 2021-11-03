@@ -161,7 +161,9 @@ class Builder extends EloquentBuilder
     public function setFilterFromArray(array $array): Builder
     {
         if ($array !== []) {
-            $this->setFilter(FilterPart::fromArray($array));
+            $this->where(function ($query) use ($array) {
+               $query->setFilter(FilterPart::fromArray($array));
+            });
         }
 
         return $this;
