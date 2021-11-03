@@ -120,6 +120,7 @@ class Builder extends EloquentBuilder
     {
         $this->where(static function ($query) use ($filterPart) {
             $filterPartContent = $filterPart->getContent();
+
             foreach ($filterPartContent as $key => $filterItem) {
                 if ($filterItem instanceof FilterCombiner) {
                     continue;
