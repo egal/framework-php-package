@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -11,7 +13,7 @@ return [
     |
     */
 
-    'enabled' => !(bool)env('AUTH_DISABLE', false),
+    'enabled' => !(bool) env('AUTH_DISABLE', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,11 +27,15 @@ return [
     'tokens' => [
 
         'user_master_token' => [
-            'ttl' => (int)env('AUTH_USER_MASTER_TOKEN_TTL', 86400),
+            'ttl' => (int) env('AUTH_USER_MASTER_TOKEN_TTL', 86400),
+        ],
+
+        'user_master_refresh_token' => [
+            'ttl' => (int) env('AUTH_USER_MASTER_REFRESH_TOKEN_TTL', 604800),
         ],
 
         'user_service_token' => [
-            'ttl' => (int)env('AUTH_USER_SERVICE_TOKEN_TTL', 600),
+            'ttl' => (int) env('AUTH_USER_SERVICE_TOKEN_TTL', 600),
         ],
 
     ],

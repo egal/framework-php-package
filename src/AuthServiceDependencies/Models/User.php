@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Egal\AuthServiceDependencies\Models;
 
+use Egal\Auth\Tokens\UserMasterRefreshToken;
 use Egal\Auth\Tokens\UserMasterToken;
 use Egal\Auth\Tokens\UserServiceToken;
 use Egal\AuthServiceDependencies\Exceptions\LoginException;
 use Egal\AuthServiceDependencies\Exceptions\UserNotIdentifiedException;
 use Egal\Model\Model;
+use Egal\Model\ModelManager;
 
 abstract class User extends Model
 {
@@ -42,8 +44,8 @@ abstract class User extends Model
         $umt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
-        $user = static::query()->find($umt->getAuthIdentification());
-        $service = Service::find($serviceName);
+        $user = static::find($umt->getAuthIdentification());
+        $service = self::getServiceModel()::find($serviceName);
 
         if (!$user) {
             throw new UserNotIdentifiedException();
@@ -58,6 +60,36 @@ abstract class User extends Model
         $ust->setAuthInformation($user->generateAuthInformation());
 
         return $ust->generateJWT();
+    }
+
+    public static function actionRefreshUserMasterToken(string $token): array
+    {
+        $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
+
+        /** @var \Egal\AuthServiceDependencies\Models\User $user */
+        $user = static::find($oldUmrt->getAuthIdentification());
+
+        if (!$user) {
+            throw new UserNotIdentifiedException();
+        }
+
+        $umt = new UserMasterToken();
+        $umt->setSigningKey(config('app.service_key'));
+        $umt->setAuthIdentification($oldUmrt->getAuthIdentification());
+
+        $umrt = new UserMasterRefreshToken();
+        $umrt->setSigningKey(config('app.service_key'));
+        $umrt->setAuthIdentification($oldUmrt->getAuthIdentification());
+
+        return [
+            'user_master_token' => $umt->generateJWT(),
+            'user_master_refresh_token' => $umrt->generateJWT(),
+        ];
+    }
+
+    public static function getServiceModel(): string
+    {
+        return ModelManager::getModelMetadata('Service')->getModelClass();
     }
 
     protected function generateAuthInformation(): array

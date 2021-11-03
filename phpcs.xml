@@ -195,6 +195,7 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
         <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
@@ -230,6 +231,9 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
         <exclude-pattern>src/Centrifugo/CenrifugoBroadcastable.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant">
+        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
     </rule>
 
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
