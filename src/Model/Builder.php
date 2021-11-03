@@ -118,32 +118,35 @@ class Builder extends EloquentBuilder
      */
     public function setFilter(FilterPart $filterPart): Builder
     {
-        $filterPartContent = $filterPart->getContent();
-        foreach ($filterPartContent as $key => $filterItem) {
-            if ($filterItem instanceof FilterCombiner) {
-                continue;
+
+        $this->where(function ($query) use ($filterPart) {
+            $filterPartContent = $filterPart->getContent();
+            foreach ($filterPartContent as $key => $filterItem) {
+                if ($filterItem instanceof FilterCombiner) {
+                    continue;
+                }
+
+                $operator = $key === 0 || strtoupper($filterPartContent[$key - 1]->getValue()) === FilterCombiner::AND
+                    ? FilterCombiner::AND
+                    : FilterCombiner::OR;
+
+                if ($filterItem instanceof FilterCondition) {
+                    $query->applyFilterCondition($filterItem, $operator);
+                    continue;
+                }
+
+                if ($filterItem instanceof FilterPart) {
+                    $query->{$operator === FilterCombiner::AND ? 'where' : 'orWhere'}(
+                        static function (Builder $query) use ($filterItem): void {
+                            $query->setFilter($filterItem);
+                        }
+                    );
+                    continue;
+                }
+
+                throw new FilterException();
             }
-
-            $operator = $key === 0 || strtoupper($filterPartContent[$key - 1]->getValue()) === FilterCombiner::AND
-                ? FilterCombiner::AND
-                : FilterCombiner::OR;
-
-            if ($filterItem instanceof FilterCondition) {
-                $this->applyFilterCondition($filterItem, $operator);
-                continue;
-            }
-
-            if ($filterItem instanceof FilterPart) {
-                $this->{$operator === FilterCombiner::AND ? 'where' : 'orWhere'}(
-                    static function (Builder $query) use ($filterItem): void {
-                        $query->setFilter($filterItem);
-                    }
-                );
-                continue;
-            }
-
-            throw new FilterException();
-        }
+        });
 
         return $this;
     }
@@ -161,9 +164,7 @@ class Builder extends EloquentBuilder
     public function setFilterFromArray(array $array): Builder
     {
         if ($array !== []) {
-            $this->where(function ($query) use ($array) {
-               $query->setFilter(FilterPart::fromArray($array));
-            });
+            $this->setFilter(FilterPart::fromArray($array));
         }
 
         return $this;
