@@ -223,7 +223,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
-        $instance = new static();
+        $instance = static::newInstance();
         
         if (!isset($id)) {
             if (!isset($attributes[$instance->getKeyName()])) {
@@ -252,7 +252,7 @@ abstract class Model extends EloquentModel
     public static function actionUpdateMany(array $objects = []): array
     {
         $collection = new Collection();
-        $instance = new static();
+        $instance = static::newInstance();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
@@ -295,7 +295,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        $builder = (new static())->newQuery();
+        $builder = static::newInstance()->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
         $entities = $builder->get();
@@ -330,7 +330,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDelete($id): array
     {
-        $instance = new static();
+        $instance = static::newInstance();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -353,7 +353,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
-        $instance = new static();
+        $instance = static::newInstance();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
         DB::beginTransaction();
 
@@ -392,7 +392,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
-        $builder = (new static())->newQuery();
+        $builder = static::newInstance()->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
         $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
