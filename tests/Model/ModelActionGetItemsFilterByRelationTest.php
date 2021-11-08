@@ -108,6 +108,15 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
                     })->get()->toArray();
                 },
             ],
+            [
+                [['category_with_word.created_at', 'le', Carbon::now()->toDateTimeString()],],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('created_at', '<=', Carbon::now()->toDateTimeString());
+                    })->get()->toArray();
+                },
+            ],
         ];
     }
 

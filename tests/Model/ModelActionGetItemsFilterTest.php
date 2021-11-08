@@ -70,6 +70,13 @@ class ModelActionGetItemsFilterTest extends TestCase
                 null,
                 [1]
             ],
+            [
+                [
+                    ['created_at', 'eq', Carbon::now()->addDay()->toDateTimeString()]
+                ],
+                null,
+                []
+            ],
         ];
     }
 
@@ -82,6 +89,13 @@ class ModelActionGetItemsFilterTest extends TestCase
                 ],
                 null,
                 [1]
+            ],
+            [
+                [
+                    ['created_at', 'eqi', Carbon::now()->addDay()->toDateTimeString()]
+                ],
+                null,
+                []
             ],
         ];
     }
@@ -110,6 +124,13 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'ne', 'first_product'],
                     'OR',
                     ['name', 'ne', 'second_product'],
+                ],
+                null,
+                [1, 2, 3, 4]
+            ],
+            [
+                [
+                    ['created_at', 'ne', Carbon::now()->addDay()->toDateTimeString()]
                 ],
                 null,
                 [1, 2, 3, 4]
@@ -243,6 +264,13 @@ class ModelActionGetItemsFilterTest extends TestCase
                 ],
                 null,
                 [2, 3, 4]
+            ],
+            [
+                [
+                    ['created_at', 'gt', Carbon::now()->toDateTimeString()]
+                ],
+                null,
+                []
             ],
         ];
     }
