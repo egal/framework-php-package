@@ -12,6 +12,22 @@ trait UsesValidator
 {
 
     /**
+     * @param \Closure|string $callback
+     */
+    public static function validating($callback): void
+    {
+        static::registerModelEvent('validating', $callback);
+    }
+
+    /**
+     * @param \Closure|string $callback
+     */
+    public static function validated($callback): void
+    {
+        static::registerModelEvent('validated', $callback);
+    }
+
+    /**
      * @throws \Egal\Model\Exceptions\ValidateException
      * @throws \ReflectionException
      */
@@ -25,8 +41,7 @@ trait UsesValidator
     }
 
     /**
-     * @param Model $entity
-     * @throws ValidateException
+     * @throws \Egal\Model\Exceptions\ValidateException
      * @throws \ReflectionException
      */
     protected static function validate(Model $entity): void
@@ -79,16 +94,6 @@ trait UsesValidator
 
             throw $exception;
         }
-    }
-
-    public static function validating($callback)
-    {
-        static::registerModelEvent('validating', $callback);
-    }
-
-    public static function validated($callback)
-    {
-        static::registerModelEvent('validated', $callback);
     }
 
 }
