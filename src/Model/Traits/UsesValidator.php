@@ -12,39 +12,69 @@ trait UsesValidator
 {
 
     /**
+     * @param \Closure|string $callback
+     */
+    public static function validating($callback): void
+    {
+        static::registerModelEvent('validating', $callback);
+    }
+
+    /**
+     * @param \Closure|string $callback
+     */
+    public static function validated($callback): void
+    {
+        static::registerModelEvent('validated', $callback);
+    }
+
+    /**
+     * @param \Closure|string $callback
+     */
+    public static function validatingWithAction($callback): void
+    {
+        static::registerModelEvent('validating.action', $callback);
+    }
+
+    /**
+     * @param \Closure|string $callback
+     */
+    public static function validatedWithAction($callback): void
+    {
+        static::registerModelEvent('validated.action', $callback);
+    }
+
+    /**
      * @throws \Egal\Model\Exceptions\ValidateException
      * @throws \ReflectionException
      */
-    protected static function bootUsesValidator(): void
+    protected function validate(): void
     {
-        static::saving(static function (Model $entity): void {
-            // Получаем validation rules
-            // всех атрибутов если объект новый,
-            // только измененных атрибутов если объект обновляется.
-            //
-            // Получение validation rules только измененных атрибутов происходит
-            // путем получения пересечения всех validation rules и измененный атрибутов по ключам.
-            $validationRules = $entity->exists
-                ? array_intersect_key($entity->getValidationRules(), $entity->getDirty())
-                : $entity->getValidationRules();
+        // Получаем validation rules
+        // всех атрибутов если объект новый,
+        // только измененных атрибутов если объект обновляется.
+        //
+        // Получение validation rules только измененных атрибутов происходит
+        // путем получения пересечения всех validation rules и измененный атрибутов по ключам.
+        $validationRules = $this->exists
+            ? array_intersect_key($this->getValidationRules(), $this->getDirty())
+            : $this->getValidationRules();
 
-            // Применяем полученные validation rules на все атрибуты модели.
-            $validator = Validator::make($entity->getAttributes(), $validationRules);
+        // Применяем полученные validation rules на все атрибуты модели.
+        $validator = Validator::make($this->getAttributes(), $validationRules);
 
-            if ($validator->fails()) {
-                $exception = new ValidateException();
-                $exception->setMessageBag($validator->errors());
+        if ($validator->fails()) {
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
 
-                throw $exception;
-            }
-        });
+            throw $exception;
+        }
     }
 
     /**
      * @param mixed $keyValue
      * @throws \Egal\Model\Exceptions\ValidateException
      */
-    private function validateKey($keyValue): void
+    protected function validateKey($keyValue): void
     {
         $primaryKey = $this->getModelMetadata()->getPrimaryKey();
 
@@ -67,6 +97,27 @@ trait UsesValidator
 
             throw $exception;
         }
+    }
+
+    /**
+     * @throws \Egal\Model\Exceptions\ValidateException
+     * @throws \ReflectionException
+     */
+    protected static function bootUsesValidator(): void
+    {
+        static::saving(static function (Model $entity): void {
+            $entity->fireModelEvent('validating', true);
+
+            if ($entity->isNeedFireActionEvents()) {
+                $entity->fireActionEvent('validating.action', true);
+                $entity->validate();
+                $entity->fireActionEvent('validated.action', true);
+            } else {
+                $entity->validate();
+            }
+
+            $entity->fireModelEvent('validated', true);
+        });
     }
 
 }
