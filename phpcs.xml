@@ -122,8 +122,7 @@
         <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
         <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
-        <exclude
-            name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
         <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint"/>
         <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
@@ -195,9 +194,10 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/ActionErrorMessage.php</exclude-pattern>
         <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
-        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
@@ -213,6 +213,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
         <exclude-pattern>src/Model/Traits/InstanceForAction.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Exception/InternalException.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
         <exclude-pattern>src/Model/Metadata/ModelMetadata.php</exclude-pattern>
     </rule>

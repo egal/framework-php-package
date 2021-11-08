@@ -7,6 +7,7 @@ namespace Egal\Core\Exceptions;
 use Egal\Core\Bus\Bus;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Session\Session;
+use Egal\Exception\HasInternalCode;
 use Illuminate\Database\QueryException;
 use Laravel\Lumen\Exceptions\Handler as BaseExceptionHandler;
 use Throwable;
@@ -35,6 +36,11 @@ class ExceptionHandler extends BaseExceptionHandler
             }
 
             $actionErrorMessage->setActionMessage(Session::getActionMessage());
+
+            if ($exception instanceof HasInternalCode) {
+                $actionErrorMessage->setInternalCode($exception->getInternalCode());
+            }
+
             Bus::getInstance()->publishMessage($actionErrorMessage);
         }
 
