@@ -128,6 +128,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
                     })->get()->toArray();
                 },
             ],
+            [
                 [['category_with_word.created_at', 'le', Carbon::now()->toDateTimeString()],],
                 null,
                 function () {

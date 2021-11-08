@@ -76,6 +76,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                 null,
                 [1, 3],
             ],
+            [
                 [
                     ['created_at', 'eq', Carbon::now()->addDay()->toDateTimeString()]
                 ],
