@@ -130,7 +130,7 @@ abstract class Model extends EloquentModel
     ): array {
         $instance = new static();
         $instance->makeIsInstanceForAction();
-        
+
         $builder = $instance->newQuery()
             ->makeModelIsInstanceForAction()
             ->setOrderFromArray($order)
@@ -163,7 +163,7 @@ abstract class Model extends EloquentModel
     {
         $instance = new static();
         $instance->makeIsInstanceForAction();
-        
+
         $count = $instance->newQuery()
             ->setFilterFromArray($filter)
             ->count();
@@ -192,6 +192,7 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $objects Array of objects to create.
      * @return mixed[] Array of created objects.
+     * @throws \Exception
      */
     public static function actionCreateMany(array $objects = []): array
     {
@@ -227,11 +228,12 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
+     * @throws \Egal\Model\Exceptions\UpdateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
         $instance = new static();
-        
+
         if (!isset($id)) {
             if (!isset($attributes[$instance->getKeyName()])) {
                 throw new UpdateException('The identifier of the entity being updated is not specified!');
@@ -255,6 +257,7 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $objects Array of updatable objects (objects must contain an identification key).
      * @return mixed[]
+     * @throws \Egal\Model\Exceptions\UpdateManyException
      */
     public static function actionUpdateMany(array $objects = []): array
     {
@@ -299,6 +302,7 @@ abstract class Model extends EloquentModel
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entities.
+     * @throws \Exception
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
@@ -335,6 +339,7 @@ abstract class Model extends EloquentModel
      *
      * @param int|string $id Entity identification.
      * @return string[]
+     * @throws \Egal\Model\Exceptions\NotFoundException
      */
     public static function actionDelete($id): array
     {
@@ -358,6 +363,8 @@ abstract class Model extends EloquentModel
      * Multiple deletion of entities
      *
      * @param int[]|string[] $ids Array of identifiers for the entities to be deleted.
+     * @throws \Egal\Model\Exceptions\DeleteManyException
+     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
@@ -397,6 +404,7 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
      * @return mixed[]
+     * @throws \Exception
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
