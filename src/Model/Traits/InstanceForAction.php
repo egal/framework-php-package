@@ -23,7 +23,7 @@ trait InstanceForAction
     {
         $instance = parent::newInstance($attributes, $exists);
 
-        if ($this->isInstanceForAction) {
+        if (isset($this) && get_class($this) == __CLASS__ && $this->isInstanceForAction) {
             $instance->makeIsInstanceForAction();
         }
 
