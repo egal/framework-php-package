@@ -28,6 +28,22 @@ trait UsesValidator
     }
 
     /**
+     * @param \Closure|string $callback
+     */
+    public static function validatingWithAction($callback): void
+    {
+        static::registerModelEvent('validating.action', $callback);
+    }
+
+    /**
+     * @param \Closure|string $callback
+     */
+    public static function validatedWithAction($callback): void
+    {
+        static::registerModelEvent('validated.action', $callback);
+    }
+
+    /**
      * @throws \Egal\Model\Exceptions\ValidateException
      * @throws \ReflectionException
      */
@@ -35,7 +51,13 @@ trait UsesValidator
     {
         static::saving(static function (Model $entity): void {
             $entity->fireModelEvent('validating', true);
-            self::validate($entity);
+            if ($this->isNeedFireActionEvents()) {
+                $this->fireActionEvent('validating.action', true);
+                self::validate($entity);
+                $this->fireActionEvent('validated.action', true);
+            } else {
+                self::validate($entity);
+            }
             $entity->fireModelEvent('validated', true);
         });
     }
