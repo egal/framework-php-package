@@ -35,7 +35,7 @@ trait UsesValidator
     {
         static::saving(static function (Model $entity): void {
             $entity->fireModelEvent('validating', true);
-            self::validate($entity);
+            $entity->validate();
             $entity->fireModelEvent('validated', true);
         });
     }
@@ -44,7 +44,7 @@ trait UsesValidator
      * @throws \Egal\Model\Exceptions\ValidateException
      * @throws \ReflectionException
      */
-    protected static function validate(Model $entity): void
+    protected function validate(): void
     {
         // Получаем validation rules
         // всех атрибутов если объект новый,
@@ -52,12 +52,12 @@ trait UsesValidator
         //
         // Получение validation rules только измененных атрибутов происходит
         // путем получения пересечения всех validation rules и измененный атрибутов по ключам.
-        $validationRules = $entity->exists
-            ? array_intersect_key($entity->getValidationRules(), $entity->getDirty())
-            : $entity->getValidationRules();
+        $validationRules = $this->exists
+            ? array_intersect_key($this->getValidationRules(), $this->getDirty())
+            : $this->getValidationRules();
 
         // Применяем полученные validation rules на все атрибуты модели.
-        $validator = Validator::make($entity->getAttributes(), $validationRules);
+        $validator = Validator::make($this->getAttributes(), $validationRules);
 
         if ($validator->fails()) {
             $exception = new ValidateException();
@@ -71,7 +71,7 @@ trait UsesValidator
      * @param mixed $keyValue
      * @throws \Egal\Model\Exceptions\ValidateException
      */
-    private function validateKey($keyValue): void
+    protected function validateKey($keyValue): void
     {
         $primaryKey = $this->getModelMetadata()->getPrimaryKey();
 
