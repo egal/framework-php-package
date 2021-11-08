@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Traits;
 
 use Egal\Core\Events\GlobalEvent;
-use Egal\Model\Model;
 
 /**
- * @package Egal\Model
- * @mixin Model
+ * @mixin \Egal\Model\Model
  */
 trait HasEvents
 {
 
-    private bool $needFireActionEvents = false;
+    /**
+     * @deprecated since v.2.0.0
+     */
+    public function isNeedFireActionEvents(): bool
+    {
+        return $this->isInstanceForAction;
+    }
 
     public static function retrievedWithAction($callback)
     {
@@ -59,52 +65,31 @@ trait HasEvents
         static::registerModelEvent('deleted.action', $callback);
     }
 
-    public function newInstance($attributes = [], $exists = false)
-    {
-        $instance = parent::newInstance($attributes, $exists);
-        if ($this->isNeedFireActionEvents()) {
-            $instance->needFireActionEvents();
-        }
-        return $instance;
-    }
-
-    public function needFireActionEvents(): self
-    {
-        $this->needFireActionEvents = true;
-        return $this;
-    }
-
     /**
-     * Запустить событие пользовательской модели для данного события.
-     *
      * @param string $event
      * @param string $method
      * @return mixed|null
-     * @noinspection PhpUnused
      */
     protected function fireCustomModelEvent($event, $method)
     {
         $result = parent::fireCustomModelEvent($event, $method);
-        if (
-            isset($this->dispatchesEvents[$event])
-            && is_subclass_of($this->dispatchesEvents[$event], GlobalEvent::class)
-        ) {
-            (new $this->dispatchesEvents[$event]($this))->publish();
+
+        $dispatchesEvent = $this->dispatchesEvents[$event] ?? null;
+
+        if (isset($dispatchesEvent) && is_subclass_of($dispatchesEvent, GlobalEvent::class)) {
+            (new $dispatchesEvent($this))->publish();
         }
+
         return $result;
     }
 
     protected function fireModelEvent($event, $halt = true)
     {
-        if ($this->isNeedFireActionEvents()) {
+        if ($this->isInstanceForAction) {
             $this->fireActionEvent($event, $halt);
         }
-        parent::fireModelEvent($event, $halt);
-    }
 
-    public function isNeedFireActionEvents(): bool
-    {
-        return $this->needFireActionEvents;
+        parent::fireModelEvent($event, $halt);
     }
 
     protected function fireActionEvent($event, $halt = true)

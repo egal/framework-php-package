@@ -251,12 +251,9 @@ class Builder extends EloquentBuilder
         return $this->model;
     }
 
-    /**
-     * @return $this
-     */
-    public function needFireModelActionEvents(): Builder
+    public function makeModelIsInstanceForAction(): Builder
     {
-        $this->model->needFireActionEvents();
+        $this->model->makeIsInstanceForAction();
 
         return $this;
     }

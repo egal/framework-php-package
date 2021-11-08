@@ -23,15 +23,6 @@ class ModelAdditionalFilterToQueryTest extends TestCase
         $this->assertTrue(PHPUnitUtil::getProperty($model, 'isInstanceForAction'));
     }
 
-    public function testModelNewInstanceForAction()
-    {
-        $model = m::mock(Model::class . '[makeIsInstanceForAction]');
-        $model->shouldAllowMockingProtectedMethods();
-        $model->shouldReceive('makeIsInstanceForAction')->once()->andReturnSelf();
-
-        $this->assertNotNull(PHPUnitUtil::callMethod($model, 'newInstanceForAction'));
-    }
-
     public function testModelNewQueryWithInstanceForAction()
     {
         $query = m::mock(BaseBuilder::class);

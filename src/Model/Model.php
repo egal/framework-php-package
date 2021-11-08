@@ -24,24 +24,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Basic Egal Model
- *
- * Contains CRUD methods:
- * {@see Model::actionGetItem()},
- * {@see Model::actionGetItems()},
- * {@see Model::actionCreate()},
- * {@see Model::actionCreateMany()},
- * {@see Model::actionUpdate()},
- * {@see Model::actionUpdateMany()},
- * {@see Model::actionUpdateManyRaw()},
- * {@see Model::actionDelete()},
- * {@see Model::actionDeleteMany()},
- * {@see Model::actionDeleteManyRaw()}
- *
- * Contains getting metadata methods:
- * {@see Model::actionGetMetadata()}
- */
 abstract class Model extends EloquentModel
 {
 
@@ -104,8 +86,6 @@ abstract class Model extends EloquentModel
 
     /**
      * Retrieving Model Metadata
-     *
-     * @throws \Egal\Core\Exceptions\ModelNotFoundException
      */
     public static function actionGetMetadata(): array
     {
@@ -118,15 +98,15 @@ abstract class Model extends EloquentModel
      * @param int|string $id Entity identification.
      * @param string[] $withs Array of relations displayed for an entity.
      * @return mixed[] Entity as an associative array.
-     * @throws \Egal\Model\Exceptions\ValidateException
      */
     public static function actionGetItem($id, array $withs = []): array
     {
-        $instance = static::newInstanceForAction();
+        $instance = new static();
+        $instance->makeIsInstanceForAction();
         $instance->validateKey($id);
 
         return $instance->newQuery()
-            ->needFireModelActionEvents()
+            ->makeModelIsInstanceForAction()
             ->where('id', '=', $id)
             ->with($withs)
             ->firstOrFail()
@@ -137,55 +117,10 @@ abstract class Model extends EloquentModel
      * Getting a array of entities
      *
      * @param mixed[]|null $pagination Entity pagination array.
-     * Further transformed into {@see \Egal\Model\Order\Order}[].
-     * If not specified, the full list of entities will be displayed.
-     * Example: [
-     *   "page": 1,
-     *   "per_page": 10
-     * ].
      * @param string[] $withs Array of relations displayed for an entity.
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
-     * Example: [
-     *   ["name", "eq", "John"],
-     *   "OR",
-     *   [
-     *     ["age", "ge", 20],
-     *     "AND",
-     *     ["age", "le", 20]
-     *   ]
-     * ].
      * @param mixed[] $order Sorting array of displayed entities, then converted to {@see \Egal\Model\Order\Order}[].
-     * Example: [
-     *   ["column" => "name", "direction" => "asc"],
-     *   ["column" => "age", "direction" => "desc"]
-     * ].
      * @return mixed[] The result of the query and the paginator as an associative array.
-     * Example: [
-     *   "current_page" => 1,
-     *   "total_count" => 1,
-     *   "per_page" => 1,
-     *   "items" => [
-     *     [
-     *       "id" => "4b30c48a-2d90-4dda-ba06-77e79e4f4642",
-     *       "email" => "test@test.test",
-     *       "roles" => [
-     *           [
-     *             "id" => 1,
-     *             "name" => "user",
-     *             "is_default" => true
-     *           ]
-     *         ],
-     *       "permissions" => [
-     *         [
-     *           "id" => 1,
-     *           "name" => "authenticate",
-     *           "is_default" => true
-     *         ]
-     *       ]
-     *     ]
-     *   ]
-     * ].
-     * @throws \Egal\Model\Exceptions\FilterException|\Egal\Model\Exceptions\OrderException|\ReflectionException
      */
     public static function actionGetItems(
         ?array $pagination = null,
@@ -193,9 +128,11 @@ abstract class Model extends EloquentModel
         array $filter = [],
         array $order = []
     ): array {
-        $builder = static::newInstanceForAction()
-            ->newQuery()
-            ->needFireModelActionEvents()
+        $instance = new static();
+        $instance->makeIsInstanceForAction();
+
+        $builder = $instance->newQuery()
+            ->makeModelIsInstanceForAction()
             ->setOrderFromArray($order)
             ->setFilterFromArray($filter)
             ->setWithFromArray($withs);
@@ -218,14 +155,16 @@ abstract class Model extends EloquentModel
     }
 
     /**
+     * Get count entityes.
+     *
      * @param mixed[] $filter
-     * @throws \Egal\Model\Exceptions\FilterException|\ReflectionException
      */
     public static function actionGetCount(array $filter = []): array
     {
-        $count = static::newInstanceForAction()
-            ->newQuery()
-            ->needFireModelActionEvents()
+        $instance = new static();
+        $instance->makeIsInstanceForAction();
+
+        $count = $instance->newQuery()
             ->setFilterFromArray($filter)
             ->count();
 
@@ -240,9 +179,9 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreate(array $attributes = []): array
     {
-        $entity = static::newInstanceForAction();
+        $entity = new static();
+        $entity->makeIsInstanceForAction();
         $entity->fill($attributes);
-        $entity->needFireActionEvents();
         $entity->save();
 
         return $entity->toArray();
@@ -253,18 +192,18 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $objects Array of objects to create.
      * @return mixed[] Array of created objects.
-     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
+     * @throws \Exception
      */
     public static function actionCreateMany(array $objects = []): array
     {
-        $instance = static::newInstanceForAction();
-        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
+        $entity = new static();
+        $entity->makeIsInstanceForAction();
+        $entity->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
         DB::beginTransaction();
 
         foreach ($objects as $attributes) {
-            $entity = $instance->newInstance();
-            $entity->needFireActionEvents();
+            $entity = static::newInstanceForAction();
             $entity->fill($attributes);
 
             try {
@@ -275,7 +214,6 @@ abstract class Model extends EloquentModel
                 throw $exception;
             }
 
-            $entity->refresh();
             $collection->add($entity);
         }
 
@@ -290,26 +228,25 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
-     * @throws \Egal\Model\Exceptions\ValidateException|\Egal\Model\Exceptions\UpdateException
+     * @throws \Egal\Model\Exceptions\UpdateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
-        if (!isset($id)) {
-            $modelInstance = new static();
+        $instance = new static();
 
-            if (!isset($attributes[$modelInstance->getKeyName()])) {
+        if (!isset($id)) {
+            if (!isset($attributes[$instance->getKeyName()])) {
                 throw new UpdateException('The identifier of the entity being updated is not specified!');
             }
 
-            $id = $attributes[$modelInstance->getKeyName()];
+            $id = $attributes[$instance->getKeyName()];
         }
 
-        $instance = static::newInstanceForAction();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->findOrFail($id);
-        $entity->needFireActionEvents();
+        $entity->makeIsInstanceForAction();
         $entity->update($attributes);
 
         return $entity->toArray();
@@ -320,12 +257,12 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $objects Array of updatable objects (objects must contain an identification key).
      * @return mixed[]
-     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException|\Egal\Model\Exceptions\UpdateManyException
+     * @throws \Egal\Model\Exceptions\UpdateManyException
      */
     public static function actionUpdateMany(array $objects = []): array
     {
         $collection = new Collection();
-        $instance = static::newInstanceForAction();
+        $instance = new static();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
@@ -337,7 +274,6 @@ abstract class Model extends EloquentModel
             }
 
             $key = $attributes[$instance->getKeyName()];
-            $instance = static::newInstanceForAction();
             $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
@@ -349,7 +285,7 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not found with ' . $objectIndex . ' index!');
             }
 
-            $entity->needFireActionEvents();
+            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
             $entity->save();
             $collection->add($entity);
@@ -366,11 +302,12 @@ abstract class Model extends EloquentModel
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entities.
-     * @throws \Egal\Model\Exceptions\FilterException|\Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException|\Exception
+     * @throws \Exception
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
-        $builder = static::newInstanceForAction()->newQuery();
+        $instance = new static();
+        $builder = $instance->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
         $entities = $builder->get();
@@ -378,7 +315,7 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($entities as $key => $entity) {
-            $entity->needFireActionEvents();
+            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
 
             try {
@@ -389,7 +326,6 @@ abstract class Model extends EloquentModel
                 throw $exception;
             }
 
-            $entity->refresh();
             $entities[$key] = $entity;
         }
 
@@ -407,7 +343,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionDelete($id): array
     {
-        $instance = static::newInstanceForAction();
+        $instance = new static();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -417,7 +353,7 @@ abstract class Model extends EloquentModel
             throw new NotFoundException();
         }
 
-        $entity->needFireActionEvents();
+        $entity->makeIsInstanceForAction();
         $entity->delete();
 
         return ['message' => 'Entity deleted!'];
@@ -427,17 +363,16 @@ abstract class Model extends EloquentModel
      * Multiple deletion of entities
      *
      * @param int[]|string[] $ids Array of identifiers for the entities to be deleted.
-     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException|\Egal\Model\Exceptions\DeleteManyException
-     * @throws \Exception
+     * @throws \Egal\Model\Exceptions\DeleteManyException
+     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
-        $instance = static::newInstanceForAction();
+        $instance = new static();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
         DB::beginTransaction();
 
         foreach ($ids as $id) {
-            $instance = static::newInstanceForAction();
             $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
@@ -450,7 +385,7 @@ abstract class Model extends EloquentModel
             }
 
             try {
-                $entity->needFireActionEvents();
+                $entity->makeIsInstanceForAction();
                 $entity->delete();
             } catch (Exception $e) {
                 DB::rollBack();
@@ -468,12 +403,13 @@ abstract class Model extends EloquentModel
      * Multiple deletion of entities by filter.
      *
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
-     * @return array
-     * @throws \Egal\Model\Exceptions\FilterException|\Exception
+     * @return mixed[]
+     * @throws \Exception
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
-        $builder = static::newInstanceForAction()->newQuery();
+        $instance = new static();
+        $builder = $instance->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
         $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
@@ -482,7 +418,7 @@ abstract class Model extends EloquentModel
 
         foreach ($entities as $entity) {
             try {
-                $entity->needFireActionEvents();
+                $entity->makeIsInstanceForAction();
                 $entity->delete();
             } catch (Exception $exception) {
                 DB::rollBack();
