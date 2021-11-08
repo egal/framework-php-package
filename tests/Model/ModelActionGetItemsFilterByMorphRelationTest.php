@@ -106,11 +106,14 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
                 ],
                 null,
                 [3]
+            ],
+            [
+                [
                     ['commentable[' . ModelActionGetItemsFilterByMorphRelationTestProduct::class . '].created_at', 'le', Carbon::now()->toDateTimeString()],
                 ],
                 null,
-                [1]
-            ],
+                [1, 3]
+            ]
         ];
     }
 
@@ -142,6 +145,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
  * @property int    $id                           {@property-type field}  {@prymary-key}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
  * @property string $count      Количество        {@property-type field}  {@validation-rules int}
+ * @property string $sale       Скидка            {@property-type field}  {@validation-rules int}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
  * @property ModelActionGetItemsFilterByMorphRelationTestComment $comment {@property-type relation}
