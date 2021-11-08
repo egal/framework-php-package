@@ -9,7 +9,7 @@ use Exception;
 abstract class InternalException extends Exception implements HasInternalCode
 {
 
-    protected string $internalCode;
+    protected string $internalCode = '';
 
     public function getInternalCode(): string
     {
