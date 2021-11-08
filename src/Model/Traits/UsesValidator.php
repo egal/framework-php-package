@@ -47,25 +47,6 @@ trait UsesValidator
      * @throws \Egal\Model\Exceptions\ValidateException
      * @throws \ReflectionException
      */
-    protected static function bootUsesValidator(): void
-    {
-        static::saving(static function (Model $entity): void {
-            $entity->fireModelEvent('validating', true);
-            if ($this->isNeedFireActionEvents()) {
-                $this->fireActionEvent('validating.action', true);
-                $entity->validate();
-                $this->fireActionEvent('validated.action', true);
-            } else {
-                $entity->validate();
-            }
-            $entity->fireModelEvent('validated', true);
-        });
-    }
-
-    /**
-     * @throws \Egal\Model\Exceptions\ValidateException
-     * @throws \ReflectionException
-     */
     protected function validate(): void
     {
         // Получаем validation rules
@@ -116,6 +97,27 @@ trait UsesValidator
 
             throw $exception;
         }
+    }
+
+    /**
+     * @throws \Egal\Model\Exceptions\ValidateException
+     * @throws \ReflectionException
+     */
+    protected static function bootUsesValidator(): void
+    {
+        static::saving(static function (Model $entity): void {
+            $entity->fireModelEvent('validating', true);
+
+            if ($entity->isNeedFireActionEvents()) {
+                $entity->fireActionEvent('validating.action', true);
+                $entity->validate();
+                $entity->fireActionEvent('validated.action', true);
+            } else {
+                $entity->validate();
+            }
+
+            $entity->fireModelEvent('validated', true);
+        });
     }
 
 }
