@@ -232,7 +232,7 @@
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
-        <exclude-pattern>src/Centrifugo/CenrifugoBroadcastable.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcastable.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant">
         <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>

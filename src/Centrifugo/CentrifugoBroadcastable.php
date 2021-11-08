@@ -6,7 +6,7 @@ namespace Egal\Centrifugo;
 
 use Egal\Model\Model;
 
-trait CenrifugoBroadcastable
+trait CentrifugoBroadcastable
 {
 
     public string $connection = 'sync';
