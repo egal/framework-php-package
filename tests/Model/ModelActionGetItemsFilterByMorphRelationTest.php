@@ -3,6 +3,9 @@
 namespace Egal\Tests\Model;
 
 use Carbon\Carbon;
+use Closure;
+use Egal\Model\Builder;
+use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
@@ -103,6 +106,10 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
                 ],
                 null,
                 [3]
+                    ['commentable[' . ModelActionGetItemsFilterByMorphRelationTestProduct::class . '].created_at', 'le', Carbon::now()->toDateTimeString()],
+                ],
+                null,
+                [1]
             ],
         ];
     }

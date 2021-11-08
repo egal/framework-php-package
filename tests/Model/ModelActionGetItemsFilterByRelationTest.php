@@ -128,12 +128,11 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
                     })->get()->toArray();
                 },
             ],
-            [
-                [['category.sale', 'ne', null]],
+                [['category_with_word.created_at', 'le', Carbon::now()->toDateTimeString()],],
                 null,
                 function () {
                     return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
-                        $query->where('sale', '!=', null);
+                        $query->where('created_at', '<=', Carbon::now()->toDateTimeString());
                     })->get()->toArray();
                 },
             ],
