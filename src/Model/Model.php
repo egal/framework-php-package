@@ -24,24 +24,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Basic Egal Model
- *
- * Contains CRUD methods:
- * {@see Model::actionGetItem()},
- * {@see Model::actionGetItems()},
- * {@see Model::actionCreate()},
- * {@see Model::actionCreateMany()},
- * {@see Model::actionUpdate()},
- * {@see Model::actionUpdateMany()},
- * {@see Model::actionUpdateManyRaw()},
- * {@see Model::actionDelete()},
- * {@see Model::actionDeleteMany()},
- * {@see Model::actionDeleteManyRaw()}
- *
- * Contains getting metadata methods:
- * {@see Model::actionGetMetadata()}
- */
 abstract class Model extends EloquentModel
 {
 
@@ -104,8 +86,6 @@ abstract class Model extends EloquentModel
 
     /**
      * Retrieving Model Metadata
-     *
-     * @throws \Egal\Core\Exceptions\ModelNotFoundException
      */
     public static function actionGetMetadata(): array
     {
@@ -118,7 +98,6 @@ abstract class Model extends EloquentModel
      * @param int|string $id Entity identification.
      * @param string[] $withs Array of relations displayed for an entity.
      * @return mixed[] Entity as an associative array.
-     * @throws \Egal\Model\Exceptions\ValidateException
      */
     public static function actionGetItem($id, array $withs = []): array
     {
@@ -137,55 +116,10 @@ abstract class Model extends EloquentModel
      * Getting a array of entities
      *
      * @param mixed[]|null $pagination Entity pagination array.
-     * Further transformed into {@see \Egal\Model\Order\Order}[].
-     * If not specified, the full list of entities will be displayed.
-     * Example: [
-     *   "page": 1,
-     *   "per_page": 10
-     * ].
      * @param string[] $withs Array of relations displayed for an entity.
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
-     * Example: [
-     *   ["name", "eq", "John"],
-     *   "OR",
-     *   [
-     *     ["age", "ge", 20],
-     *     "AND",
-     *     ["age", "le", 20]
-     *   ]
-     * ].
      * @param mixed[] $order Sorting array of displayed entities, then converted to {@see \Egal\Model\Order\Order}[].
-     * Example: [
-     *   ["column" => "name", "direction" => "asc"],
-     *   ["column" => "age", "direction" => "desc"]
-     * ].
      * @return mixed[] The result of the query and the paginator as an associative array.
-     * Example: [
-     *   "current_page" => 1,
-     *   "total_count" => 1,
-     *   "per_page" => 1,
-     *   "items" => [
-     *     [
-     *       "id" => "4b30c48a-2d90-4dda-ba06-77e79e4f4642",
-     *       "email" => "test@test.test",
-     *       "roles" => [
-     *           [
-     *             "id" => 1,
-     *             "name" => "user",
-     *             "is_default" => true
-     *           ]
-     *         ],
-     *       "permissions" => [
-     *         [
-     *           "id" => 1,
-     *           "name" => "authenticate",
-     *           "is_default" => true
-     *         ]
-     *       ]
-     *     ]
-     *   ]
-     * ].
-     * @throws \Egal\Model\Exceptions\FilterException|\Egal\Model\Exceptions\OrderException|\ReflectionException
      */
     public static function actionGetItems(
         ?array $pagination = null,
@@ -218,8 +152,9 @@ abstract class Model extends EloquentModel
     }
 
     /**
+     * Get count entityes.
+     *
      * @param mixed[] $filter
-     * @throws \Egal\Model\Exceptions\FilterException|\ReflectionException
      */
     public static function actionGetCount(array $filter = []): array
     {
@@ -251,7 +186,6 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $objects Array of objects to create.
      * @return mixed[] Array of created objects.
-     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
      */
     public static function actionCreateMany(array $objects = []): array
     {
@@ -286,21 +220,19 @@ abstract class Model extends EloquentModel
      * @param int|string|null $id Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
-     * @throws \Egal\Model\Exceptions\ValidateException|\Egal\Model\Exceptions\UpdateException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
+        $instance = new static();
+        
         if (!isset($id)) {
-            $modelInstance = new static();
-
-            if (!isset($attributes[$modelInstance->getKeyName()])) {
+            if (!isset($attributes[$instance->getKeyName()])) {
                 throw new UpdateException('The identifier of the entity being updated is not specified!');
             }
 
-            $id = $attributes[$modelInstance->getKeyName()];
+            $id = $attributes[$instance->getKeyName()];
         }
 
-        $instance = new static();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -316,12 +248,11 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $objects Array of updatable objects (objects must contain an identification key).
      * @return mixed[]
-     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException|\Egal\Model\Exceptions\UpdateManyException
      */
     public static function actionUpdateMany(array $objects = []): array
     {
         $collection = new Collection();
-        $instance = (new static());
+        $instance = new static();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
@@ -361,7 +292,6 @@ abstract class Model extends EloquentModel
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entities.
-     * @throws \Egal\Model\Exceptions\FilterException|\Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException|\Exception
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
@@ -397,7 +327,6 @@ abstract class Model extends EloquentModel
      *
      * @param int|string $id Entity identification.
      * @return string[]
-     * @throws \Egal\Model\Exceptions\NotFoundException
      */
     public static function actionDelete($id): array
     {
@@ -421,8 +350,6 @@ abstract class Model extends EloquentModel
      * Multiple deletion of entities
      *
      * @param int[]|string[] $ids Array of identifiers for the entities to be deleted.
-     * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException|\Egal\Model\Exceptions\DeleteManyException
-     * @throws \Exception
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
@@ -461,8 +388,7 @@ abstract class Model extends EloquentModel
      * Multiple deletion of entities by filter.
      *
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
-     * @return array
-     * @throws \Egal\Model\Exceptions\FilterException|\Exception
+     * @return mixed[]
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
