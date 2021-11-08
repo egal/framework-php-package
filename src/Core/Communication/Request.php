@@ -221,6 +221,7 @@ class Request extends ActionMessage
             case [true, true, false]:
                 $this->response->setStatusCode($this->response->getActionErrorMessage()->getCode());
                 $this->response->setErrorMessage($this->response->getActionErrorMessage()->getMessage());
+                $this->response->setInternalCode($this->response->getActionErrorMessage()->getInternalCode());
                 break;
             case [true, false, false]:
                 $this->response->setStatusCode(500);
