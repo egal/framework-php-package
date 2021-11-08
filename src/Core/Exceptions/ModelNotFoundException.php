@@ -9,8 +9,14 @@ use Exception;
 class ModelNotFoundException extends Exception
 {
 
-    protected $message = 'Model not found!';
-
     protected $code = 404;
+
+    public static function make(string $modelClassName): self
+    {
+        $exception = new static();
+        $exception->message = 'Model ' . $modelClassName . ' not found!';
+
+        return $exception;
+    }
 
 }

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Metadata;
 
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Model\Exceptions\ModelActionMetadataException;
+use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic as RefGenericTag;
-use ReflectionParameter;
 
 /**
  * @package Egal\Model
@@ -22,9 +24,8 @@ class ModelActionMetadata
     private const AND_TAG_SEPARATOR = ',';
     private const OR_TAG_SEPARATOR = '|';
 
-    /**
-     * @var string
-     */
+    private const MODEL_ACTION_PREFIX = 'action';
+
     protected string $actionName;
 
     /**
@@ -48,7 +49,7 @@ class ModelActionMetadata
     protected array $permissionsAccess = [];
 
     /**
-     * @var ReflectionParameter[]
+     * @var \ReflectionParameter[]
      */
     private array $parameters;
 
@@ -67,44 +68,24 @@ class ModelActionMetadata
 
         foreach ($this->parameters as $key => $parameter) {
             $result['parameters'][$key]['name'] = Str::snake($parameter->getName());
-            $result['parameters'][$key]['allows_null'] = $parameter->allowsNull() || $parameter->getType()->allowsNull();
-            if ($parameter->isDefaultValueAvailable()) {
-                $result['parameters'][$key]['default_value'] = $parameter->getDefaultValue();
+            $result['parameters'][$key]['allows_null'] = $parameter->allowsNull()
+                || $parameter->getType()->allowsNull();
+
+            if (!$parameter->isDefaultValueAvailable()) {
+                continue;
             }
+
+            $result['parameters'][$key]['default_value'] = $parameter->getDefaultValue();
         }
+
         return $result;
     }
 
-    /**
-     * Получение корректного названия метода у модели.
-     *
-     * @param string $actionName
-     * @return string
-     *
-     * TODO: Убрать ответственность с других классов от определения метода по названию
-     */
-    public static function getCurrentActionName(string $actionName): string
-    {
-        if (str_contains($actionName, ModelActionMetadata::METHOD_NAME_PREFIX)) {
-            return $actionName;
-        } else {
-            return ModelActionMetadata::METHOD_NAME_PREFIX . ucwords($actionName);
-        }
-    }
-
-    /**
-     * @return string
-     */
     public function getActionName(): string
     {
         return $this->actionName;
     }
 
-    private const MODEL_ACTION_PREFIX = 'action';
-
-    /**
-     * @return string
-     */
     public function getActionMethodName(): string
     {
         return self::MODEL_ACTION_PREFIX . ucwords($this->actionName);
@@ -143,59 +124,87 @@ class ModelActionMetadata
     }
 
     /**
-     * @return ReflectionParameter[]
+     * @return \ReflectionParameter[]
      */
     public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    /**
-     * @param RefGenericTag $tag
-     * @throws ModelActionMetadataException
-     */
-    public function supplementFromTag(RefGenericTag $tag)
+    public function supplementFromTag(RefGenericTag $tag): void
     {
-        switch ($tag->getName()) {
+        $tagDescription = $tag->getDescription()->render();
+        $tagName = $tag->getName();
+
+        switch ($tagName) {
             case self::STATUSES_ACCESS_TAG_NAME:
             case self::SERVICES_ACCESS_TAG_NAME:
-                if (str_contains($tag->getDescription(), self::AND_TAG_SEPARATOR)) {
+                if (str_contains($tagDescription, self::AND_TAG_SEPARATOR)) {
                     throw new ModelActionMetadataException(
                         'Services and Statuses accesses don\'t supported AND operator!'
                     );
                 }
-                $this->{Str::camel($tag->getName())} = explode(self::OR_TAG_SEPARATOR, $tag->getDescription());
+
+                // Check string not contain spaces.
+                $pattern = '/[^\s]+/';
+
+                if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
+                    throw ModelMetadataTagContainsSpaceException::make($tagName);
+                }
+
+                $this->{Str::camel($tagName)} = explode(self::OR_TAG_SEPARATOR, $tagDescription);
                 break;
             case self::ROLES_ACCESS_TAG_NAME:
             case self::PERMISSIONS_ACCESS_TAG_NAME:
-                foreach (explode(self::OR_TAG_SEPARATOR, $tag->getDescription()) as $rawOrValue) {
-                    $this->{Str::camel($tag->getName())}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
-                    if (in_array(StatusAccess::GUEST, $this->{Str::camel($tag->getName())})) {
+                // Check string not contain spaces.
+                $pattern = '/[^\s]+/';
+
+                if (!preg_match($pattern, (string) $tagDescription, $matches) || $matches[0] !== $tagDescription) {
+                    throw ModelMetadataTagContainsSpaceException::make($tagName);
+                }
+
+                foreach (explode(self::OR_TAG_SEPARATOR, $tagDescription) as $rawOrValue) {
+                    $this->{Str::camel($tagName)}[] = explode(self::AND_TAG_SEPARATOR, $rawOrValue);
+
+                    if (in_array(StatusAccess::GUEST, $this->{Str::camel($tagName)})) {
                         throw new ModelActionMetadataException(
-                            $tag->getName() . ' don\'t supports with ' . StatusAccess::GUEST . ' auth status!'
+                            $tagName . ' don\'t supports with ' . StatusAccess::GUEST . ' auth status!'
                         );
                     }
                 }
                 $this->statusesAccess[] = StatusAccess::LOGGED;
                 $this->statusesAccess = array_unique($this->statusesAccess);
                 break;
+            default:
+                break;
         }
     }
 
-    /**
-     * @param string $actionName
-     */
     public function setActionName(string $actionName): void
     {
         $this->actionName = $actionName;
     }
 
     /**
-     * @param ReflectionParameter[] $parameters
+     * @param \ReflectionParameter[] $parameters
      */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
+    }
+
+    /**
+     * Получение корректного названия метода у модели.
+     *
+     * @return string
+     *
+     * TODO: Убрать ответственность с других классов от определения метода по названию
+     */
+    public static function getCurrentActionName(string $actionName): string
+    {
+        return str_contains($actionName, self::METHOD_NAME_PREFIX)
+            ? $actionName
+            : self::METHOD_NAME_PREFIX . ucwords($actionName);
     }
 
 }
