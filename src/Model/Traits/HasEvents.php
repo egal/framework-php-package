@@ -7,7 +7,6 @@ namespace Egal\Model\Traits;
 use Egal\Core\Events\GlobalEvent;
 
 /**
- * @package Egal\Model
  * @mixin \Egal\Model\Model
  */
 trait HasEvents
@@ -69,12 +68,9 @@ trait HasEvents
     }
 
     /**
-     * Запустить событие пользовательской модели для данного события.
-     *
      * @param string $event
      * @param string $method
      * @return mixed|null
-     * @noinspection PhpUnused
      */
     protected function fireCustomModelEvent($event, $method)
     {
