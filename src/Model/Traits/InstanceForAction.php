@@ -23,7 +23,7 @@ trait InstanceForAction
     {
         $instance = parent::newInstance($attributes, $exists);
 
-        if ($this->isNeedFireActionEvents()) {
+        if ($this->isInstanceForAction) {
             $instance->makeIsInstanceForAction();
         }
 
