@@ -21,10 +21,13 @@ trait InstanceForAction
 
     public function newInstance($attributes = [], $exists = false): self
     {
-        $instance = parent::newInstance($attributes, $exists);
-
-        if (isset($this) && get_class($this) == __CLASS__ && $this->isInstanceForAction) {
-            $instance->makeIsInstanceForAction();
+        if (isset($this) && get_class($this) == __CLASS__) {
+            $instance = $this->newInstance($attributes, $exists);
+            if ($this->isInstanceForAction) {
+                $instance->makeIsInstanceForAction();
+            }
+        } else {
+            $instance = new static();
         }
 
         return $instance;
