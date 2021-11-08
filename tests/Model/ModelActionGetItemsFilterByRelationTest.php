@@ -176,7 +176,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
 /**
  * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
- * @property string $sale       Скидка          {@property-type field}  {@validation-rules string}
+ * @property string $sale       Скидка          {@property-type field}  {@validation-rules integer}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
  */
