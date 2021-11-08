@@ -12,8 +12,6 @@ use Egal\Core\Events\GlobalEvent;
 trait HasEvents
 {
 
-    private bool $needFireActionEvents = false;
-
     /**
      * @deprecated since v.2.0.0
      */
@@ -87,7 +85,7 @@ trait HasEvents
 
     protected function fireModelEvent($event, $halt = true)
     {
-        if ($this->isNeedFireActionEvents()) {
+        if ($this->isInstanceForAction) {
             $this->fireActionEvent($event, $halt);
         }
 
