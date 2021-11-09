@@ -49,9 +49,9 @@ trait HasDefaultLimits
     /**
      * Checks if {@param $count} is less than {@see \Egal\Model\Traits\HasDefaultLimits::maxCountEntitiesToProcess}.
      */
-    public function isLessThanMaxCountEntitiesCanToManipulateWithAction(int $count): bool
+    public function isLessOrEqualMaxCountEntitiesCanToManipulateWithAction(int $count): bool
     {
-        return $count < $this->getMaxCountEntitiesToProcess();
+        return $count <= $this->getMaxCountEntitiesToProcess();
     }
 
     /**
@@ -63,7 +63,7 @@ trait HasDefaultLimits
      */
     public function isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(int $count): bool
     {
-        if (!$this->isLessThanMaxCountEntitiesCanToManipulateWithAction($count)) {
+        if (!$this->isLessOrEqualMaxCountEntitiesCanToManipulateWithAction($count)) {
             throw new ExceedingTheLimitCountEntitiesForManipulationException();
         }
 
