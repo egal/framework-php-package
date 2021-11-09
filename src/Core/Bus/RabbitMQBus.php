@@ -115,7 +115,7 @@ class RabbitMQBus extends Bus
         $this->connection->declareQueue(
             $this->queueName,
             false,
-            false,
+            true,
             ['x-queue-mode' => 'default']
         );
         $this->connection->declareExchange(
