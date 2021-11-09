@@ -52,7 +52,7 @@ class RabbitMQBus extends Bus
         $properties = ['delivery_mode' => 1];
 
         if ($message instanceof ActionMessage) {
-            $properties['reply_to'] = $this->replyQueueName;
+            $properties['reply-to'] = $this->replyQueueName;
             $properties['hash-on'] = $message->getUuid();
         }
 
@@ -180,7 +180,7 @@ class RabbitMQBus extends Bus
                     $this->connection->getChannel()->basic_publish(
                         new AMQPMessage($startProcessingMessage->toJson(), ['delivery_mode' => 1]),
                         '',
-                        $message->get('reply_to')
+                        $message->get('reply-to')
                     );
 
                     Session::setActionMessage($actionMessage);
@@ -195,7 +195,7 @@ class RabbitMQBus extends Bus
                     $this->connection->getChannel()->basic_publish(
                         new AMQPMessage($actionResultMessage->toJson(), ['delivery_mode' => 1]),
                         '',
-                        $message->get('reply_to')
+                        $message->get('reply-to')
                     );
                 } catch (Throwable $exception) {
                     $actionErrorMessage = new ActionErrorMessage();
@@ -214,7 +214,7 @@ class RabbitMQBus extends Bus
                     $this->connection->getChannel()->basic_publish(
                         new AMQPMessage($actionErrorMessage->toJson(), ['delivery_mode' => 1]),
                         '',
-                        $message->get('reply_to')
+                        $message->get('reply-to')
                     );
                 }
 
