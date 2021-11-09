@@ -10,6 +10,7 @@ class TokenExpiredException extends InternalException
 {
 
     protected $code = 401;
+
     protected string $internalCode = 'Token expired';
 
     public static function make(string $tokenType): self
