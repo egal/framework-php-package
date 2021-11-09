@@ -106,21 +106,36 @@ class RabbitMQBus extends Bus
 
     public function startProcessingMessages(): void
     {
+        $processUuid = Str::uuid()->toString();
         $serviceName = config('app.service_name');
-        $this->queueName = "{$serviceName}.queue";
+        $this->queueName = "$serviceName.$processUuid.queue";
+        $exchangeBalancerName = "$serviceName.balancer.exchange";
+
         $this->connection->declareQueue(
             $this->queueName,
             false,
             false,
             ['x-queue-mode' => 'default']
         );
-        $this->connection->getChannel()->queue_bind(
+        $this->connection->declareExchange(
+            $exchangeBalancerName,
+            'x-consistent-hash',
+            false,
+            false,
+            ['hash-header' => 'hash-on']
+        );
+        $this->connection->bindQueue(
             $this->queueName,
+            $exchangeBalancerName,
+            '100'
+        );
+        $this->connection->getChannel()->exchange_bind(
+            $exchangeBalancerName,
             'amq.topic',
             "$serviceName.*.*.action"
         );
-        $this->connection->getChannel()->queue_bind(
-            $this->queueName,
+        $this->connection->getChannel()->exchange_bind(
+            $exchangeBalancerName,
             'amq.topic',
             '*.*.*.*.event'
         );
