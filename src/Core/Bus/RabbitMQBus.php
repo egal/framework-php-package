@@ -3,8 +3,6 @@
 namespace Egal\Core\Bus;
 
 use Egal\Core\ActionCaller\ActionCaller;
-use Egal\Core\Events\EventManager;
-use Egal\Core\Exceptions\EventHandlingException;
 use Egal\Core\Exceptions\MessageProcessingException;
 use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
@@ -19,6 +17,7 @@ use Egal\Core\Session\Session;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Throwable;
@@ -287,7 +286,11 @@ class RabbitMQBus extends Bus
 
     public function consumeReplyMessages($timeout = 0): void
     {
-        $this->connection->getChannel()->wait(null, false, $timeout);
+        try {
+            $this->connection->getChannel()->wait(null, false, $timeout);
+        } catch (AMQPTimeoutException $exception) {
+
+        }
     }
 
 }
