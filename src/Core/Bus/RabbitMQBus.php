@@ -52,7 +52,7 @@ class RabbitMQBus extends Bus
 
         if ($message instanceof ActionMessage) {
             $properties['reply_to'] = $this->replyQueueName;
-            $properties['hash-on'] = $message->getUuid();
+            $properties['headers'] = ['hash-on' => $message->getUuid()];
         }
 
         $AMQPMessage = new AMQPMessage($message->toJson(), $properties);
