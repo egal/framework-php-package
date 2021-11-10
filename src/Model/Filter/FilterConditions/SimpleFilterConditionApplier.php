@@ -8,7 +8,6 @@ use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
 use Egal\Model\Filter\FilterCondition;
-use Egal\Model\With\Relation;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
 {
@@ -75,8 +74,10 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $function = $matches[2];
 
             $column = isset($matches[3]) ? $matches[3] : '*';
-            $subQuery = (clone $builder)->withAggregate($relation, $column, $function);
-            $builder = $subQuery->where($relation.'_'.$function, $operator, $value);
+            $subQueryWithAggregate = (clone $builder)->withAggregate($relation, $column, $function)->toSql();
+            $builder = $builder->getQuery()
+                ->fromSub($subQueryWithAggregate, 'subQueryWithAggregate')
+                ->where($relation.'_'.$function, $operator, $value);
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
             $field = $condition->getField();
