@@ -9,7 +9,6 @@ use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\Message;
-use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 
 /**

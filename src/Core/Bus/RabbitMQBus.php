@@ -51,8 +51,8 @@ class RabbitMQBus extends Bus
         $properties = ['delivery_mode' => 1];
 
         if ($message instanceof ActionMessage) {
-            $properties['reply-to'] = $this->replyQueueName;
-            $properties['hash-on'] = $message->getUuid();
+            $properties['reply_to'] = $this->replyQueueName;
+            $properties['hash_on'] = $message->getUuid();
         }
 
         $AMQPMessage = new AMQPMessage($message->toJson(), $properties);
@@ -122,7 +122,7 @@ class RabbitMQBus extends Bus
             'x-consistent-hash',
             false,
             false,
-            ['hash-header' => 'hash-on']
+            ['hash-header' => 'hash_on']
         );
         $this->connection->bindQueue(
             $this->queueName,
@@ -173,16 +173,17 @@ class RabbitMQBus extends Bus
             case MessageType::ACTION:
                 $actionMessage = ActionMessage::fromArray($body);
 
-                try {
-                    $startProcessingMessage = new StartProcessingMessage();
-                    $startProcessingMessage->setActionMessage($actionMessage);
-                    $this->connection->getChannel()->basic_publish(
-                        new AMQPMessage($startProcessingMessage->toJson(), ['delivery_mode' => 1]),
-                        '',
-                        $message->get('reply-to')
-                    );
+                $startProcessingMessage = new StartProcessingMessage();
+                $startProcessingMessage->setActionMessage($actionMessage);
+                $this->connection->getChannel()->basic_publish(
+                    new AMQPMessage($startProcessingMessage->toJson(), ['delivery_mode' => 1]),
+                    '',
+                    $message->get('reply_to')
+                );
 
-                    Session::setActionMessage($actionMessage);
+                Session::setActionMessage($actionMessage);
+
+                try {
                     $actionResultMessage = new ActionResultMessage();
                     $actionResultMessage->setActionMessage($actionMessage);
                     $actionCaller = new ActionCaller(
@@ -194,7 +195,7 @@ class RabbitMQBus extends Bus
                     $this->connection->getChannel()->basic_publish(
                         new AMQPMessage($actionResultMessage->toJson(), ['delivery_mode' => 1]),
                         '',
-                        $message->get('reply-to')
+                        $message->get('reply_to')
                     );
                 } catch (Throwable $exception) {
                     $actionErrorMessage = new ActionErrorMessage();
@@ -213,7 +214,7 @@ class RabbitMQBus extends Bus
                     $this->connection->getChannel()->basic_publish(
                         new AMQPMessage($actionErrorMessage->toJson(), ['delivery_mode' => 1]),
                         '',
-                        $message->get('reply-to')
+                        $message->get('reply_to')
                     );
                 }
 
