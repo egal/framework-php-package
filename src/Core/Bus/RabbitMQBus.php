@@ -51,6 +51,7 @@ class RabbitMQBus extends Bus
         $properties = ['delivery_mode' => 1];
 
         if ($message instanceof ActionMessage) {
+            $properties['delivery_mode'] = 2;
             $properties['reply_to'] = $this->replyQueueName;
             $properties['application_headers'] = new AMQPTable(['hash-on' => $message->getUuid()]);
         }
