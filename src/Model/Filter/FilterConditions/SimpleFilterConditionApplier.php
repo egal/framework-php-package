@@ -75,8 +75,8 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $function = $matches[2];
 
             $column = isset($matches[3]) ? $matches[3] : '*';
-            $builder->withAggregate($relation, $column, $function)
-                ->where($relation.'_'.$function, $operator, $value);
+            $subQuery = (clone $builder)->withAggregate($relation, $column, $function);
+            $builder = $subQuery->where($relation.'_'.$function, $operator, $value);
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
             $field = $condition->getField();
