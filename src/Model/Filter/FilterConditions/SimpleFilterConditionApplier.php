@@ -74,15 +74,9 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $relation = $matches[1];
             $function = $matches[2];
 
-            $clause = static function (Builder $query) use ($function, $value): void {
-                if (isset($matches[3])) {
-                    $column = $matches[3];
-                    $query->havingRaw($function . '(' . $column . ') = ' . $value);
-                } else {
-                    $query->havingRaw($function . '() = ' . $value);
-                }
-            };
-            $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
+            $column = isset($matches[3]) ? $matches[3] : '*';
+            $builder->withAggregate($relation, $column, $function)
+                ->whereRaw($relation.'_'.$function, $operator, $value);
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
             $field = $condition->getField();
