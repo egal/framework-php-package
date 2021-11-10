@@ -52,7 +52,7 @@ class RabbitMQBus extends Bus
 
         if ($message instanceof ActionMessage) {
             $properties['reply_to'] = $this->replyQueueName;
-            $properties['hash_on'] = $message->getUuid();
+            $properties['hash-on'] = $message->getUuid();
         }
 
         $AMQPMessage = new AMQPMessage($message->toJson(), $properties);
@@ -122,7 +122,7 @@ class RabbitMQBus extends Bus
             'x-consistent-hash',
             false,
             false,
-            ['hash-header' => 'hash_on']
+            ['hash-header' => 'hash-on']
         );
         $this->connection->bindQueue(
             $this->queueName,
