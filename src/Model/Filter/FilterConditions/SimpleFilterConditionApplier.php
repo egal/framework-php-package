@@ -74,12 +74,12 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $relation = $matches[1];
             $function = $matches[2];
 
-            $clause = static function (Builder $query) use ($function): void {
+            $clause = static function (Builder $query) use ($function, $value): void {
                 if (isset($matches[3])) {
                     $column = $matches[3];
-                    $query->$function($column);
+                    $query->havingRaw($function . '(' . $column . ') = ' . $value);
                 } else {
-                    $query->$function();
+                    $query->havingRaw($function . '() = ' . $value);
                 }
             };
             $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
