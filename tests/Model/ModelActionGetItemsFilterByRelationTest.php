@@ -2,6 +2,7 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Closure;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -10,6 +11,7 @@ use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
+use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelActionGetItemsFilterByRelationTest extends TestCase
@@ -22,11 +24,12 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
      *
      * @return void
      */
-    protected function createSchema()
+    protected function createSchema(): void
     {
         $this->schema()->create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->integer('sale')->nullable();
             $table->timestamps();
         });
 
@@ -50,10 +53,20 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
             'id' => 1,
             'name' => 'first_category',
         ]);
+        ModelTestCategory::create([
+            'id' => 2,
+            'name' => 'first_category',
+            'sale' => 30
+        ]);
         ModelTestProduct::create([
             'id' => 1,
             'name' => 'first_product',
             'category_id' => 1,
+        ]);
+        ModelTestProduct::create([
+            'id' => 2,
+            'name' => 'second_product',
+            'category_id' => 2,
         ]);
     }
 
@@ -106,6 +119,24 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
                     })->get()->toArray();
                 },
             ],
+            [
+                [['category.sale', 'eq', null]],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('sale', '=', null);
+                    })->get()->toArray();
+                },
+            ],
+            [
+                [['category_with_word.created_at', 'le', Carbon::now()->toDateTimeString()],],
+                null,
+                function () {
+                    return ModelTestProduct::query()->whereHas('category', function (Builder $query) {
+                        $query->where('created_at', '<=', Carbon::now()->toDateTimeString());
+                    })->get()->toArray();
+                },
+            ],
         ];
     }
 
@@ -142,6 +173,13 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
 
 }
 
+/**
+ * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
+ * @property string $name       Название          {@property-type field}  {@validation-rules string}
+ * @property string $sale       Скидка          {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ */
 class ModelTestCategory extends Model
 {
 
@@ -156,8 +194,14 @@ class ModelTestCategory extends Model
 }
 
 /**
- * @property $category {@property-type relation}
- * @property $category_with_word {@property-type relation}
+ * @property int    $id                            {@property-type field}  {@prymary-key}
+ * @property string $name        Название          {@property-type field}  {@validation-rules string}
+ * @property int    $category_id Категория         {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                    {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                    {@property-type field}  {@validation-rules date}
+ *
+ * @property ModelTestCategory $category           {@property-type relation}
+ * @property ModelTestCategory $category_with_word {@property-type relation}
  */
 class ModelTestProduct extends Model
 {

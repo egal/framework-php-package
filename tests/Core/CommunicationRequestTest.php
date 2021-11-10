@@ -55,6 +55,7 @@ class CommunicationRequestTest extends TestCase
             $actionErrorMessage = m::mock(ActionErrorMessage::class);
             $actionErrorMessage->shouldReceive('getMessage')->andReturn('foo');
             $actionErrorMessage->shouldReceive('getCode')->andReturn($actionErrorMessageCode);
+            $actionErrorMessage->shouldReceive('getInternalCode')->andReturn($actionErrorMessageCode);
             $response->setActionErrorMessage($actionErrorMessage);
         }
 

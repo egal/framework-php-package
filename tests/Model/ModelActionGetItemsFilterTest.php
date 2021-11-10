@@ -2,11 +2,13 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
 use Illuminate\Database\Schema\Blueprint;
+use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelActionGetItemsFilterTest extends TestCase
@@ -20,14 +22,15 @@ class ModelActionGetItemsFilterTest extends TestCase
             $table->increments('id');
             $table->string('name');
             $table->integer('count');
+            $table->integer('sale')->nullable();
             $table->timestamps();
         });
 
         $productsAttributes = [
             ['id' => 1, 'name' => 'first_product', 'count' => 1],
-            ['id' => 2, 'name' => 'second_product', 'count' => 2],
+            ['id' => 2, 'name' => 'second_product', 'count' => 2, 'sale' => 30],
             ['id' => 3, 'name' => 'product_third', 'count' => 3],
-            ['id' => 4, 'name' => 'product_fourth', 'count' => 4],
+            ['id' => 4, 'name' => 'product_fourth', 'count' => 4, 'sale'  => 50],
         ];
 
         foreach ($productsAttributes as $attributes) {
@@ -48,7 +51,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'eq', 'first_product'],
                 ],
                 null,
-                [1]
+                [1],
             ],
             [
                 [
@@ -57,7 +60,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'eq', 'second_product'],
                 ],
                 null,
-                [1, 2]
+                [1, 2],
             ],
             [
                 [
@@ -66,7 +69,19 @@ class ModelActionGetItemsFilterTest extends TestCase
                     [['name', 'eq', 'first_product']]
                 ],
                 null,
-                [1]
+                [1],
+            ],
+            [
+                [['sale', 'eq', null]],
+                null,
+                [1, 3],
+            ],
+            [
+                [
+                    ['created_at', 'eq', Carbon::now()->addDay()->toDateTimeString()]
+                ],
+                null,
+                [],
             ],
         ];
     }
@@ -79,7 +94,14 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'eqi', 'fIrSt_PrOdUcT'],
                 ],
                 null,
-                [1]
+                [1],
+            ],
+            [
+                [
+                    ['created_at', 'eqi', Carbon::now()->addDay()->toDateTimeString()]
+                ],
+                null,
+                [],
             ],
         ];
     }
@@ -92,7 +114,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'ne', 'first_product'],
                 ],
                 null,
-                [2, 3, 4]
+                [2, 3, 4],
             ],
             [
                 [
@@ -101,7 +123,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'ne', 'second_product'],
                 ],
                 null,
-                [3, 4]
+                [3, 4],
             ],
             [
                 [
@@ -110,7 +132,14 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'ne', 'second_product'],
                 ],
                 null,
-                [1, 2, 3, 4]
+                [1, 2, 3, 4],
+            ],
+            [
+                [
+                    ['created_at', 'ne', Carbon::now()->addDay()->toDateTimeString()]
+                ],
+                null,
+                [1, 2, 3, 4],
             ],
         ];
     }
@@ -123,7 +152,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'nei', 'fIrSt_PrOdUcT'],
                 ],
                 null,
-                [2, 3, 4]
+                [2, 3, 4],
             ],
         ];
     }
@@ -136,7 +165,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'co', 'product'],
                 ],
                 null,
-                [1, 2, 3, 4]
+                [1, 2, 3, 4],
             ],
         ];
     }
@@ -149,7 +178,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'coi', 'pRoDuCt'],
                 ],
                 null,
-                [1, 2, 3, 4]
+                [1, 2, 3, 4],
             ],
         ];
     }
@@ -162,7 +191,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'nc', 'product'],
                 ],
                 null,
-                []
+                [],
             ],
         ];
     }
@@ -175,7 +204,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'nci', 'pRoDuCt'],
                 ],
                 null,
-                []
+                [],
             ],
         ];
     }
@@ -188,7 +217,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'sw', 'product'],
                 ],
                 null,
-                [3, 4]
+                [3, 4],
             ],
         ];
     }
@@ -201,7 +230,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'swi', 'pRoDuCt'],
                 ],
                 null,
-                [3, 4]
+                [3, 4],
             ],
         ];
     }
@@ -214,7 +243,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'ew', 'product'],
                 ],
                 null,
-                [1, 2]
+                [1, 2],
             ],
         ];
     }
@@ -227,7 +256,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['name', 'ewi', 'pRoDuCt'],
                 ],
                 null,
-                [1, 2]
+                [1, 2],
             ],
         ];
     }
@@ -240,7 +269,14 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['count', 'gt', 1],
                 ],
                 null,
-                [2, 3, 4]
+                [2, 3, 4],
+            ],
+            [
+                [
+                    ['created_at', 'gt', Carbon::now()->toDateTimeString()]
+                ],
+                null,
+                [],
             ],
         ];
     }
@@ -253,7 +289,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['count', 'ge', 1],
                 ],
                 null,
-                [1, 2, 3, 4]
+                [1, 2, 3, 4],
             ],
         ];
     }
@@ -266,7 +302,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['count', 'lt', 2],
                 ],
                 null,
-                [1]
+                [1],
             ],
         ];
     }
@@ -279,7 +315,7 @@ class ModelActionGetItemsFilterTest extends TestCase
                     ['count', 'le', 2],
                 ],
                 null,
-                [1, 2]
+                [1, 2],
             ],
         ];
     }
@@ -326,6 +362,17 @@ class ModelActionGetItemsFilterTest extends TestCase
 
 }
 
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property string $name       Название          {@property-type field}  {@validation-rules string}
+ * @property string $count      Количество        {@property-type field}  {@validation-rules int}
+ * @property string $sale       Скидка          {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
+ */
 class ModelActionGetItemsFilterTestProductStub extends Model
 {
 

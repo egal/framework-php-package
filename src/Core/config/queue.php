@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     'default' => env('QUEUE_CONNECTION', 'rabbitmq'),
 
     'connections' => [
+
+        'sync' => ['driver' => 'sync'],
 
         'rabbitmq' => [
 
@@ -36,13 +40,14 @@ return [
                     'exchange_type' => 'topic',
                 ],
                 'consume' => [
-                    'sleep' => env('RABBITMQ_CONSUME_SLEEP_MILLISECONDS', 10)
-                ]
+                    'sleep' => env('RABBITMQ_CONSUME_SLEEP_MILLISECONDS', 10),
+                ],
             ],
 
             /*
              * Set to "horizon" if you wish to use Laravel Horizon.
              */
+
             'worker' => env('RABBITMQ_WORKER', 'default'),
 
         ],

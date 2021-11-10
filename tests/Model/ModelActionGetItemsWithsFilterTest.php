@@ -2,12 +2,14 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
+use Laravel\Lumen\Application;
 use PHPUnit\Framework\TestCase;
 
 class ModelActionGetItemsWithsFilterTest extends TestCase
@@ -104,7 +106,11 @@ class ModelActionGetItemsWithsFilterTest extends TestCase
 }
 
 /**
- * @property $products {@property-type relation}
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property ModelActionGetItemsWithsFilterTestProduct[] $products {@property-type relation}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
  */
 class ModelActionGetItemsWithsFilterTestCategory extends Model
 {
@@ -124,6 +130,14 @@ class ModelActionGetItemsWithsFilterTestCategory extends Model
 
 }
 
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $category_id                  {@property-type field}  {@validation-rules int}
+ * @property ModelActionGetItemsWithsFilterTestCategory $category {@property-type relation}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
+ */
 class ModelActionGetItemsWithsFilterTestProduct extends Model
 {
 
