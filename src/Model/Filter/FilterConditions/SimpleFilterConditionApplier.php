@@ -75,7 +75,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 
             $column = isset($matches[3]) ? $matches[3] : '*';
             $subQueryWithAggregate = (clone $builder)->withAggregate($relation, $column, $function)->toSql();
-            $builder = $builder->getQuery()
+            $builder = $builder->getModel()->newQuery()
                 ->fromSub($subQueryWithAggregate, 'subQueryWithAggregate')
                 ->where($relation.'_'.$function, $operator, $value);
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
