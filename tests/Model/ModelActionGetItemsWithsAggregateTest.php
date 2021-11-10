@@ -2,6 +2,7 @@
 
 namespace Egal\Tests\Model;
 
+use Carbon\Carbon;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
@@ -87,7 +88,7 @@ class ModelActionGetItemsWithsAggregateTest extends TestCase
                 true,
             ],
             [
-                ['dd.avg()'],
+                ['dd.count()'],
                 RelationNotFoundException::class,
                 null,
                 null,
@@ -119,6 +120,10 @@ class ModelActionGetItemsWithsAggregateTest extends TestCase
 }
 
 /**
+ * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ *
  * @property $products {@property-type relation}
  */
 class ModelActionGetItemsWithsAggregateTestCategory extends Model
@@ -139,6 +144,17 @@ class ModelActionGetItemsWithsAggregateTestCategory extends Model
 
 }
 
+/**
+ * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $category_id                  {@property-type field}  {@validation-rules int}
+ * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
+ * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
+ *
+ * @property $category {@property-type relation}
+ *
+ * @action create         {@statuses-access guest}
+ * @action getItems       {@statuses-access guest}
+ */
 class ModelActionGetItemsWithsAggregateTestProduct extends Model
 {
 

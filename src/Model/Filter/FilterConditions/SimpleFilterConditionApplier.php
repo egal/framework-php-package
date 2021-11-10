@@ -8,6 +8,7 @@ use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
 use Egal\Model\Filter\FilterCondition;
+use Egal\Model\With\Relation;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
 {
@@ -66,6 +67,20 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 
             $clause = static function (Builder $query) use ($field, $operator, $value): void {
                 $query->where($field, $operator, $value);
+            };
+            $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
+        } elseif (preg_match('/^(\w+)\.(\w+)\((\w+)?\)$/', $condition->getField(), $matches)) {
+            // For condition field like `rel.function(column?)`.
+            $relation = $matches[1];
+            $function = $matches[2];
+
+            $clause = static function (Builder $query) use ($function): void {
+                if (isset($matches[3])) {
+                    $column = $matches[3];
+                    $query->$function($column);
+                } else {
+                    $query->$function();
+                }
             };
             $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
