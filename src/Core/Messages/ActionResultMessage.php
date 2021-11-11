@@ -4,9 +4,8 @@ namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
-use Exception;
 
-class ActionResultMessage extends Message
+class ActionResultMessage extends Message implements HasActionMessageInterface
 {
 
     use HasActionMessage;
@@ -18,11 +17,6 @@ class ActionResultMessage extends Message
      */
     public $data;
 
-    /**
-     * @param array $array
-     * @return ActionResultMessage
-     * @throws Exception
-     */
     public static function fromArray(array $array): ActionResultMessage
     {
         if (!isset($array['type'])) {
@@ -43,21 +37,14 @@ class ActionResultMessage extends Message
         return $result;
     }
 
-    /**
-     * @return mixed
-     */
     public function getData()
     {
         return $this->data;
     }
 
-    /**
-     * @param mixed $data
-     */
     public function setData($data): void
     {
         $this->data = $data;
     }
-
 
 }

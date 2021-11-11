@@ -4,10 +4,9 @@ namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
-use Exception;
 use Illuminate\Support\Carbon;
 
-class StartProcessingMessage extends Message
+class StartProcessingMessage extends Message implements HasActionMessageInterface
 {
 
     use HasActionMessage;
@@ -21,11 +20,6 @@ class StartProcessingMessage extends Message
         $this->startedAt = Carbon::now('UTC');
     }
 
-    /**
-     * @param array $array
-     * @return StartProcessingMessage
-     * @throws Exception
-     */
     public static function fromArray(array $array): StartProcessingMessage
     {
         if (!isset($array['type'])) {
