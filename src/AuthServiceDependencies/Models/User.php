@@ -65,6 +65,7 @@ abstract class User extends Model
     public static function actionRefreshUserMasterToken(string $token): array
     {
         $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
+        $oldUmrt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
         $user = static::find($oldUmrt->getAuthIdentification());
