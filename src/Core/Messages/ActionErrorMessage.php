@@ -26,6 +26,7 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
         if (!isset($array['type'])) {
             throw new UndefinedTypeOfMessageException();
         }
+
         if ($array['type'] !== MessageType::ACTION_ERROR) {
             throw new InitializeMessageFromArrayException('Invalid type substitution!');
         }
@@ -34,10 +35,7 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
         $result->uuid = $array['uuid'];
         $result->message = $array['message'];
         $result->code = $array['code'];
-
-        if (isset($array['action_message'])) {
-            $result->actionMessage = ActionMessage::fromArray($array['action_message']);
-        }
+        $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 
         return $result;
     }

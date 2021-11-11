@@ -25,6 +25,7 @@ class StartProcessingMessage extends Message implements HasActionMessageInterfac
         if (!isset($array['type'])) {
             throw new UndefinedTypeOfMessageException();
         }
+
         if ($array['type'] !== MessageType::START_PROCESSING) {
             throw new InitializeMessageFromArrayException('Invalid type substitution!');
         }
@@ -32,10 +33,7 @@ class StartProcessingMessage extends Message implements HasActionMessageInterfac
         $result = new StartProcessingMessage();
         $result->startedAt = Carbon::parse($array['started_at']);
         $result->uuid = $array['uuid'];
-
-        if (isset($array['action_message'])) {
-            $result->actionMessage = ActionMessage::fromArray($array['action_message']);
-        }
+        $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 
         return $result;
     }

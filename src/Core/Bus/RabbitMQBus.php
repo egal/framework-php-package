@@ -203,7 +203,7 @@ class RabbitMQBus extends Bus
             $this->replyQueueExists = true;
         }
 
-        $convertJsonToMessage = function (string $body) {
+        $convertJsonToMessage = function (string $body): Message {
             $body = json_decode($body, true);
 
             if (!array_key_exists('type', $body)) {
@@ -228,6 +228,9 @@ class RabbitMQBus extends Bus
 
     public function stopConsumeReplyMessages(ActionMessage $actionMessage): void
     {
+        $this->connection->getChannel()->callbacks[$this->replyQueueName] = function (AMQPMessage $message) {
+
+        };
     }
 
     public function consumeReplyMessages($timeout = 0): void

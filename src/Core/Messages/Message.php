@@ -9,6 +9,7 @@ abstract class Message
 {
 
     protected string $uuid;
+
     protected string $type;
 
     abstract static function fromArray(array $array): Message;
@@ -16,9 +17,11 @@ abstract class Message
     public function toArray(): array
     {
         $result = [];
+
         foreach (get_object_vars($this) as $key => $value) {
             $result[Str::snake($key)] = $value;
         }
+
         return $result;
     }
 
@@ -37,17 +40,11 @@ abstract class Message
         return json_encode(array_merge($this->toArray(), ['hash' => $this->makeHash()]));
     }
 
-    /**
-     * @return string
-     */
     public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;

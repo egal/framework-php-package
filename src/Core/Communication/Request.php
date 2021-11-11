@@ -8,10 +8,10 @@ use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
+use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Session\Session;
-use Illuminate\Support\Carbon;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 class Request extends ActionMessage
@@ -84,24 +84,24 @@ class Request extends ActionMessage
         switch ([
             $response->getStartProcessingMessage() !== null,
             $response->getActionErrorMessage() !== null,
-            $response->getActionResultMessage() !== null
+            $response->getActionResultMessage() !== null,
         ]) {
-            case [true, false, true]:
-                $response->setStatusCode(200);
-                break;
-            case [true, true, false]:
-                $response->setStatusCode($response->getActionErrorMessage()->getCode());
-                $response->setErrorMessage($response->getActionErrorMessage()->getMessage());
-                break;
             case [true, false, false]:
-                $response->setStatusCode(500);
-                $response->setErrorMessage(
+                $actionErrorMessage = new ActionErrorMessage();
+                $actionErrorMessage->setCode(500);
+                $actionErrorMessage->setMessage(
                     'The service responded, but did not process the request within the allotted time!'
                 );
+                $response->setActionErrorMessage($actionErrorMessage);
                 break;
             case [false, false, false]:
-                $response->setStatusCode(500);
-                $response->setErrorMessage('Service not responding!');
+                $actionErrorMessage = new ActionErrorMessage();
+                $actionErrorMessage->setCode(500);
+                $actionErrorMessage->setMessage('Service not responding!');
+                $response->setActionErrorMessage($actionErrorMessage);
+                break;
+            case [true, false, true]:
+            case [true, true, false]:
                 break;
             case [false, true, true]:
             case [false, true, false]:
@@ -114,9 +114,6 @@ class Request extends ActionMessage
         $this->response = $response;
     }
 
-    /**
-     * Getter for {@see \Egal\Core\Communication\Request::$response}
-     */
     public function getResponse(): Response
     {
         return $this->response;
