@@ -30,14 +30,9 @@ abstract class Message
         $this->uuid = Str::uuid()->toString();
     }
 
-    protected function makeHash(): string
-    {
-        return hash('md5', json_encode($this->toArray()));
-    }
-
     public function toJson(): string
     {
-        return json_encode(array_merge($this->toArray(), ['hash' => $this->makeHash()]));
+        return json_encode($this->toArray());
     }
 
     public function getUuid(): string

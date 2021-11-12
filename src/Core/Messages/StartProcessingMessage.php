@@ -4,7 +4,6 @@ namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
-use Illuminate\Support\Carbon;
 
 class StartProcessingMessage extends Message implements HasActionMessageInterface
 {
@@ -12,12 +11,12 @@ class StartProcessingMessage extends Message implements HasActionMessageInterfac
     use HasActionMessage;
 
     protected string $type = MessageType::START_PROCESSING;
-    protected Carbon $startedAt;
+    protected float $startedAt;
 
     public function __construct()
     {
         parent::__construct();
-        $this->startedAt = Carbon::now('UTC');
+        $this->startedAt = microtime(true);
     }
 
     public static function fromArray(array $array): StartProcessingMessage
@@ -31,7 +30,7 @@ class StartProcessingMessage extends Message implements HasActionMessageInterfac
         }
 
         $result = new StartProcessingMessage();
-        $result->startedAt = Carbon::parse($array['started_at']);
+        $result->startedAt = $array['started_at'];
         $result->uuid = $array['uuid'];
         $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 

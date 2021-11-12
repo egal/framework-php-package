@@ -12,7 +12,6 @@ use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Session\Session;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 class Request extends ActionMessage
 {
@@ -21,8 +20,6 @@ class Request extends ActionMessage
      * Exhibited after {@see \Egal\Core\Communication\Request::call()}
      */
     private Response $response;
-
-    private RabbitMQQueue $connection;
 
     private string $authServiceName = 'auth';
 
