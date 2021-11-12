@@ -53,7 +53,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             };
             $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
         } elseif (preg_match(Relation::AGGREGATE_PATTERN, $condition->getField())) {
-            // For condition field like `rel.function(column?)`.
+            // For condition field like `rel.function(?column)`.
             $aggregateRelation = Relation::fromString($condition->getField());
             $aggregateColumnName = $aggregateRelation->getAggregateResultColumnName();
             $builder->where($aggregateColumnName, $operator, $value);
