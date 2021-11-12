@@ -12,6 +12,7 @@ use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
+use Egal\Model\Exceptions\UnsupportedModelMetadataPropertyTypeException;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -347,10 +348,12 @@ class ModelMetadata
             $modelActionMetadata = new ModelActionMetadata();
             $modelActionMetadata->setActionName($actionName);
             $modelActionMetadata->setParameters($reflectionMethod->getParameters());
+
             /** @var \phpDocumentor\Reflection\DocBlock\Tags\Generic $actionTag */
             foreach ($tag->getDescription()->getTags() as $actionTag) {
                 $modelActionMetadata->supplementFromTag($actionTag);
             }
+
             $this->addActionMetadata($modelActionMetadata);
         }
     }
@@ -367,6 +370,7 @@ class ModelMetadata
     /**
      * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
      * @throws \Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException
+     * @throws \Egal\Model\Exceptions\UnsupportedModelMetadataPropertyTypeException
      */
     protected function scanPropertyTag(
         DocBlock\Tag $propertyTag,
@@ -406,6 +410,10 @@ class ModelMetadata
                     $this->fieldsWithTypes[$propertyVariableName] = $property->getType();
                 } elseif ($bodyTemplate === 'relation') {
                     $this->relations[] = $propertyVariableName;
+                } elseif ($bodyTemplate === 'fake-field') {
+                    $this->fakeFields[] = $propertyVariableName;
+                } else {
+                    throw UnsupportedModelMetadataPropertyTypeException::make($bodyTemplate);
                 }
 
                 break;
