@@ -12,6 +12,8 @@ use Egal\Model\Exceptions\ModelMetadataException;
 use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
+use Egal\Model\Exceptions\UnsupportedModelMetadataPropertyType;
+use Egal\Model\Exceptions\UnsupportedModelMetadataPropertyTypeException;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -406,6 +408,10 @@ class ModelMetadata
                     $this->fieldsWithTypes[$propertyVariableName] = $property->getType();
                 } elseif ($bodyTemplate === 'relation') {
                     $this->relations[] = $propertyVariableName;
+                } elseif ($bodyTemplate === 'fake-field') {
+                    $this->relations[] = $propertyVariableName;
+                } else {
+                    throw UnsupportedModelMetadataPropertyTypeException::make($bodyTemplate);
                 }
 
                 break;
