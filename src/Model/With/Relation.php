@@ -31,11 +31,14 @@ class Relation
     public static function fromString(string $string): self
     {
         $relation = new self();
-        preg_match(self::AGGREGATE_PATTERN, $string, $matches);
-        $relation->setName($matches[1]);
-        $relation->setAggregateFunction($matches[2]);
-        $column = $matches[3] ?? '*';
-        $relation->setAggregateColumn($column);
+        if (preg_match(self::AGGREGATE_PATTERN, $string, $matches)) {
+            $relation->setName($matches[1]);
+            $relation->setAggregateFunction($matches[2]);
+            $column = $matches[3] ?? '*';
+            $relation->setAggregateColumn($column);
+        } else {
+            $relation->setName($string);
+        }
 
         return $relation;
     }
