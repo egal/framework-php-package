@@ -411,7 +411,7 @@ class ModelMetadata
                 } elseif ($bodyTemplate === 'relation') {
                     $this->relations[] = $propertyVariableName;
                 } elseif ($bodyTemplate === 'fake-field') {
-                    $this->relations[] = $propertyVariableName;
+                    $this->fakeFields[] = $propertyVariableName;
                 } else {
                     throw UnsupportedModelMetadataPropertyTypeException::make($bodyTemplate);
                 }
