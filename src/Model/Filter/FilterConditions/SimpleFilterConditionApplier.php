@@ -7,7 +7,10 @@ namespace Egal\Model\Filter\FilterConditions;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
+use Egal\Model\Filter\AggregateFilterCondition;
 use Egal\Model\Filter\FilterCondition;
+use Egal\Model\With\Relation;
+use Illuminate\Support\Facades\Log;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
 {
@@ -52,6 +55,16 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
                 $query->where($field, $operator, $value);
             };
             $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
+        } elseif (preg_match(Relation::AGGREGATE_PATTERN, $condition->getField())) {
+            // For condition field like `rel.function(column?)`.
+            $aggregateRelation = Relation::fromString($condition->getField());
+
+            $aggregateColumnName = $aggregateRelation->getAggregateResultColumnName();
+            $builder->where(
+                $aggregateColumnName,
+                $operator,
+                $value
+            );
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
             $relation = $matches[1];

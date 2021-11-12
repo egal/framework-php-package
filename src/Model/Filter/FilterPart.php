@@ -6,6 +6,7 @@ namespace Egal\Model\Filter;
 
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\InitializeFilterPartException;
+use Egal\Model\With\Relation;
 
 final class FilterPart
 {
@@ -14,6 +15,11 @@ final class FilterPart
      * @var mixed[]
      */
     private array $content = [];
+
+    /**
+     * @var mixed[]
+     */
+    private array $aggregates = [];
 
     /**
      * @param mixed[] $array
@@ -26,6 +32,9 @@ final class FilterPart
         foreach ($array as $item) {
             if (FilterCondition::mayMakeFromArray($item)) {
                 $filterPart->addContentItem(FilterCondition::fromArray($item));
+                if (preg_match(Relation::AGGREGATE_PATTERN, $item[0])) {
+                    $filterPart->addAggregateContentItem((Relation::fromString($item[0])));
+                }
             } elseif (is_array($item)) {
                 $filterPart->addContentItem(self::fromArray($item));
             } elseif (FilterCombiner::mayMakeFromString($item)) {
@@ -47,6 +56,15 @@ final class FilterPart
     }
 
     /**
+     * @return array
+     */
+    public function getAggregateRelations(): array
+    {
+        return $this->aggregates;
+    }
+
+
+    /**
      * @param \Egal\Model\Filter\FilterPart|\Egal\Model\Filter\FilterCondition|\Egal\Model\Filter\FilterCombiner $item
      * @throws \Egal\Model\Exceptions\FilterException
      */
@@ -62,5 +80,11 @@ final class FilterPart
 
         $this->content[] = $item;
     }
+
+    public function addAggregateContentItem($item): void
+    {
+        $this->aggregates[] = $item;
+    }
+
 
 }

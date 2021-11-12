@@ -22,24 +22,21 @@ class Collection
     public static function fromArray(array $array): self
     {
         $collection = new static();
+        $isSequentialArray = is_sequential_array($array);
 
-        if (is_sequential_array($array)) {
-            foreach ($array as $relName) {
-                $relation = new Relation();
-                $relation->setName($relName);
-                $collection->relations[] = $relation;
+        foreach ($array as $relationName => $relationContent) {
+            if ($isSequentialArray) {
+                $relationName = $relationContent;
+                unset($relationContent);
             }
-        } else {
-            foreach ($array as $relName => $relContent) {
-                $relation = new Relation();
-                $relation->setName($relName);
 
-                if (isset($relContent['filter'])) {
-                    $relation->setFilter(FilterPart::fromArray($relContent['filter']));
-                }
+            $relation = Relation::fromString($relationName);
 
-                $collection->relations[] = $relation;
+            if (isset($relationContent['filter'])) {
+                $relation->setFilter(FilterPart::fromArray($relationContent['filter']));
             }
+
+            $collection->relations[] = $relation;
         }
 
         return $collection;

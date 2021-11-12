@@ -131,11 +131,13 @@ abstract class Model extends EloquentModel
         $instance = new static();
         $instance->makeIsInstanceForAction();
 
+        $tableColumns = $instance->getConnection()->getSchemaBuilder()->getColumnListing($instance->getTable());
         $builder = $instance->newQuery()
+            ->select($tableColumns)
             ->makeModelIsInstanceForAction()
+            ->setWithFromArray($withs)
             ->setOrderFromArray($order)
-            ->setFilterFromArray($filter)
-            ->setWithFromArray($withs);
+            ->setFilterFromArray($filter);
 
         if (isset($pagination)) {
             $paginator = $builder->difficultPaginateFromArray($pagination);
