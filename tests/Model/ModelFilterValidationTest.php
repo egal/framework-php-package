@@ -116,7 +116,7 @@ class ModelFilterValidationTest extends TestCase
             ],
             [
                 [['fake', 'eq', '{"fourth":["fourth"]}']],
-                null,
+                FieldNotFoundException::class,
             ],
         ];
     }

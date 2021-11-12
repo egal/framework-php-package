@@ -31,6 +31,7 @@ class Relation
     public static function fromString(string $string): self
     {
         $relation = new self();
+
         if (preg_match(self::AGGREGATE_PATTERN, $string, $matches)) {
             $relation->setName($matches[1]);
             $relation->setAggregateFunction($matches[2]);
