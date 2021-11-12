@@ -13,7 +13,6 @@ use Egal\Core\Events\EventManager;
 use Egal\Core\Exceptions\EgalCoreInitializationException;
 use Egal\Core\Session\Session;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
-use VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
