@@ -42,7 +42,7 @@ class RabbitMQBus extends Bus
     {
         $connector = new RabbitMQConnector(app('events'));
         $this->connection = $connector->connect(config('queue.connections.rabbitmq'));
-        $this->replyQueueName = config('app.service_name') . '.' . Str::uuid() . '.reply_queue';
+        $this->replyQueueName = config('app.service_name') . '.' . Str::uuid() . '.service.request_reply';
     }
 
     public function publishMessage(Message $message): void
@@ -102,6 +102,7 @@ class RabbitMQBus extends Bus
 
     public function processMessages(): void
     {
+        $this->connection->getChannel()->basic_qos(null, 1, null);
         $this->connection->getChannel()->basic_consume(
             $this->queueName,
             '',
@@ -188,16 +189,15 @@ class RabbitMQBus extends Bus
                 null
             );
 
+            $this->connection->getChannel()->basic_qos(null, 1, null);
             $this->connection->getChannel()->basic_consume(
                 $this->replyQueueName,
                 $this->replyQueueName,
                 true,
                 true,
                 true,
-                false,
-                function (AMQPMessage $message) {
-
-                }
+                true,
+                null
             );
 
             $this->replyQueueExists = true;
