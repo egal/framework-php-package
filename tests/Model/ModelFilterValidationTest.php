@@ -114,10 +114,6 @@ class ModelFilterValidationTest extends TestCase
                 [['json', 'eq', 'foo']],
                 UnsupportedFilterValueTypeException::class,
             ],
-            [
-                [['fake', 'eq', '{"fourth":["fourth"]}']],
-                FieldNotFoundException::class,
-            ],
         ];
     }
 
