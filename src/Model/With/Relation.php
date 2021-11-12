@@ -9,6 +9,7 @@ use Egal\Model\Filter\FilterPart;
 
 class Relation
 {
+
     public const AGGREGATE_PATTERN = '/^(\w+)\.(\w+)\((\w+)?\)$/';
     public const AGGREGATE_FUNCTION = [
         'avg',
@@ -16,7 +17,7 @@ class Relation
         'exists',
         'max',
         'min',
-        'sum'
+        'sum',
     ];
 
     private string $name;
@@ -26,6 +27,18 @@ class Relation
     private string $aggregateFunction;
 
     private string $aggregateColumn = '*';
+
+    public static function fromString(string $string): self
+    {
+        $relation = new self();
+        preg_match(self::AGGREGATE_PATTERN, $string, $matches);
+        $relation->setName($matches[1]);
+        $relation->setAggregateFunction($matches[2]);
+        $column = $matches[3] ?? '*';
+        $relation->setAggregateColumn($column);
+
+        return $relation;
+    }
 
     public function setName(string $name): Relation
     {
@@ -61,6 +74,7 @@ class Relation
         if (!in_array($aggregateFunction, self::AGGREGATE_FUNCTION)) {
             throw UnsupportedAggregateFunctionException::make($aggregateFunction);
         }
+
         $this->aggregateFunction = $aggregateFunction;
 
         return $this;
@@ -90,20 +104,9 @@ class Relation
 
     public function getAggregateResultColumnName(): string
     {
-        return $this->getAggregateColumn() != '*'
+        return $this->getAggregateColumn() !== '*'
             ? $this->getName() . '_' . $this->getAggregateFunction() . '_' . $this->getAggregateColumn()
             : $this->getName() . '_' . $this->getAggregateFunction();
-    }
-
-    public static function fromString($string): self
-    {
-        $relation = new self();
-        preg_match(self::AGGREGATE_PATTERN, $string, $matches);
-        $relation->setName($matches[1]);
-        $relation->setAggregateFunction($matches[2]);
-        $column = $matches[3] ?? '*';
-        $relation->setAggregateColumn($column);
-        return $relation;
     }
 
 }

@@ -16,10 +16,9 @@ class FieldNotFoundException extends Exception
     public static function make(string $field): self
     {
         $exception = new static();
-        $exception->message = "Field $field not found!";
+        $exception->message = 'Field ' . $field . 'not found!';
 
         return $exception;
     }
-
 
 }

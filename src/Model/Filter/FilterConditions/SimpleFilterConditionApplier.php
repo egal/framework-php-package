@@ -7,10 +7,8 @@ namespace Egal\Model\Filter\FilterConditions;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
-use Egal\Model\Filter\AggregateFilterCondition;
 use Egal\Model\Filter\FilterCondition;
 use Egal\Model\With\Relation;
-use Illuminate\Support\Facades\Log;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
 {
@@ -42,7 +40,6 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $relation = $matches[1];
             $field = $matches[3];
             $types = explode(',', $matches[2]);
-
             $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
 
             foreach ($types as $type) {
@@ -58,25 +55,18 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         } elseif (preg_match(Relation::AGGREGATE_PATTERN, $condition->getField())) {
             // For condition field like `rel.function(column?)`.
             $aggregateRelation = Relation::fromString($condition->getField());
-
             $aggregateColumnName = $aggregateRelation->getAggregateResultColumnName();
-            $builder->where(
-                $aggregateColumnName,
-                $operator,
-                $value
-            );
+            $builder->where($aggregateColumnName, $operator, $value);
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
             $relation = $matches[1];
             $field = $matches[2];
-
             $model = $builder->getModel();
             $model->getModelMetadata()->relationExistOrFail($relation);
             $relationName = camel_case($relation);
             $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
             $relationModelMetadata->fieldExistOrFail($field);
             $relationModelMetadata->validateFieldValueType($field, $value);
-
             $clause = static function (Builder $query) use ($field, $operator, $value): void {
                 $query->where($field, $operator, $value);
             };
@@ -84,11 +74,9 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
             $field = $condition->getField();
-
             $modelMetadata = $builder->getModel()->getModelMetadata();
             $modelMetadata->fieldExistOrFail($field);
             $modelMetadata->validateFieldValueType($field, $value);
-
             $builder->where($condition->getField(), $operator, $value, $boolean);
         } else {
             throw new UnsupportedFilterConditionFieldFormException();

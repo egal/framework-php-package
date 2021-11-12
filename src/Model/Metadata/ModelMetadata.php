@@ -347,10 +347,12 @@ class ModelMetadata
             $modelActionMetadata = new ModelActionMetadata();
             $modelActionMetadata->setActionName($actionName);
             $modelActionMetadata->setParameters($reflectionMethod->getParameters());
+
             /** @var \phpDocumentor\Reflection\DocBlock\Tags\Generic $actionTag */
             foreach ($tag->getDescription()->getTags() as $actionTag) {
                 $modelActionMetadata->supplementFromTag($actionTag);
             }
+
             $this->addActionMetadata($modelActionMetadata);
         }
     }

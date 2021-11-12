@@ -151,20 +151,27 @@ class Builder extends EloquentBuilder
         return $this;
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Relations\Relation[] $aggregateRelations
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     */
     public function setFromSubWithAggregateRelationFilter(array $aggregateRelations): Builder
     {
         $subQuery = (clone $this);
+
         /** @var \Egal\Model\With\Relation $aggregateRelation */
         foreach ($aggregateRelations as $aggregateRelation) {
-
             $model = $this->getModel();
             $relationName = $aggregateRelation->getName();
+
             if (!in_array($relationName, $model->getModelMetadata()->getRelations())) {
                 throw RelationNotFoundException::make($model, $relationName);
             }
+
             $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
             $aggregateColumn = $aggregateRelation->getAggregateColumn();
-            if ($aggregateColumn != '*') {
+
+            if ($aggregateColumn !== '*') {
                 $relationModelMetadata->fieldExistOrFail($aggregateColumn);
             }
 
@@ -174,7 +181,8 @@ class Builder extends EloquentBuilder
                 $aggregateRelation->getAggregateFunction()
             )->toBase();
         }
-        if (!empty($aggregateRelations)) {
+
+        if ($aggregateRelations !== []) {
             $this->fromSub($subQuery, 'sub');
         }
 
@@ -218,12 +226,15 @@ class Builder extends EloquentBuilder
         foreach (Collection::fromArray($array)->getRelations() as $relation) {
             $model = $this->getModel();
             $relationName = $relation->getName();
+
             if (!in_array($relationName, $model->getModelMetadata()->getRelations())) {
                 throw RelationNotFoundException::make($model, $relationName);
             }
+
             $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
             $aggregateColumn = $relation->getAggregateColumn();
-            if ($aggregateColumn != '*') {
+
+            if ($aggregateColumn !== '*') {
                 $relationModelMetadata->fieldExistOrFail($aggregateColumn);
             }
 

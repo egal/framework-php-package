@@ -16,7 +16,7 @@ class RelationNotFoundException extends Exception
     public static function make(string $relation): self
     {
         $exception = new static();
-        $exception->message = "Relation $relation not found!";
+        $exception->message = 'Relation ' . $relation . ' not found!';
 
         return $exception;
     }

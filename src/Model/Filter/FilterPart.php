@@ -19,7 +19,7 @@ final class FilterPart
     /**
      * @var mixed[]
      */
-    private array $aggregates = [];
+    private array $aggregateRelations = [];
 
     /**
      * @param mixed[] $array
@@ -32,8 +32,9 @@ final class FilterPart
         foreach ($array as $item) {
             if (FilterCondition::mayMakeFromArray($item)) {
                 $filterPart->addContentItem(FilterCondition::fromArray($item));
+
                 if (preg_match(Relation::AGGREGATE_PATTERN, $item[0])) {
-                    $filterPart->addAggregateContentItem((Relation::fromString($item[0])));
+                    $filterPart->addAggregateContentItem(Relation::fromString($item[0]));
                 }
             } elseif (is_array($item)) {
                 $filterPart->addContentItem(self::fromArray($item));
@@ -60,9 +61,8 @@ final class FilterPart
      */
     public function getAggregateRelations(): array
     {
-        return $this->aggregates;
+        return $this->aggregateRelations;
     }
-
 
     /**
      * @param \Egal\Model\Filter\FilterPart|\Egal\Model\Filter\FilterCondition|\Egal\Model\Filter\FilterCombiner $item
@@ -81,10 +81,9 @@ final class FilterPart
         $this->content[] = $item;
     }
 
-    public function addAggregateContentItem($item): void
+    public function addAggregateContentItem(Relation $item): void
     {
-        $this->aggregates[] = $item;
+        $this->aggregateRelations[] = $item;
     }
-
 
 }
