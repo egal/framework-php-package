@@ -6,6 +6,7 @@ namespace Egal\Model\Filter\FilterConditions;
 
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
+use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
@@ -53,6 +54,10 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         } elseif (preg_match('/^(\w+)\.(exists)\(\)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.exists()`.
             [$relation, $function] = [$matches[1], $matches[2]];
+
+            if ($operator !== '=') {
+                throw new UnsupportedFilterConditionException();
+            }
 
             if (!is_bool($value)) {
                 throw UnsupportedFilterValueTypeException::make($relation . '_' . $function, 'boolean');

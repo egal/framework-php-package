@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Closure;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\UnsupportedAggregateFunctionException;
+use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Metadata\ModelMetadata;
@@ -78,6 +79,18 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
             [
                 [["products.exists()", "eq", 9]],
                 UnsupportedFilterValueTypeException::class,
+                [],
+                []
+            ],
+            [
+                [["products.exists()", "ne", true]],
+                UnsupportedFilterConditionException::class,
+                [],
+                []
+            ],
+            [
+                [["products.exists()", "foo", true]],
+                UnsupportedFilterConditionException::class,
                 [],
                 []
             ]
