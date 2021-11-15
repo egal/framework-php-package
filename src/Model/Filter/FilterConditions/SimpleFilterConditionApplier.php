@@ -6,8 +6,8 @@ namespace Egal\Model\Filter\FilterConditions;
 
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
-use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFieldPatternInFilterConditionException;
+use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
 
