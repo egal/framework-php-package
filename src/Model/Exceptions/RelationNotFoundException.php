@@ -11,4 +11,14 @@ class RelationNotFoundException extends Exception
 
     protected $message = 'Relation not found!';
 
+    protected $code = 403;
+
+    public static function make(string $relation): self
+    {
+        $exception = new static();
+        $exception->message = 'Relation ' . $relation . ' not found!';
+
+        return $exception;
+    }
+
 }
