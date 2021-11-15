@@ -7,7 +7,7 @@ namespace Egal\Model\Filter\FilterConditions;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
-use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
+use Egal\Model\Exceptions\UnsupportedFieldPatternInFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
 
@@ -45,7 +45,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             self::filterByField($condition, $builder, $value, $operator, $boolean);
         } else {
-            throw new UnsupportedFilterConditionFieldFormException();
+            throw new UnsupportedFieldPatternInFilterConditionException();
         }
     }
 

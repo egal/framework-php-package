@@ -4,15 +4,12 @@ namespace Egal\Tests\Model;
 
 use Carbon\Carbon;
 use Closure;
-use Egal\Model\Exceptions\FieldNotFoundException;
-use Egal\Model\Exceptions\UnsupportedAggregateFunctionException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
-use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
+use Egal\Model\Exceptions\UnsupportedFieldPatternInFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
-use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
@@ -72,7 +69,7 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
             ],
             [
                 [["products.exist()", "eq", true]],
-                UnsupportedFilterConditionFieldFormException::class,
+                UnsupportedFieldPatternInFilterConditionException::class,
                 [],
                 []
             ],
