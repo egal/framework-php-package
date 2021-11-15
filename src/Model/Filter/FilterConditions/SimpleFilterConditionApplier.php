@@ -56,7 +56,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             // For condition field like `rel.function(?column)`.
             $aggregateRelation = Relation::fromString($condition->getField());
             $aggregateColumnName = $aggregateRelation->getAggregateResultColumnName();
-            $builder->where($aggregateColumnName, $operator, $value);
+            $builder->where('filter_' . $aggregateColumnName, $operator, $value);
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
             $relation = $matches[1];

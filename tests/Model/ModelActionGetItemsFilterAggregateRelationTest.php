@@ -56,6 +56,7 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
                     return ModelActionGetItemsFilterAggregateRelationTestCategory::query()
                         ->whereDoesntHave('products')->get()->toArray();
                 },
+                []
             ],
             [
                 [["products.count()", "eq", 3]],
@@ -64,6 +65,7 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
                     return ModelActionGetItemsFilterAggregateRelationTestCategory::query()
                         ->whereHas('products', null, '=', 3)->get()->toArray();
                 },
+                []
             ],
             [
                 [["products.count()", "eq", 2]],
@@ -71,11 +73,13 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
                 function () {
                     return [];
                 },
+                []
             ],
             [
                 [["test.count()", "eq", 2]],
                 RelationNotFoundException::class,
-               null,
+                null,
+                []
             ],
             [
                 [["products.avg(id)", "eq", 2]],
@@ -88,11 +92,13 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
                         ->makeHidden('products_avg_id')
                         ->toArray();
                 },
+                []
             ],
             [
                 [["products.avg(test)", "eq", 2]],
                 FieldNotFoundException::class,
                 null,
+                []
             ],
             [
                 [["products.max(id)", "eq", 2]],
@@ -100,11 +106,33 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
                 function () {
                     return [];
                 },
+                []
             ],
             [
                 [["products.test(id)", "eq", 2]],
                 UnsupportedAggregateFunctionException::class,
                 null,
+                []
+            ],
+            [
+                [["products.exists()", "eq", true]],
+                null,
+                function () {
+                    return ModelActionGetItemsFilterAggregateRelationTestCategory::query()
+                        ->withAggregate("products", "*", "exists")
+                        ->whereHas('products')->get()->toArray();
+                },
+                ["products.exists()"]
+            ],
+            [
+                [["products.exists()", "eq", true]],
+                null,
+                function () {
+                    return ModelActionGetItemsFilterAggregateRelationTestCategory::query()
+                        ->withAggregate("products", "*", "count")
+                        ->whereHas('products')->get()->toArray();
+                },
+                ["products.count()"]
             ]
         ];
     }
@@ -112,7 +140,7 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
     /**
      * @dataProvider dataProviderFilterAggregateRelation
      */
-    public function testFilterAggregateRelation(?array $filter, ?string $expectException, $responseExpect)
+    public function testFilterAggregateRelation(?array $filter, ?string $expectException, $responseExpect, array $withs)
     {
         if ($expectException) {
             $this->expectException($expectException);
@@ -120,10 +148,11 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
 
         $actual = ModelActionGetItemsFilterAggregateRelationTestCategory::actionGetItems(
             null,
-            [],
+            $withs,
             $filter,
             []
         )['items'];
+
 
         if ($responseExpect instanceof Closure) {
             $responseExpect = $responseExpect();

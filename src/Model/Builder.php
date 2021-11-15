@@ -176,14 +176,14 @@ class Builder extends EloquentBuilder
             }
 
             $subQuery->withAggregate(
-                $relationName,
+                $relationName . ' as filter_'.$aggregateRelation->getAggregateResultColumnName(),
                 $aggregateColumn,
                 $aggregateRelation->getAggregateFunction()
             )->toBase();
         }
 
         if ($aggregateRelations !== []) {
-            $this->fromSub($subQuery, 'sub');
+            $this->fromSub($subQuery, $model->getTable());
         }
 
         return $this;
