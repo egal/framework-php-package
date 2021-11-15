@@ -1,22 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
+use Exception;
 
 class ActionErrorMessage extends Message implements HasActionMessageInterface
 {
 
     use HasActionMessage;
 
+    protected int $code;
+
+    protected string $message;
+
+    protected ?string $internalCode;
+
     protected string $type = MessageType::ACTION_ERROR;
-    public int $code;
-    public string $message;
 
     public function __construct(string $message = '', int $code = 500)
     {
         parent::__construct();
+
         $this->code = $code;
         $this->message = $message;
     }
@@ -35,6 +43,7 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
         $result->uuid = $array['uuid'];
         $result->message = $array['message'];
         $result->code = $array['code'];
+        $result->internalCode = $array['internal_code'] ?? null;
         $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 
         return $result;
@@ -58,6 +67,16 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
     public function setCode(int $code): void
     {
         $this->code = $code;
+    }
+
+    public function setInternalCode(string $internalCode): void
+    {
+        $this->internalCode = $internalCode;
+    }
+
+    public function getInternalCode(): ?string
+    {
+        return $this->internalCode;
     }
 
 }

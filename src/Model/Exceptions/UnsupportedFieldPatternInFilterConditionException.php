@@ -6,7 +6,7 @@ namespace Egal\Model\Exceptions;
 
 use Exception;
 
-class UnsupportedFilterConditionFieldFormException extends Exception
+class UnsupportedFieldPatternInFilterConditionException extends Exception
 {
 
     protected $message = 'Unsupported filter condition field form!';

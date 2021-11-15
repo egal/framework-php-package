@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Event;
 abstract class CentrifugoEvent extends Event implements ShouldBroadcast
 {
 
-    use CenrifugoBroadcastable;
+    use CentrifugoBroadcastable;
 
     protected Model $entity;
 

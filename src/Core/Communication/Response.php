@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ReplyMessageNotBelongToRequestException;
@@ -15,9 +17,18 @@ class Response
 {
 
     private ActionMessage $actionMessage;
+
     private ?StartProcessingMessage $startProcessingMessage = null;
+
     private ?ActionResultMessage $actionResultMessage = null;
+
     private ?ActionErrorMessage $actionErrorMessage = null;
+
+    private int $statusCode = 500;
+
+    private ?string $internalCode = null;
+
+    private ?string $errorMessage = null;
 
     public function getActionMessage(): ActionMessage
     {
@@ -54,7 +65,9 @@ class Response
         if ($this->getActionErrorMessage()) {
             $statusCode = $this->getActionErrorMessage()->getCode();
 
-            return $statusCode !== 0 ? $statusCode : 500;
+            return $statusCode !== 0
+                ? $statusCode
+                : 500;
         }
 
         return 200;
