@@ -106,6 +106,9 @@
     <rule ref="Squiz.Commenting.ClassComment.TagNotAllowed">
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
     </rule>
+    <rule ref="Squiz.ControlStructures.SwitchDeclaration.EmptyCase">
+        <exclude-pattern>src/Core/Communication/Request.php</exclude-pattern>
+    </rule>
 
     <rule ref="SlevomatCodingStandard">
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
@@ -191,10 +194,18 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/EventMessage.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix">
+        <exclude-pattern>src/Core/Messages/HasActionMessageInterface.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
         <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/StartProcessingMessage.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/Message.php</exclude-pattern>
         <exclude-pattern>src/Core/Messages/ActionErrorMessage.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/ActionResultMessage.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/EventMessage.php</exclude-pattern>
         <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>

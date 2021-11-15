@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
@@ -11,11 +13,13 @@ class StartProcessingMessage extends Message implements HasActionMessageInterfac
     use HasActionMessage;
 
     protected string $type = MessageType::START_PROCESSING;
+
     protected float $startedAt;
 
     public function __construct()
     {
         parent::__construct();
+
         $this->startedAt = microtime(true);
     }
 

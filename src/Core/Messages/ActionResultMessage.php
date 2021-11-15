@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
@@ -10,12 +12,12 @@ class ActionResultMessage extends Message implements HasActionMessageInterface
 
     use HasActionMessage;
 
-    protected string $type = MessageType::ACTION_RESULT;
-
     /**
      * @var mixed
      */
-    public $data;
+    protected $data;
+
+    protected string $type = MessageType::ACTION_RESULT;
 
     public static function fromArray(array $array): ActionResultMessage
     {
@@ -35,11 +37,17 @@ class ActionResultMessage extends Message implements HasActionMessageInterface
         return $result;
     }
 
+    /**
+     * @return mixed
+     */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * @param mixed $data
+     */
     public function setData($data): void
     {
         $this->data = $data;

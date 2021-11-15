@@ -60,14 +60,13 @@ class Request extends ActionMessage
     {
         $response = new Response();
         $response->setActionMessage($this);
-
         $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
-
         $bus = Bus::getInstance();
         $bus->startConsumeReplyMessages(
             $this,
-            function (Message $message) use ($response) {
+            static function (Message $message) use ($response) {
                 $response->collectReplyMessage($message);
+
                 return !$response->isReplyMessagesCollected();
             }
         );
@@ -78,11 +77,53 @@ class Request extends ActionMessage
 
         $bus->stopConsumeReplyMessages($this);
 
-        switch ([
+        $this->processResponse($response);
+    }
+
+    public function getResponse(): Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param mixed $key
+     * @return mixed[]
+     * @depricated since v2.0.0
+     */
+    public function getParameter($key): array
+    {
+        return $this->parameters[$key];
+    }
+
+    public function call(): Response
+    {
+        $this->send();
+        $this->waitResponse();
+
+        return $this->getResponse();
+    }
+
+    public function send(): void
+    {
+        if ($this->isServiceAuthorizationEnabled()) {
+            $this->authorizeService();
+        }
+
+        $this->publish();
+    }
+
+    /**
+     * @throws \Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
+     */
+    protected function processResponse(Response $response): void
+    {
+        $responseArray = [
             $response->getStartProcessingMessage() !== null,
             $response->getActionErrorMessage() !== null,
             $response->getActionResultMessage() !== null,
-        ]) {
+        ];
+
+        switch ($responseArray) {
             case [true, false, false]:
                 $actionErrorMessage = new ActionErrorMessage();
                 $actionErrorMessage->setCode(500);
@@ -110,39 +151,6 @@ class Request extends ActionMessage
         }
 
         $this->response = $response;
-    }
-
-    public function getResponse(): Response
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param mixed $key
-     * @return mixed[]
-     *
-     * @depricated since v2.0.0
-     */
-    public function getParameter($key): array
-    {
-        return $this->parameters[$key];
-    }
-
-    public function call(): Response
-    {
-        $this->send();
-        $this->waitResponse();
-
-        return $this->getResponse();
-    }
-
-    public function send(): void
-    {
-        if ($this->isServiceAuthorizationEnabled()) {
-            $this->authorizeService();
-        }
-
-        $this->publish();
     }
 
     private function authorizeService(): void

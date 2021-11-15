@@ -93,7 +93,7 @@ class Response
         return isset($this->actionErrorMessage);
     }
 
-    public function throwActionErrorMessageIfExists()
+    public function throwActionErrorMessageIfExists(): void
     {
         if ($this->isActionErrorMessageExists()) {
             throw new ResponseException(
@@ -105,8 +105,8 @@ class Response
 
     public function collectReplyMessage(Message $replyMessage): void
     {
-        $checkAffiliation = function ($message) {
-            /** @var ActionResultMessage|ActionErrorMessage|StartProcessingMessage $message */
+        $checkAffiliation = function ($message): void {
+            /** @var \Egal\Core\Messages\ActionResultMessage|\Egal\Core\Messages\ActionErrorMessage|\Egal\Core\Messages\StartProcessingMessage $message */
             if ($message->getActionMessage()->getUuid() !== $this->getActionMessage()->getUuid()) {
                 throw new ReplyMessageNotBelongToRequestException();
             }

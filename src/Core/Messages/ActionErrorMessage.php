@@ -6,7 +6,6 @@ namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
-use Exception;
 
 class ActionErrorMessage extends Message implements HasActionMessageInterface
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 use Egal\Core\Bus\Bus;
@@ -12,7 +14,12 @@ abstract class Message
 
     protected string $type;
 
-    abstract static function fromArray(array $array): Message;
+    abstract static public function fromArray(array $array): Message;
+
+    public function __construct()
+    {
+        $this->uuid = Str::uuid()->toString();
+    }
 
     public function toArray(): array
     {
@@ -23,11 +30,6 @@ abstract class Message
         }
 
         return $result;
-    }
-
-    public function __construct()
-    {
-        $this->uuid = Str::uuid()->toString();
     }
 
     public function toJson(): string
