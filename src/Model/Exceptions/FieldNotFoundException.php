@@ -11,14 +11,4 @@ class FieldNotFoundException extends Exception
 
     protected $message = 'Field not found!';
 
-    protected $code = 403;
-
-    public static function make(string $field): self
-    {
-        $exception = new static();
-        $exception->message = 'Field ' . $field . ' not found!';
-
-        return $exception;
-    }
-
 }

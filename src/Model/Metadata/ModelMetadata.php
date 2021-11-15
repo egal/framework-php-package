@@ -239,7 +239,7 @@ class ModelMetadata
     public function fieldExistOrFail(string $fieldName): bool
     {
         if (!$this->fieldExist($fieldName)) {
-            throw FieldNotFoundException::make($fieldName);
+            throw new FieldNotFoundException();
         }
 
         return true;
@@ -256,7 +256,7 @@ class ModelMetadata
     public function relationExistOrFail(string $relation): bool
     {
         if (!$this->relationExist($relation)) {
-            throw RelationNotFoundException::make($relation);
+            throw new RelationNotFoundException();
         }
 
         return true;

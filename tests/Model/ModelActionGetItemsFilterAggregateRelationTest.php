@@ -57,6 +57,15 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
                         ->whereDoesntHave('products')->get()->toArray();
                 },
                 []
+            ],
+            [
+                [["products.exists()", "eq", true]],
+                null,
+                function () {
+                    return ModelActionGetItemsFilterAggregateRelationTestCategory::query()
+                        ->whereHas('products')->get()->toArray();
+                },
+                []
             ]
         ];
     }
