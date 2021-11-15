@@ -6,7 +6,9 @@ namespace Egal\Model\Filter\FilterConditions;
 
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
-use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
+use Egal\Model\Exceptions\UnsupportedFieldPatternInFilterConditionException;
+use Egal\Model\Exceptions\UnsupportedFilterConditionException;
+use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
@@ -35,51 +37,119 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         $value = static::getPreparedValue($condition->getOperator(), $condition->getValue());
 
         if (preg_match('/^(\w+)\[([\w,\\\\]+)\]\.(\w+)$/', $condition->getField(), $matches)) {
-            // For condition field like `morph_rel[first_type,second_type].field`.
-            $relation = $matches[1];
-            $field = $matches[3];
-            $types = explode(',', $matches[2]);
-
-            $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
-
-            foreach ($types as $type) {
-                $relationModelMetadata = (new $type())->getModelMetadata();
-                $relationModelMetadata->fieldExistOrFail($field);
-                $relationModelMetadata->validateFieldValueType($field, $value);
-            }
-
-            $clause = static function (Builder $query) use ($field, $operator, $value): void {
-                $query->where($field, $operator, $value);
-            };
-            $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
+            self::filterByMorphRelationField($matches, $builder, $value, $operator, $boolean);
+        } elseif (preg_match('/^(\w+)\.(exists)\(\)$/', $condition->getField(), $matches)) {
+            self::filterByExistsRelation($matches, $operator, $value, $builder, $boolean);
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
-            // For condition field like `rel.field`.
-            $relation = $matches[1];
-            $field = $matches[2];
+            self::filterByRelationField($matches, $builder, $value, $operator, $boolean);
+        } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
+            self::filterByField($condition, $builder, $value, $operator, $boolean);
+        } else {
+            throw new UnsupportedFieldPatternInFilterConditionException();
+        }
+    }
 
-            $model = $builder->getModel();
-            $model->getModelMetadata()->relationExistOrFail($relation);
-            $relationName = camel_case($relation);
-            $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
+    /**
+     * @param mixed $matches
+     * @param mixed $value
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     * @throws \ReflectionException
+     */
+    protected static function filterByMorphRelationField(
+        $matches,
+        Builder $builder,
+        $value,
+        string $operator,
+        string $boolean
+    ): void {
+        // For condition field like `morph_rel[first_type,second_type].field`.
+        [$relation, $field, $types] = [$matches[1], $matches[3], explode(',', $matches[2])];
+        $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+
+        foreach ($types as $type) {
+            $relationModelMetadata = (new $type())->getModelMetadata();
             $relationModelMetadata->fieldExistOrFail($field);
             $relationModelMetadata->validateFieldValueType($field, $value);
-
-            $clause = static function (Builder $query) use ($field, $operator, $value): void {
-                $query->where($field, $operator, $value);
-            };
-            $builder->has(camel_case($relation), '>=', 1, $boolean, $clause);
-        } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
-            // For condition field like `field`.
-            $field = $condition->getField();
-
-            $modelMetadata = $builder->getModel()->getModelMetadata();
-            $modelMetadata->fieldExistOrFail($field);
-            $modelMetadata->validateFieldValueType($field, $value);
-
-            $builder->where($condition->getField(), $operator, $value, $boolean);
-        } else {
-            throw new UnsupportedFilterConditionFieldFormException();
         }
+
+        $clause = static function (Builder $query) use ($field, $operator, $value): void {
+            $query->where($field, $operator, $value);
+        };
+        $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
+    }
+
+    /**
+     * @param mixed $matches
+     * @param mixed $value
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterConditionException
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterValueTypeException
+     */
+    protected static function filterByExistsRelation(
+        $matches,
+        string $operator,
+        $value,
+        Builder $builder,
+        string $boolean
+    ): void {
+        // For condition field like `rel.exists()`.
+        [$relation, $function] = [$matches[1], $matches[2]];
+
+        if ($operator !== '=') {
+            throw new UnsupportedFilterConditionException();
+        }
+
+        if (!is_bool($value)) {
+            throw UnsupportedFilterValueTypeException::make($relation . '_' . $function, 'boolean');
+        }
+
+        $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+        $builder->has(camel_case($relation), $value ? '>=' : '<', 1, $boolean);
+    }
+
+    /**
+     * @param mixed $matches
+     * @param mixed $value
+     * @throws \Egal\Model\Exceptions\RelationNotFoundException
+     * @throws \ReflectionException
+     */
+    protected static function filterByRelationField(
+        $matches,
+        Builder $builder,
+        $value,
+        string $operator,
+        string $boolean
+    ): void {
+        // For condition field like `rel.field`.
+        [$relation, $field, $model] = [$matches[1], $matches[2], $builder->getModel()];
+        $model->getModelMetadata()->relationExistOrFail($relation);
+        $relationName = camel_case($relation);
+        $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
+        $relationModelMetadata->fieldExistOrFail($field);
+        $relationModelMetadata->validateFieldValueType($field, $value);
+        $clause = static function (Builder $query) use ($field, $operator, $value): void {
+            $query->where($field, $operator, $value);
+        };
+        $builder->has($relationName, '>=', 1, $boolean, $clause);
+    }
+
+    /**
+     * @param mixed $value
+     * @throws \Egal\Model\Exceptions\UnsupportedFilterValueTypeException
+     * @throws \Egal\Model\Exceptions\FieldNotFoundException
+     * @throws \ReflectionException
+     */
+    protected static function filterByField(
+        FilterCondition $condition,
+        Builder $builder,
+        $value,
+        string $operator,
+        string $boolean
+    ): void {
+        // For condition field like `field`.
+        [$field, $modelMetadata] = [$condition->getField(), $builder->getModel()->getModelMetadata()];
+        $modelMetadata->fieldExistOrFail($field);
+        $modelMetadata->validateFieldValueType($field, $value);
+        $builder->where($condition->getField(), $operator, $value, $boolean);
     }
 
     private static function getSqlOperator(string $operator): string
