@@ -115,9 +115,11 @@ class Builder extends EloquentBuilder
      *
      * @return $this
      * @throws \ReflectionException|\Egal\Model\Exceptions\FilterException
+     * @throws Exceptions\RelationNotFoundException
      */
     public function setFilter(FilterPart $filterPart): Builder
     {
+        $this->setFromSubWithAggregateRelationFilter($filterPart->getAggregateRelations());
         $this->where(static function ($query) use ($filterPart) {
             $filterPartContent = $filterPart->getContent();
 
@@ -203,7 +205,6 @@ class Builder extends EloquentBuilder
     {
         if ($array !== []) {
             $filterPart = FilterPart::fromArray($array);
-            $this->setFromSubWithAggregateRelationFilter($filterPart->getAggregateRelations());
             $this->setFilter($filterPart);
         }
 
