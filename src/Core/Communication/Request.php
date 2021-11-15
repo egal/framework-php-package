@@ -95,6 +95,7 @@ class Request extends ActionMessage
                 $actionErrorMessage = new ActionErrorMessage();
                 $actionErrorMessage->setCode(500);
                 $actionErrorMessage->setMessage('Service not responding!');
+                $actionErrorMessage->setInternalCode($this->response->getActionErrorMessage()->getInternalCode());
                 $response->setActionErrorMessage($actionErrorMessage);
                 break;
             case [true, false, true]:

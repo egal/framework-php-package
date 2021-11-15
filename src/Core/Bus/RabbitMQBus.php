@@ -16,6 +16,7 @@ use Egal\Core\Messages\Message;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
+use Egal\Exception\HasInternalCode;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
@@ -160,6 +161,11 @@ class RabbitMQBus extends Bus
                     }
 
                     $actionErrorMessage->setActionMessage(Session::getActionMessage());
+
+                    if ($exception instanceof HasInternalCode) {
+                        $actionErrorMessage->setInternalCode($exception->getInternalCode());
+                    }
+
                     $this->basicPublish($actionErrorMessage, $replyTo);
                 }
 
