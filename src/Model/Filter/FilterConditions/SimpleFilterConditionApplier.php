@@ -37,10 +37,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
 
         if (preg_match('/^(\w+)\[([\w,\\\\]+)\]\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `morph_rel[first_type,second_type].field`.
-            $relation = $matches[1];
-            $field = $matches[3];
-            $types = explode(',', $matches[2]);
-
+            [$relation, $field, $types] = [$matches[1], $matches[3], explode(',', $matches[2])];
             $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
 
             foreach ($types as $type) {
@@ -55,29 +52,22 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
             $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
         } elseif (preg_match('/^(\w+)\.(exists)\(\)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.exists()`.
-            $relation = $matches[1];
-            $function = $matches[2];
+            [$relation, $function] = [$matches[1], $matches[2]];
+
             if (!is_bool($value)) {
                 throw UnsupportedFilterValueTypeException::make($relation . '_' . $function, 'boolean');
             }
-            $operator = $value ? '>=' : '<';
 
-            $model = $builder->getModel();
-            $model->getModelMetadata()->relationExistOrFail($relation);
-
-            $builder->has(camel_case($relation), $operator, 1, $boolean);
+            $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
+            $builder->has(camel_case($relation), $value ? '>=' : '<', 1, $boolean);
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
-            $relation = $matches[1];
-            $field = $matches[2];
-
-            $model = $builder->getModel();
+            [$relation, $field, $model] = [$matches[1], $matches[2], $builder->getModel()];
             $model->getModelMetadata()->relationExistOrFail($relation);
             $relationName = camel_case($relation);
             $relationModelMetadata = $model->$relationName()->getQuery()->getModel()->getModelMetadata();
             $relationModelMetadata->fieldExistOrFail($field);
             $relationModelMetadata->validateFieldValueType($field, $value);
-
             $clause = static function (Builder $query) use ($field, $operator, $value): void {
                 $query->where($field, $operator, $value);
             };
@@ -85,11 +75,9 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         } elseif (preg_match('/^(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `field`.
             $field = $condition->getField();
-
             $modelMetadata = $builder->getModel()->getModelMetadata();
             $modelMetadata->fieldExistOrFail($field);
             $modelMetadata->validateFieldValueType($field, $value);
-
             $builder->where($condition->getField(), $operator, $value, $boolean);
         } else {
             throw new UnsupportedFilterConditionFieldFormException();
