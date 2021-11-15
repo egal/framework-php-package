@@ -133,12 +133,12 @@ class ModelFilterValidationTest extends TestCase
 
 /**
  * @property $id            {@property-type field}  {@prymary-key}
- * @property $string        {@property-type field}        {@validation-rules string}
- * @property $integer       {@property-type field}        {@validation-rules integer}
- * @property $numeric       {@property-type field}        {@validation-rules numeric}
- * @property $boolean       {@property-type field}        {@validation-rules boolean}
- * @property $array         {@property-type field}        {@validation-rules array}
- * @property $json          {@property-type field}        {@validation-rules json}
+ * @property $string        {@property-type field}  {@validation-rules string}
+ * @property $integer       {@property-type field}  {@validation-rules integer}
+ * @property $numeric       {@property-type field}  {@validation-rules numeric}
+ * @property $boolean       {@property-type field}  {@validation-rules boolean}
+ * @property $array         {@property-type field}  {@validation-rules array}
+ * @property $json          {@property-type field}  {@validation-rules json}
  * @property $created_at    {@property-type field}  {@validation-rules date}
  * @property $updated_at    {@property-type field}  {@validation-rules date}
  */
