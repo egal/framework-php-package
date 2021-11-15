@@ -7,6 +7,7 @@ namespace Egal\Model\Filter\FilterConditions;
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionFieldFormException;
+use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
@@ -52,6 +53,19 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
                 $query->where($field, $operator, $value);
             };
             $builder->hasMorph(camel_case($relation), $types, '>=', 1, $boolean, $clause);
+        } elseif (preg_match('/^(\w+)\.(exists)\(\)$/', $condition->getField(), $matches)) {
+            // For condition field like `rel.exists()`.
+            $relation = $matches[1];
+            $function = $matches[2];
+            if (!is_bool($value)) {
+                throw UnsupportedFilterValueTypeException::make($relation . '_' . $function, 'boolean');
+            }
+            $operator = $value ? '>=' : '<';
+
+            $model = $builder->getModel();
+            $model->getModelMetadata()->relationExistOrFail($relation);
+
+            $builder->has(camel_case($relation), $operator, 1, $boolean);
         } elseif (preg_match('/^(\w+)\.(\w+)$/', $condition->getField(), $matches)) {
             // For condition field like `rel.field`.
             $relation = $matches[1];
