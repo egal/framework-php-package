@@ -25,6 +25,6 @@ abstract class Bus
 
     abstract public function stopConsumeReplyMessages(ActionMessage $actionMessage): void;
 
-    abstract public function consumeReplyMessages(int $timeout = 0): void;
+    abstract public function consumeReplyMessages(float $timeout = 0): void;
 
 }

@@ -81,7 +81,7 @@ class RabbitMQBus extends Bus
             true,
             false,
             false,
-            fn (AMQPMessage $message) => $this->processMessage($message)
+            fn(AMQPMessage $message) => $this->processMessage($message)
         );
 
         while (true) {
@@ -140,7 +140,7 @@ class RabbitMQBus extends Bus
         };
 
         $this->connection->getChannel()->callbacks[$this->replyQueueName] =
-            static fn (AMQPMessage $message) => $callback($convertJsonToMessage($message->body));
+            static fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body));
     }
 
     public function stopConsumeReplyMessages(ActionMessage $actionMessage): void
@@ -149,7 +149,7 @@ class RabbitMQBus extends Bus
         };
     }
 
-    public function consumeReplyMessages(int $timeout = 0): void
+    public function consumeReplyMessages(float $timeout = 0): void
     {
         try {
             $this->connection->getChannel()->wait(null, false, $timeout);
