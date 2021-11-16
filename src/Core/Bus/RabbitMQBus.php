@@ -56,7 +56,7 @@ class RabbitMQBus extends Bus
     public function startProcessingMessages(): void
     {
         $serviceName = config('app.service_name');
-        $this->queueName = "$serviceName.service";
+        $this->queueName = $serviceName . '.service';
 
         $this->connection->declareQueue(
             $this->queueName,
@@ -64,7 +64,11 @@ class RabbitMQBus extends Bus
             false,
             ['x-queue-mode' => 'default']
         );
-        $this->connection->getChannel()->queue_bind($this->queueName, 'amq.direct', "$serviceName.action");
+        $this->connection->getChannel()->queue_bind(
+            $this->queueName,
+            'amq.direct',
+            $serviceName . '.action'
+        );
     }
 
     public function stopProcessingMessages(): void
@@ -146,6 +150,7 @@ class RabbitMQBus extends Bus
     public function stopConsumeReplyMessages(ActionMessage $actionMessage): void
     {
         $this->connection->getChannel()->callbacks[$this->replyQueueName] = static function (AMQPMessage $message): void {
+            // Since the consumer remains, but the handler needs to be turned off, we'll just make the callback empty.
         };
     }
 
@@ -154,6 +159,7 @@ class RabbitMQBus extends Bus
         try {
             $this->connection->getChannel()->wait(null, false, $timeout);
         } catch (AMQPTimeoutException $exception) {
+            // This error is not critical, since it is a stopping point for processing the queue.
         }
     }
 
@@ -200,7 +206,7 @@ class RabbitMQBus extends Bus
                 break;
             case MessageType::EVENT:
                 throw new MessageProcessingException('НЕ РЕАЛИЗОВАНО!');
-// TODO: Реализовать.
+            // TODO: Реализовать.
             default:
                 throw new MessageProcessingException('Error processing queue message! ' . json_encode($body));
         }

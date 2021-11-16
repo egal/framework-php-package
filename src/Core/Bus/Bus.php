@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Bus;
 
 use Egal\Core\Messages\ActionMessage;
@@ -7,11 +9,6 @@ use Egal\Core\Messages\Message;
 
 abstract class Bus
 {
-
-    public static function getInstance(): Bus
-    {
-        return app(Bus::class);
-    }
 
     abstract public function publishMessage(Message $message): void;
 
@@ -26,5 +23,10 @@ abstract class Bus
     abstract public function stopConsumeReplyMessages(ActionMessage $actionMessage): void;
 
     abstract public function consumeReplyMessages(float $timeout = 0): void;
+
+    public static function getInstance(): Bus
+    {
+        return app(self::class);
+    }
 
 }
