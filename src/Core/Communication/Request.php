@@ -62,22 +62,47 @@ class Request extends ActionMessage
         $response->setActionMessage($this);
         $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
         $bus = Bus::getInstance();
-        $bus->startConsumeReplyMessages(
-            $this,
-            static function (Message $message) use ($response) {
-                $response->collectReplyMessage($message);
-
-                return !$response->isReplyMessagesCollected();
-            }
-        );
+        $bus->startConsumeReplyMessages(static fn(Message $message) => $response->collectReplyMessage($message));
 
         while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
             $bus->consumeReplyMessages($mustDieAt - microtime(true));
         }
 
-        $bus->stopConsumeReplyMessages($this);
+        $bus->stopConsumeReplyMessages();
 
-        $this->processResponse($response);
+        $switch = [
+            $response->getStartProcessingMessage() !== null,
+            $response->getActionErrorMessage() !== null,
+            $response->getActionResultMessage() !== null,
+        ];
+
+        switch ($switch) {
+            case [true, false, false]:
+                $actionErrorMessage = new ActionErrorMessage();
+                $actionErrorMessage->setCode(500);
+                $actionErrorMessage->setMessage(
+                    'The service responded, but did not process the request within the allotted time!'
+                );
+                $response->setActionErrorMessage($actionErrorMessage);
+                break;
+            case [false, false, false]:
+                $actionErrorMessage = new ActionErrorMessage();
+                $actionErrorMessage->setCode(500);
+                $actionErrorMessage->setMessage('Service not responding!');
+                $response->setActionErrorMessage($actionErrorMessage);
+                break;
+            case [true, false, true]:
+            case [true, true, false]:
+                break;
+            case [false, true, true]:
+            case [false, true, false]:
+            case [false, false, true]:
+            case [true, true, true]:
+            default:
+                throw new ImpossibilityDeterminingStatusOfResponseException();
+        }
+
+        $this->response = $response;
     }
 
     public function getResponse(): Response
@@ -110,47 +135,6 @@ class Request extends ActionMessage
         }
 
         $this->publish();
-    }
-
-    /**
-     * @throws \Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException
-     */
-    protected function processResponse(Response $response): void
-    {
-        $responseArray = [
-            $response->getStartProcessingMessage() !== null,
-            $response->getActionErrorMessage() !== null,
-            $response->getActionResultMessage() !== null,
-        ];
-
-        switch ($responseArray) {
-            case [true, false, false]:
-                $actionErrorMessage = new ActionErrorMessage();
-                $actionErrorMessage->setCode(500);
-                $actionErrorMessage->setMessage(
-                    'The service responded, but did not process the request within the allotted time!'
-                );
-                $response->setActionErrorMessage($actionErrorMessage);
-                break;
-            case [false, false, false]:
-                $actionErrorMessage = new ActionErrorMessage();
-                $actionErrorMessage->setCode(500);
-                $actionErrorMessage->setMessage('Service not responding!');
-                $actionErrorMessage->setInternalCode($this->response->getActionErrorMessage()->getInternalCode());
-                $response->setActionErrorMessage($actionErrorMessage);
-                break;
-            case [true, false, true]:
-            case [true, true, false]:
-                break;
-            case [false, true, true]:
-            case [false, true, false]:
-            case [false, false, true]:
-            case [true, true, true]:
-            default:
-                throw new ImpossibilityDeterminingStatusOfResponseException();
-        }
-
-        $this->response = $response;
     }
 
     private function authorizeService(): void

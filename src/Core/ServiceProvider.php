@@ -67,6 +67,7 @@ class ServiceProvider extends IlluminateServiceProvider
     private function mergeConfigs(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/config/app.php', 'app');
+        $this->mergeConfigFrom(__DIR__ . '/config/bus.php', 'bus');
         $this->mergeConfigFrom(__DIR__ . '/config/auth.php', 'auth');
         $this->mergeConfigFrom(__DIR__ . '/config/database.php', 'database');
         $this->mergeConfigFrom(__DIR__ . '/config/queue.php', 'queue');

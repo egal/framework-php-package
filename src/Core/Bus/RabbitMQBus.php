@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Egal\Core\Bus;
 
+use Illuminate\Support\Arr;
+use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Exceptions\MessageProcessingException;
 use Egal\Core\Exceptions\TargetQueueNotProvidedException;
-use Egal\Core\Exceptions\UnableDetermineMessageTypeException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
@@ -15,37 +17,53 @@ use Egal\Core\Messages\ActionResultMessage;
 use Egal\Core\Messages\EventMessage;
 use Egal\Core\Messages\HasActionMessageInterface;
 use Egal\Core\Messages\Message;
+use Egal\Core\Messages\MessageCreator;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
 use Egal\Exception\HasInternalCode;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Throwable;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Connectors\RabbitMQConnector;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
+/**
+ * @mixin AMQPChannel
+ */
 class RabbitMQBus extends Bus
 {
 
-    protected const REPLY_TO_PROPERTY_NAME = 'reply_to';
+    private const REPLY_TO_PROPERTY_NAME = 'reply_to';
 
-    protected RabbitMQQueue $connection;
+    private AMQPChannel $channel;
 
-    protected string $queueName;
+    private string $queueName;
 
-    protected string $replyQueueName;
+    private string $replyQueueName;
 
-    protected bool $replyQueueExists = false;
+    private bool $replyQueueExists = false;
 
-    public function __construct()
+    public function __construct(array $config)
     {
-        $connector = new RabbitMQConnector(app('events'));
-        $this->connection = $connector->connect(config('queue.connections.rabbitmq'));
+        $config = Arr::add($config, 'options.heartbeat', 0);
+
+        /** @var AbstractConnection $connector */
+        $connector = Arr::get($config, 'connection', AMQPLazyConnection::class);
+        $connection = $connector::create_connection(
+            Arr::shuffle(Arr::get($config, 'hosts', [])),
+            $this->filterOptions(Arr::get($config, 'options', []))
+        );
+
+        $this->channel = $connection->channel();
         $this->replyQueueName = config('app.service_name') . '.' . Str::uuid() . '.service.request_reply';
+    }
+
+    public function __call($name, $arguments)
+    {
+        $this->channel->{$name}(...$arguments);
     }
 
     public function publishMessage(Message $message): void
@@ -58,13 +76,16 @@ class RabbitMQBus extends Bus
         $serviceName = config('app.service_name');
         $this->queueName = $serviceName . '.service';
 
-        $this->connection->declareQueue(
+        $this->queue_declare(
             $this->queueName,
             false,
             false,
-            ['x-queue-mode' => 'default']
+            false,
+            false,
+            false,
+            new AMQPTable(['x-queue-mode' => 'default'])
         );
-        $this->connection->getChannel()->queue_bind(
+        $this->queue_bind(
             $this->queueName,
             'amq.direct',
             $serviceName . '.action'
@@ -77,8 +98,8 @@ class RabbitMQBus extends Bus
 
     public function processMessages(): void
     {
-        $this->connection->getChannel()->basic_qos(null, 1, null);
-        $this->connection->getChannel()->basic_consume(
+        $this->basic_qos(null, 1, null);
+        $this->basic_consume(
             $this->queueName,
             '',
             true,
@@ -89,20 +110,20 @@ class RabbitMQBus extends Bus
         );
 
         while (true) {
-            $this->connection->getChannel()->wait();
+            $this->wait();
         }
     }
 
-    public function startConsumeReplyMessages(ActionMessage $actionMessage, callable $callback): void
+    public function startConsumeReplyMessages(callable $callback): void
     {
         if (!$this->replyQueueExists) {
-            $this->connection->getChannel()->queue_declare(
+            $this->queue_declare(
                 $this->replyQueueName,
                 false,
                 false,
                 true,
                 true,
-                true,
+                false,
                 new AMQPTable([
                     'x-queue-mode' => 'default',
                     'x-expires' => config('app.request.wait_reply_message_ttl') * 1000,
@@ -110,60 +131,42 @@ class RabbitMQBus extends Bus
                 null
             );
 
-            $this->connection->getChannel()->basic_qos(null, 1, null);
-            $this->connection->getChannel()->basic_consume(
+            $this->basic_qos(null, 1, null);
+            $this->basic_consume(
                 $this->replyQueueName,
                 $this->replyQueueName,
                 true,
                 true,
                 true,
-                true,
-                null
+                true
             );
 
             $this->replyQueueExists = true;
         }
 
-        $convertJsonToMessage = static function (string $body): Message {
-            $body = json_decode($body, true);
-
-            if (!array_key_exists('type', $body)) {
-                throw new UnableDetermineMessageTypeException();
-            }
-
-            switch ($body['type']) {
-                case MessageType::START_PROCESSING:
-                    return StartProcessingMessage::fromArray($body);
-                case MessageType::ACTION_RESULT:
-                    return ActionResultMessage::fromArray($body);
-                case MessageType::ACTION_ERROR:
-                    return ActionErrorMessage::fromArray($body);
-                default:
-                    throw new UnsupportedMessageTypeException();
-            }
-        };
-
-        $this->connection->getChannel()->callbacks[$this->replyQueueName] =
-            static fn(AMQPMessage $message) => $callback($convertJsonToMessage($message->body));
+        $callback = static fn(AMQPMessage $message) => $callback(MessageCreator::fromJson($message->body));
+        $this->channel->callbacks[$this->replyQueueName] = $callback;
     }
 
-    public function stopConsumeReplyMessages(ActionMessage $actionMessage): void
+    public function stopConsumeReplyMessages(): void
     {
-        $this->connection->getChannel()->callbacks[$this->replyQueueName] = static function (AMQPMessage $message): void {
+        $this->channel->callbacks[$this->replyQueueName] = static function (AMQPMessage $message): void {
             // Since the consumer remains, but the handler needs to be turned off, we'll just make the callback empty.
+            return;
         };
     }
 
     public function consumeReplyMessages(float $timeout = 0): void
     {
         try {
-            $this->connection->getChannel()->wait(null, false, $timeout);
+            $this->wait(null, false, $timeout);
         } catch (AMQPTimeoutException $exception) {
             // This error is not critical, since it is a stopping point for processing the queue.
+            return;
         }
     }
 
-    protected function basicPublish(Message $message, ?string $targetQueue = null): void
+    private function basicPublish(Message $message, ?string $targetQueue = null): void
     {
         $exchange = 'amq.direct';
 
@@ -182,14 +185,14 @@ class RabbitMQBus extends Bus
             throw new UnsupportedMessageTypeException();
         }
 
-        $properties = ['delivery_mode' => 1];
+        $properties = ['delivery_mode' => AMQPMessage::DELIVERY_MODE_NON_PERSISTENT];
 
         if ($message instanceof ActionMessage) {
             $properties[self::REPLY_TO_PROPERTY_NAME] = $this->replyQueueName;
         }
 
         $AMQPMessage = new AMQPMessage($message->toJson(), $properties);
-        $this->connection->getChannel()->basic_publish($AMQPMessage, $exchange, $routingKey);
+        $this->basic_publish($AMQPMessage, $exchange, $routingKey);
     }
 
     private function processMessage(AMQPMessage $message): void
@@ -262,6 +265,26 @@ class RabbitMQBus extends Bus
         }
 
         Session::unsetActionMessage();
+    }
+
+    private function filterOptions($array): array
+    {
+        foreach ($array as $index => &$value) {
+            if (is_array($value)) {
+                $value = $this->filterOptions($value);
+
+                continue;
+            }
+
+            // If the value is null then remove it.
+            if ($value === null) {
+                unset($array[$index]);
+
+                continue;
+            }
+        }
+
+        return $array;
     }
 
 }

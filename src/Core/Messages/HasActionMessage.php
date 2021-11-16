@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 trait HasActionMessage
@@ -21,12 +23,11 @@ trait HasActionMessage
     {
         $result = parent::toArray();
 
-        if (isset($this->actionMessage))  {
+        if (isset($this->actionMessage)) {
             $result[MessageType::ACTION] = $this->actionMessage->toArray();
         }
 
         return $result;
     }
-
 
 }

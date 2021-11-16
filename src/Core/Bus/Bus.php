@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Egal\Core\Bus;
 
-use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 
 abstract class Bus
@@ -18,9 +17,9 @@ abstract class Bus
 
     abstract public function processMessages(): void;
 
-    abstract public function startConsumeReplyMessages(ActionMessage $actionMessage, callable $callback): void;
+    abstract public function startConsumeReplyMessages(callable $callback): void;
 
-    abstract public function stopConsumeReplyMessages(ActionMessage $actionMessage): void;
+    abstract public function stopConsumeReplyMessages(): void;
 
     abstract public function consumeReplyMessages(float $timeout = 0): void;
 
