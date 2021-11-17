@@ -107,7 +107,7 @@
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.ControlStructures.SwitchDeclaration.EmptyCase">
-        <exclude-pattern>src/Core/Communication/Request.php</exclude-pattern>
+        <exclude-pattern>src/Core/Communication/Response.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard">

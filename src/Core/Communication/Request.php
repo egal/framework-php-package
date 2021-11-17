@@ -6,9 +6,7 @@ namespace Egal\Core\Communication;
 
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
-use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\RequestException;
-use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Session\Session;
