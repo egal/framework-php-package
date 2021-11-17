@@ -23,7 +23,7 @@ abstract class Bus
 
     abstract public function consumeReplyMessages(float $timeout = 0): void;
 
-    public static function getInstance(): Bus
+    public static function instance(): Bus
     {
         return app(self::class);
     }

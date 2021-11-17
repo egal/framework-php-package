@@ -135,6 +135,7 @@
         <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
         <exclude name="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired"/>
         <exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
@@ -198,19 +199,6 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix">
         <exclude-pattern>src/Core/Messages/HasActionMessageInterface.php</exclude-pattern>
-    </rule>
-    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
-        <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
-        <exclude-pattern>src/Core/Messages/StartProcessingMessage.php</exclude-pattern>
-        <exclude-pattern>src/Core/Messages/Message.php</exclude-pattern>
-        <exclude-pattern>src/Core/Messages/ActionErrorMessage.php</exclude-pattern>
-        <exclude-pattern>src/Core/Messages/ActionResultMessage.php</exclude-pattern>
-        <exclude-pattern>src/Core/Messages/EventMessage.php</exclude-pattern>
-        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
-        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
-        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
-        <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
-        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>

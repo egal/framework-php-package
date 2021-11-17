@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Egal\Core\Bus;
 
+use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Events\EventManager;
 use Egal\Core\Exceptions\EventHandlingException;
-use Illuminate\Support\Arr;
-use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
-use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Exceptions\MessageProcessingException;
 use Egal\Core\Exceptions\TargetQueueNotProvidedException;
 use Egal\Core\Exceptions\UnsupportedMessageTypeException;
@@ -25,15 +22,17 @@ use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
 use Egal\Exception\HasInternalCode;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Throwable;
 
 /**
- * @mixin AMQPChannel
+ * @mixin \PhpAmqpLib\Channel\AMQPChannel
  */
 class RabbitMQBus extends Bus
 {
@@ -52,7 +51,7 @@ class RabbitMQBus extends Bus
     {
         $config = Arr::add($config, 'options.heartbeat', 0);
 
-        /** @var AbstractConnection $connector */
+        /** @var \PhpAmqpLib\Connection\AbstractConnection $connector */
         $connector = Arr::get($config, 'connection', AMQPLazyConnection::class);
         $connection = $connector::create_connection(
             Arr::shuffle(Arr::get($config, 'hosts', [])),
@@ -61,11 +60,6 @@ class RabbitMQBus extends Bus
 
         $this->channel = $connection->channel();
         $this->replyQueueName = config('app.service_name') . '.' . Str::uuid() . '.service.request_reply';
-    }
-
-    public function __call($name, $arguments)
-    {
-        $this->channel->{$name}(...$arguments);
     }
 
     public function publishMessage(Message $message): void
@@ -87,11 +81,7 @@ class RabbitMQBus extends Bus
             false,
             new AMQPTable(['x-queue-mode' => 'default'])
         );
-        $this->queue_bind(
-            $this->queueName,
-            'amq.direct',
-            $serviceName . '.action'
-        );
+        $this->queue_bind($this->queueName, 'amq.direct', $serviceName . '.action');
     }
 
     public function stopProcessingMessages(): void
@@ -109,7 +99,7 @@ class RabbitMQBus extends Bus
             true,
             false,
             false,
-            fn(AMQPMessage $message) => $this->processMessage($message)
+            fn (AMQPMessage $message) => $this->processMessage($message)
         );
 
         while (true) {
@@ -135,19 +125,12 @@ class RabbitMQBus extends Bus
             );
 
             $this->basic_qos(null, 1, null);
-            $this->basic_consume(
-                $this->replyQueueName,
-                $this->replyQueueName,
-                true,
-                true,
-                true,
-                true
-            );
+            $this->basic_consume($this->replyQueueName, $this->replyQueueName, true, true, true, true);
 
             $this->replyQueueExists = true;
         }
 
-        $callback = static fn(AMQPMessage $message) => $callback(MessageCreator::fromJson($message->body));
+        $callback = static fn (AMQPMessage $message) => $callback(MessageCreator::fromJson($message->body));
         $this->channel->callbacks[$this->replyQueueName] = $callback;
     }
 
@@ -220,14 +203,13 @@ class RabbitMQBus extends Bus
     }
 
     /**
-     * @param mixed $body
      * @throws \Egal\Core\Exceptions\TargetQueueNotProvidedException
      * @throws \Egal\Core\Exceptions\UnsupportedMessageTypeException
      * @throws \Egal\Core\Exceptions\InitializeMessageFromArrayException
      * @throws \Egal\Core\Exceptions\TokenSignatureInvalidException
      * @throws \Egal\Core\Exceptions\UndefinedTypeOfMessageException
      */
-    private function processActionMessage($body, AMQPMessage $message): void
+    private function processActionMessage(array $body, AMQPMessage $message): void
     {
         $actionMessage = ActionMessage::fromArray($body);
         $replyTo = $message->get(self::REPLY_TO_PROPERTY_NAME);
@@ -271,27 +253,20 @@ class RabbitMQBus extends Bus
         Session::unsetActionMessage();
     }
 
-    private function filterOptions($array): array
+    private function filterOptions(array $array): array
     {
-        foreach ($array as $index => &$value) {
+        foreach ($array as $index => $value) {
             if (is_array($value)) {
-                $value = $this->filterOptions($value);
-
-                continue;
-            }
-
-            // If the value is null then remove it.
-            if ($value === null) {
+                $array[$index] = $this->filterOptions($value);
+            } elseif ($value === null) {
                 unset($array[$index]);
-
-                continue;
             }
         }
 
         return $array;
     }
 
-    private function processEventMessage($body): void
+    private function processEventMessage(array $body): void
     {
         try {
             $eventMessage = EventMessage::fromArray($body);
@@ -312,6 +287,11 @@ class RabbitMQBus extends Bus
         } catch (Throwable $exception) {
             report($exception);
         }
+    }
+
+    public function __call(string $name, array $arguments): void
+    {
+        $this->channel->{$name}(...$arguments);
     }
 
 }

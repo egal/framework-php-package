@@ -61,8 +61,8 @@ class Request extends ActionMessage
         $response = new Response();
         $response->setActionMessage($this);
         $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
-        $bus = Bus::getInstance();
-        $bus->startConsumeReplyMessages(static fn(Message $message) => $response->collectReplyMessage($message));
+        $bus = Bus::instance();
+        $bus->startConsumeReplyMessages(static fn (Message $message) => $response->collectReplyMessage($message));
 
         while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
             $bus->consumeReplyMessages($mustDieAt - microtime(true));

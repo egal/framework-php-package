@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Bus;
 
 use Egal\Core\Exceptions\BusCreatorException;
-use Exception;
 use Illuminate\Support\Arr;
 
 class BusCreator
 {
 
-    /**
-     * @return Bus
-     * @throws Exception
-     */
     public static function createBus(): Bus
     {
         $connectionConfig = config('bus.connections.' . config('bus.default'));

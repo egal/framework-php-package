@@ -49,7 +49,7 @@ abstract class Message
 
     public function publish(): void
     {
-        Bus::getInstance()->publishMessage($this);
+        Bus::instance()->publishMessage($this);
     }
 
 }
