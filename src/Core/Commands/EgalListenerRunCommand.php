@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Egal\Core\Commands;
 
 /**
- * @deprecated
+ * @deprecated Since all the logic of this command goes to {@see EgalRunCommand}
  */
 class EgalListenerRunCommand extends EgalRunCommand
 {
@@ -17,6 +17,7 @@ class EgalListenerRunCommand extends EgalRunCommand
     public function handle(): void
     {
         $this->warn('This command was deprecated!');
+
         parent::handle();
     }
 

@@ -84,11 +84,6 @@ class RabbitMQBus extends Bus
         $this->queue_bind($this->queueName, 'amq.direct', $serviceName . '.action');
     }
 
-    public function stopProcessingMessages(): void
-    {
-        return;
-    }
-
     public function processMessages(): void
     {
         $this->basic_qos(null, 1, null);
@@ -105,6 +100,11 @@ class RabbitMQBus extends Bus
         while (true) {
             $this->wait();
         }
+    }
+
+    public function stopProcessingMessages(): void
+    {
+        $this->close();
     }
 
     public function startConsumeReplyMessages(callable $callback): void
@@ -134,14 +134,6 @@ class RabbitMQBus extends Bus
         $this->channel->callbacks[$this->replyQueueName] = $callback;
     }
 
-    public function stopConsumeReplyMessages(): void
-    {
-        $this->channel->callbacks[$this->replyQueueName] = static function (AMQPMessage $message): void {
-            // Since the consumer remains, but the handler needs to be turned off, we'll just make the callback empty.
-            return;
-        };
-    }
-
     public function consumeReplyMessages(float $timeout = 0): void
     {
         try {
@@ -150,6 +142,12 @@ class RabbitMQBus extends Bus
             // This error is not critical, since it is a stopping point for processing the queue.
             return;
         }
+    }
+
+    public function stopConsumeReplyMessages(): void
+    {
+        // Since the consumer remains, but the handler needs to be turned off, we'll just make the callback empty.
+        $this->channel->callbacks[$this->replyQueueName] = null;
     }
 
     private function basicPublish(Message $message, ?string $targetQueue = null): void
