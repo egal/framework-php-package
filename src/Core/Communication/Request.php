@@ -69,39 +69,7 @@ class Request extends ActionMessage
         }
 
         $bus->stopConsumeReplyMessages();
-
-        $switch = [
-            $response->getStartProcessingMessage() !== null,
-            $response->getActionErrorMessage() !== null,
-            $response->getActionResultMessage() !== null,
-        ];
-
-        switch ($switch) {
-            case [true, false, false]:
-                $actionErrorMessage = new ActionErrorMessage();
-                $actionErrorMessage->setCode(500);
-                $actionErrorMessage->setMessage(
-                    'The service responded, but did not process the request within the allotted time!'
-                );
-                $response->setActionErrorMessage($actionErrorMessage);
-                break;
-            case [false, false, false]:
-                $actionErrorMessage = new ActionErrorMessage();
-                $actionErrorMessage->setCode(500);
-                $actionErrorMessage->setMessage('Service not responding!');
-                $response->setActionErrorMessage($actionErrorMessage);
-                break;
-            case [true, false, true]:
-            case [true, true, false]:
-                break;
-            case [false, true, true]:
-            case [false, true, false]:
-            case [false, false, true]:
-            case [true, true, true]:
-            default:
-                throw new ImpossibilityDeterminingStatusOfResponseException();
-        }
-
+        $response->collect();
         $this->response = $response;
     }
 

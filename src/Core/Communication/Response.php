@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\Core\Communication;
 
+use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
 use Egal\Core\Exceptions\ReplyMessageNotBelongToRequestException;
 use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
@@ -23,12 +24,6 @@ class Response
     private ?ActionResultMessage $actionResultMessage = null;
 
     private ?ActionErrorMessage $actionErrorMessage = null;
-
-    private int $statusCode = 500;
-
-    private ?string $internalCode = null;
-
-    private ?string $errorMessage = null;
 
     public function getActionMessage(): ActionMessage
     {
@@ -123,6 +118,41 @@ class Response
             $this->setStartProcessingMessage($replyMessage);
         } else {
             throw new UnsupportedReplyMessageTypeException();
+        }
+    }
+
+    public function collect(): void
+    {
+        $switch = [
+            $this->getStartProcessingMessage() !== null,
+            $this->getActionErrorMessage() !== null,
+            $this->getActionResultMessage() !== null,
+        ];
+
+        switch ($switch) {
+            case [true, false, false]:
+                $actionErrorMessage = new ActionErrorMessage();
+                $actionErrorMessage->setCode(500);
+                $actionErrorMessage->setMessage(
+                    'The service responded, but did not process the request within the allotted time!'
+                );
+                $this->setActionErrorMessage($actionErrorMessage);
+                break;
+            case [false, false, false]:
+                $actionErrorMessage = new ActionErrorMessage();
+                $actionErrorMessage->setCode(500);
+                $actionErrorMessage->setMessage('Service not responding!');
+                $this->setActionErrorMessage($actionErrorMessage);
+                break;
+            case [true, false, true]:
+            case [true, true, false]:
+                break;
+            case [false, true, true]:
+            case [false, true, false]:
+            case [false, false, true]:
+            case [true, true, true]:
+            default:
+                throw new ImpossibilityDeterminingStatusOfResponseException();
         }
     }
 

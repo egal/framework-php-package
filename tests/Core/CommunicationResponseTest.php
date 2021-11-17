@@ -12,13 +12,18 @@ use Egal\Tests\PHPUnitUtil;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class CommunicationRequestTest extends TestCase
+class CommunicationResponseTest extends TestCase
 {
 
     public function dataProviderSetResponseStatusCode()
     {
         return [
-            //  SPM?,   AEM?,   AEM C,  ARM?,   E C,    E E
+            //  StartProcessingMessage exists
+            //  |       ActionErrorMessage exists
+            //  |       |       ActionErrorMessage code
+            //  |       |       |       ActionResultMessage exists
+            //  |       |       |       |       Expected code
+            //  |       |       |       |       |       Expect ImpossibilityDeterminingStatusOfResponseException
             [   false,  false,  null,   false,  500,    false   ],
             [   true,   false,  null,   false,  500,    false   ],
             [   true,   true,   500,    false,  500,    false   ],
@@ -35,15 +40,14 @@ class CommunicationRequestTest extends TestCase
     /**
      * @dataProvider dataProviderSetResponseStatusCode
      */
-    public function testSetResponseStatusCode(
+    public function testCollect(
         bool $startProcessingMessageExists,
         bool $actionErrorMessageExists,
         ?int $actionErrorMessageCode,
         bool $actionResultMessageExists,
         ?int $expectedCode,
-        bool $expectDefinitionOfResponseStatusException
+        bool $expectImpossibilityDeterminingStatusOfResponseException
     ) {
-        $request = new Request('service', 'model', 'action', []);
         $response = new Response();
 
         if ($startProcessingMessageExists) {
@@ -64,16 +68,14 @@ class CommunicationRequestTest extends TestCase
             $response->setActionResultMessage($actionResultMessage);
         }
 
-        if ($expectDefinitionOfResponseStatusException) {
+        if ($expectImpossibilityDeterminingStatusOfResponseException) {
             $this->expectException(ImpossibilityDeterminingStatusOfResponseException::class);
         }
 
-        PHPUnitUtil::setProperty($request, 'response', $response);
-
-        PHPUnitUtil::callMethod($request, 'setResponseStatusCode');
+        $response->collect();
 
         if ($expectedCode) {
-            $this->assertEquals($expectedCode, $request->getResponse()->getStatusCode());
+            $this->assertEquals($expectedCode, $response->getStatusCode());
         }
     }
 
