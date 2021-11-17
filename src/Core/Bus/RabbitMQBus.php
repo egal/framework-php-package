@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Egal\Core\Bus;
 
+use Egal\Core\Events\EventManager;
+use Egal\Core\Exceptions\EventHandlingException;
 use Illuminate\Support\Arr;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
@@ -94,6 +96,7 @@ class RabbitMQBus extends Bus
 
     public function stopProcessingMessages(): void
     {
+        return;
     }
 
     public function processMessages(): void
@@ -198,18 +201,19 @@ class RabbitMQBus extends Bus
     private function processMessage(AMQPMessage $message): void
     {
         $body = json_decode($message->body, true);
+        $type = Arr::get($body, 'type');
 
-        if (!isset($body['type'])) {
+        if (!$type) {
             throw new MessageProcessingException();
         }
 
-        switch ($body['type']) {
+        switch ($type) {
             case MessageType::ACTION:
                 $this->processActionMessage($body, $message);
                 break;
             case MessageType::EVENT:
-                throw new MessageProcessingException('НЕ РЕАЛИЗОВАНО!');
-            // TODO: Реализовать.
+                $this->processEventMessage($body);
+                break;
             default:
                 throw new MessageProcessingException('Error processing queue message! ' . json_encode($body));
         }
@@ -285,6 +289,29 @@ class RabbitMQBus extends Bus
         }
 
         return $array;
+    }
+
+    private function processEventMessage($body): void
+    {
+        try {
+            $eventMessage = EventMessage::fromArray($body);
+            $listenerClasses = EventManager::getListeners(
+                $eventMessage->getServiceName(),
+                $eventMessage->getModelName(),
+                $eventMessage->getName()
+            );
+
+            foreach ($listenerClasses as $listenerClass) {
+                if (!class_exists($listenerClass)) {
+                    throw new EventHandlingException();
+                }
+
+                $listener = new $listenerClass();
+                $listener->{'handle'}($body['data']);
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
 }
