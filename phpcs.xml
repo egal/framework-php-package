@@ -109,6 +109,9 @@
     <rule ref="Squiz.ControlStructures.SwitchDeclaration.EmptyCase">
         <exclude-pattern>src/Core/Communication/Response.php</exclude-pattern>
     </rule>
+    <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
+        <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
+    </rule>
 
     <rule ref="SlevomatCodingStandard">
         <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
