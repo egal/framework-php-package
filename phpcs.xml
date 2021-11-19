@@ -83,6 +83,7 @@
         <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
         <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned"/>
         <exclude name="Squiz.Commenting.ClassComment.TagNotAllowed"/>
+        <exclude name="Squiz.PHP.NonExecutableCode.ReturnNotRequired"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>

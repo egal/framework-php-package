@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Egal\Model\Traits;
 
 use Egal\Model\Exceptions\HashGuardException;
-use Egal\Model\Model;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -20,27 +19,15 @@ use Illuminate\Support\Facades\Schema;
  * Для добавления дополнительных полей, которые нужно исключить из списка защищенных -
  * нужно переопределить $ignoreHashShieldingFields атрибут.
  *
- * @mixin Model
+ * @mixin \Egal\Model\Model
  */
 trait HashGuard
 {
 
-    public function initializeHashGuard()
+    public function initializeHashGuard(): void
     {
-        # TODO: Проверить используется ли в static HashGradable
+        // TODO: Проверить используется ли в static HashGradable.
         $this->computeHashShieldingFields();
-    }
-
-    public static function bootHashGuard()
-    {
-        static::saved(function (self $model) {
-            $model->refresh();
-            $model->setHash($model->makeHash());
-            $model->saveQuietly();
-        });
-        static::retrieved(function (self $model) {
-            $model->checkHash();
-        });
     }
 
     public function getHash(): string
@@ -57,35 +44,18 @@ trait HashGuard
 
     /**
      * Проверка возможности проведения защиты
+     *
+     * @throws \Egal\Model\Exceptions\HashGuardException
      */
-    public function mayUsesHashGuardOrFail()
+    public function mayUsesHashGuardOrFail(): void
     {
         if (!$this->getModelMetadata()->fieldExist($this->getHashFieldName())) {
-            throw new HashGuardException(
-                'Missing ' . $this->getHashFieldName() . ' field in Metadata!'
-            );
+            throw new HashGuardException('Missing ' . $this->getHashFieldName() . ' field in Metadata!');
         }
 
         if (!Schema::hasColumn($this->getTable(), $this->getHashFieldName())) {
-            throw new HashGuardException(
-                'Missing ' . $this->getHashFieldName() . ' field in database!'
-            );
+            throw new HashGuardException('Missing ' . $this->getHashFieldName() . ' field in database!');
         }
-    }
-
-    /**
-     * Генерация hash данных модели
-     */
-    protected function makeHash(): string
-    {
-        $this->mayUsesHashGuardOrFail();
-
-        // Получаем данные модели, которые будем использовать для генерации hash,
-        // меняя местами ключи и значения у $this->hashShieldingFields
-        // и находя общие значения между получившимся массивом и $this->attributesToArray() по ключам
-        $toHashAttributes = array_intersect_key($this->attributesToArray(), array_flip($this->hashShieldingFields));
-
-        return hash('SHA256', json_encode($toHashAttributes));
     }
 
     /**
@@ -93,21 +63,21 @@ trait HashGuard
      */
     public function computeHashShieldingFields(): self
     {
-        # TODO: Неправильно оставлять поля timestamps без защиты (при выставлении hash они изменяются LaravelModel)
-        // Описываем поля, которые по стандарту игнорируются проверкой
+        // TODO: Неправильно оставлять поля timestamps без защиты (при выставлении hash они изменяются LaravelModel).
+        // Описываем поля, которые по стандарту игнорируются проверкой.
         $defaultIgnoreHashShieldingFields = [
             $this->getHashFieldName(),
             $this::CREATED_AT,
-            $this::UPDATED_AT
+            $this::UPDATED_AT,
         ];
 
-        // Если указано в списке полей требуемых защиты указано '*' - выставляем на проверку все поля
-        if ($this->hashShieldingFields == ['*']) {
+        // Если указано в списке полей требуемых защиты указано '*' - выставляем на проверку все поля.
+        if ($this->hashShieldingFields === ['*']) {
             $this->hashShieldingFields = $this->getModelMetadata()->getFields();
         }
 
         // Получаем итоговый список полей, которые нужно защитить
-        // путём нахождения разницы выставленных полей для защиты и полей не требующих защиты
+        // путём нахождения разницы выставленных полей для защиты и полей не требующих защиты.
         $this->hashShieldingFields = array_diff(
             $this->hashShieldingFields,
             $this->ignoreHashShieldingFields,
@@ -119,32 +89,61 @@ trait HashGuard
 
     /**
      * Проверка совпадения текущего hash и который должен быть
+     *
+     * @throws \Egal\Model\Exceptions\HashGuardException
      */
-    public function checkHash()
+    public function checkHash(): void
     {
         if ($this->getHash() !== $this->makeHash()) {
             throw new HashGuardException('Data check hash failed!');
         }
     }
 
+    public static function bootHashGuard(): void
+    {
+        static::saved(static function (self $model): void {
+            $model->refresh();
+            $model->setHash($model->makeHash());
+            $model->saveQuietly();
+        });
+        static::retrieved(static function (self $model): void {
+            $model->checkHash();
+        });
+    }
+
     /**
      * TODO: Сделать консольную команду rehash
      */
-    public static function rehash(array $ids = [])
+    public static function rehash(array $ids = []): void
     {
-        static::withoutEvents(function () use ($ids) {
+        static::withoutEvents(static function () use ($ids): void {
             $query = static::query();
 
-            if (!empty($ids)) {
+            if ($ids !== []) {
                 $query->whereIn('id', $ids);
             }
 
             $items = $query->get();
-            $items->each(function (self $item) {
+            $items->each(static function (self $item): void {
                 $item->setHash($item->makeHash());
                 $item->saveQuietly();
             });
         });
+    }
+
+    /**
+     * Генерация hash данных модели
+     */
+    protected function makeHash(): string
+    {
+        $this->mayUsesHashGuardOrFail();
+
+        // Получаем данные модели, которые будем использовать для генерации hash,
+        // меняя местами ключи и значения у $this->hashShieldingFields
+        // и находя общие значения между получившимся массивом и $this->attributesToArray() по ключам.
+        $toHashAttributes = array_intersect_key($this->attributesToArray(), array_flip($this->hashShieldingFields));
+
+        return hash('SHA256', json_encode($toHashAttributes));
     }
 
 }
