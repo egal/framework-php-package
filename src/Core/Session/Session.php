@@ -52,14 +52,6 @@ final class Session
         return true;
     }
 
-    /**
-     * @deprecated since v2.0.0, use {@see Session::isUserServiceTokenExistsOrFail()}.
-     */
-    public static function userServiceTokenExistsOrFail(): bool
-    {
-        return self::isUserServiceTokenExistsOrFail();
-    }
-
     public static function getAuthStatus(): string
     {
         return self::isUserServiceTokenExists() || self::isServiceServiceTokenExists()
@@ -107,14 +99,6 @@ final class Session
         }
 
         return true;
-    }
-
-    /**
-     * @deprecated since v2.0.0, use {@see Session::isActionMessageExistsOrFail()}.
-     */
-    public static function actionMessageExistsOrFail(): bool
-    {
-        return self::isActionMessageExistsOrFail();
     }
 
     public static function setActionMessage(ActionMessage $actionMessage): void

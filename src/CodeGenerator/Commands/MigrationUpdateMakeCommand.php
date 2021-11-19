@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
-use Egal\Model\Metadata\ModelMetadata;
 use Illuminate\Support\Str;
 
 class MigrationUpdateMakeCommand extends MakeCommand
@@ -34,33 +33,12 @@ class MigrationUpdateMakeCommand extends MakeCommand
     private array $tableFields = [];
 
     /**
-     * @var string[] Array: field => type from the "{@property}" tag of the model.
-     */
-    private array $fieldsTypes = [];
-
-    /**
-     * @var mixed[] Array of validation rules from the "{@validation-rules}" tag of the model.
-     */
-    private array $validationRules;
-
-    /**
-     * @var string[] Array of key fields from the "{@primary-key}" tag of the model.
-     */
-    private array $primaryKeys = [];
-
-    /**
      * @throws \Exception
      */
     public function handle(): void
     {
         $modelName = trim((string) $this->argument('model-name'));
         $this->tableName = Str::snake(Str::plural($modelName));
-
-        $modelMetadata = new ModelMetadata('App\\Models\\' . $modelName);
-
-        $this->validationRules = $modelMetadata->getValidationRules();
-        $this->fieldsTypes = $modelMetadata->getFieldsWithTypes();
-        $this->primaryKeys = $modelMetadata->getPrimaryKeys();
 
         $this->className = 'Update' . Str::plural($modelName) . 'Table';
         $this->fileBaseName = Str::snake(date('Y_m_d_His') . $this->className);

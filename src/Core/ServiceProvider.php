@@ -6,7 +6,6 @@ namespace Egal\Core;
 
 use Egal\Core\Bus\Bus;
 use Egal\Core\Bus\BusCreator;
-use Egal\Core\Commands\EgalListenerRunCommand;
 use Egal\Core\Commands\EgalRunCommand;
 use Egal\Core\Commands\GenerateKeyCommand;
 use Egal\Core\Events\EventManager;
@@ -50,7 +49,6 @@ class ServiceProvider extends IlluminateServiceProvider
 
             $this->commands([
                 EgalRunCommand::class,
-                EgalListenerRunCommand::class,
                 GenerateKeyCommand::class,
             ]);
         }

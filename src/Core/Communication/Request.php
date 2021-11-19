@@ -79,7 +79,6 @@ class Request extends ActionMessage
     /**
      * @param mixed $key
      * @return mixed[]
-     * @depricated since v2.0.0
      */
     public function getParameter($key): array
     {

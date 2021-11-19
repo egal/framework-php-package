@@ -196,14 +196,15 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreateMany(array $objects = []): array
     {
-        $entity = new static();
-        $entity->makeIsInstanceForAction();
-        $entity->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
+        $model = new static();
+        $model->makeIsInstanceForAction();
+        $model->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
         DB::beginTransaction();
 
         foreach ($objects as $attributes) {
-            $entity = static::newInstanceForAction();
+            $entity = new static();
+            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
 
             try {

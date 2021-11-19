@@ -1,17 +1,17 @@
-<?php /** @noinspection PhpUnused */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\Model\Traits;
 
-use Egal\Model\Builder;
 use Egal\Model\Exceptions\HashGuardException;
 use Egal\Model\Model;
 use Illuminate\Support\Facades\Schema;
-use ReflectionException;
 
 /**
  * Trait используется для защиты данных с помощью проверки hash объекта.
  *
- * Для включения защиты объектов, нужно включить данный Trait в смою Model.
+ * Для включения защиты объектов, нужно включить данный Trait в свою Model.
  *
  * По стандарту защищаются все атрибуты, кроме полей timestamps и поля хранящего hash.
  * Для формирования точно списка защищенных полей -
@@ -21,68 +21,51 @@ use ReflectionException;
  * нужно переопределить $ignoreHashShieldingFields атрибут.
  *
  * @mixin Model
- * @package Egal\Model
  */
 trait HashGuard
 {
 
-    /**
-     * @throws ReflectionException
-     * @noinspection PhpUnused
-     */
     public function initializeHashGuard()
     {
         # TODO: Проверить используется ли в static HashGradable
         $this->computeHashShieldingFields();
     }
 
-    /** @noinspection PhpUnused */
     public static function bootHashGuard()
     {
-        static::saved(function ($model) {
-            /** @var static $model */
+        static::saved(function (self $model) {
             $model->refresh();
             $model->setHash($model->makeHash());
             $model->saveQuietly();
         });
-
-        static::retrieved(function ($model) {
-            /** @var static $model */
+        static::retrieved(function (self $model) {
             $model->checkHash();
         });
     }
 
-    /**
-     * @return mixed
-     */
-    public function getHash()
+    public function getHash(): string
     {
-        return $this->{$this->getHashFieldName()};
+        return $this->getAttribute($this->getHashFieldName());
     }
 
-    /**
-     * @param $hash
-     * @return $this
-     */
-    public function setHash($hash): HashGuard
+    public function setHash(string $hash): self
     {
-        $this->{$this->getHashFieldName()} = $hash;
+        $this->setAttribute($this->getHashFieldName(), $hash);
+
         return $this;
     }
 
     /**
      * Проверка возможности проведения защиты
-     *
-     * @throws HashGuardException
-     * @throws ReflectionException
      */
     public function mayUsesHashGuardOrFail()
     {
-        if (!$this->getModelMetadata()->databaseFieldExists($this->getHashFieldName())) {
+        if (!$this->getModelMetadata()->fieldExist($this->getHashFieldName())) {
             throw new HashGuardException(
                 'Missing ' . $this->getHashFieldName() . ' field in Metadata!'
             );
         }
+
         if (!Schema::hasColumn($this->getTable(), $this->getHashFieldName())) {
             throw new HashGuardException(
                 'Missing ' . $this->getHashFieldName() . ' field in database!'
@@ -92,10 +75,6 @@ trait HashGuard
 
     /**
      * Генерация hash данных модели
-     *
-     * @return string
-     * @throws HashGuardException
-     * @throws ReflectionException
      */
     protected function makeHash(): string
     {
@@ -111,12 +90,8 @@ trait HashGuard
 
     /**
      * Вычисление полей требуемых для hash защиты данных модели
-     * (вычисление $this->hashShieldingFields)
-     *
-     * @return $this
-     * @throws ReflectionException
      */
-    public function computeHashShieldingFields(): HashGuard
+    public function computeHashShieldingFields(): self
     {
         # TODO: Неправильно оставлять поля timestamps без защиты (при выставлении hash они изменяются LaravelModel)
         // Описываем поля, которые по стандарту игнорируются проверкой
@@ -128,7 +103,7 @@ trait HashGuard
 
         // Если указано в списке полей требуемых защиты указано '*' - выставляем на проверку все поля
         if ($this->hashShieldingFields == ['*']) {
-            $this->hashShieldingFields = $this->getModelMetadata()->getDatabaseFields();
+            $this->hashShieldingFields = $this->getModelMetadata()->getFields();
         }
 
         // Получаем итоговый список полей, которые нужно защитить
@@ -144,9 +119,6 @@ trait HashGuard
 
     /**
      * Проверка совпадения текущего hash и который должен быть
-     *
-     * @throws HashGuardException
-     * @throws ReflectionException
      */
     public function checkHash()
     {
@@ -156,23 +128,19 @@ trait HashGuard
     }
 
     /**
-     * @param array $ids
-     * @throws HashGuardException
-     * @throws ReflectionException
-     * @noinspection PhpUnused
      * TODO: Сделать консольную команду rehash
      */
     public static function rehash(array $ids = [])
     {
         static::withoutEvents(function () use ($ids) {
-            /** @var Builder $query */
             $query = static::query();
+
             if (!empty($ids)) {
                 $query->whereIn('id', $ids);
             }
+
             $items = $query->get();
-            $items->each(function ($item) {
-                /** @var static $item */
+            $items->each(function (self $item) {
                 $item->setHash($item->makeHash());
                 $item->saveQuietly();
             });

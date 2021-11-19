@@ -44,10 +44,7 @@ class MigrationCreateMakeCommand extends MakeCommand
      */
     private array $validationRules;
 
-    /**
-     * @var string[] An array of key fields from the "{@primary-key}" tag of the model.
-     */
-    private array $primaryKeys = [];
+    private ?string $primaryKey;
 
     /**
      * @throws \Exception
@@ -61,7 +58,7 @@ class MigrationCreateMakeCommand extends MakeCommand
 
         $this->validationRules = $modelMetadata->getValidationRules();
         $this->fieldsTypes = $modelMetadata->getFieldsWithTypes();
-        $this->primaryKeys = $modelMetadata->getPrimaryKeys();
+        $this->primaryKey = $modelMetadata->getPrimaryKey();
         $this->className = 'Create' . Str::plural($modelName) . 'Table';
         $this->fileBaseName = Str::snake(date('Y_m_d_His') . $this->className);
         $this->filePath = base_path('database/migrations') . '/' . $this->fileBaseName . '.php';
@@ -97,7 +94,7 @@ class MigrationCreateMakeCommand extends MakeCommand
             $this->parseValidationRules($field);
 
             // Adding primary for the field.
-            if (!isset($this->tableFields[$field]) || !in_array($field, $this->primaryKeys)) {
+            if (!isset($this->tableFields[$field]) || $field !== $this->primaryKey) {
                 continue;
             }
 
@@ -177,6 +174,8 @@ class MigrationCreateMakeCommand extends MakeCommand
         if (in_array('nullable', $this->validationRules[$field])) {
             $this->tableFields[$field] = str_replace(';', '->nullable();', $this->tableFields[$field]);
         }
+
+        return;
     }
 
 }

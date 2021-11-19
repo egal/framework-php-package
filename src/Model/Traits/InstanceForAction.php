@@ -22,21 +22,10 @@ trait InstanceForAction
     public function newInstance($attributes = [], $exists = false): self
     {
         $instance = parent::newInstance($attributes, $exists);
-        
+
         if ($this->isInstanceForAction) {
             $instance->makeIsInstanceForAction();
         }
-
-        return $instance;
-    }
-
-    /**
-     * @depricated sience v2.0.0
-     */
-    protected static function newInstanceForAction(): self
-    {
-        $instance = new static();
-        $instance->makeIsInstanceForAction();
 
         return $instance;
     }

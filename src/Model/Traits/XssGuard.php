@@ -29,7 +29,7 @@ trait XssGuard
     {
         # TODO: Проверить используется ли в static XssGuardable
         $casts = [];
-        $fieldNames = array_diff($this->getModelMetadata()->getDatabaseFields(), $this->ignoreXssShieldingFields);
+        $fieldNames = array_diff($this->getModelMetadata()->getFields(), $this->ignoreXssShieldingFields);
         foreach ($fieldNames as $fieldName) {
             $casts[$fieldName] = $this->xssShieldingCastClass;
         }

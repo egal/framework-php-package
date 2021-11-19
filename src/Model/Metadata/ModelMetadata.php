@@ -32,12 +32,6 @@ class ModelMetadata
 
     /**
      * @var string[]
-     * @deprecated from v2.0.0, use {@see ModelMetadata::$fields}.
-     */
-    protected array $databaseFields = [];
-
-    /**
-     * @var string[]
      */
     protected array $fields = [];
 
@@ -106,7 +100,7 @@ class ModelMetadata
             'fake_fields' => $this->fakeFields,
             'relations' => $this->relations,
             'validation_rules' => $this->validationRules,
-            'primary_keys' => $this->getPrimaryKeys(),
+            'primary_key' => $this->getPrimaryKey(),
             'actions_metadata' => [],
         ];
 
@@ -140,15 +134,6 @@ class ModelMetadata
     public function getFieldsWithTypes(): array
     {
         return $this->fieldsWithTypes;
-    }
-
-    /**
-     * @return array
-     * @deprecated from v2.0.0, use {@see ModelMetadata::getFields()}
-     */
-    public function getDatabaseFields(): array
-    {
-        return $this->fields;
     }
 
     public function getModelShortName(): string
@@ -221,14 +206,6 @@ class ModelMetadata
         }
 
         throw ActionNotFoundException::make($this->modelClass, $actionName);
-    }
-
-    /**
-     * @deprecated from 2.0.0, use {@see ModelMetadata::fieldExist()}
-     */
-    public function databaseFieldExists(string $string): bool
-    {
-        return $this->fieldExist($string);
     }
 
     public function fieldExist(string $fieldName): bool
