@@ -9,7 +9,6 @@ use Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\IncorrectCaseOfPropertyVariableNameException;
 use Egal\Model\Exceptions\ModelMetadataException;
-use Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Exceptions\UnsupportedModelMetadataPropertyTypeException;
@@ -369,7 +368,6 @@ class ModelMetadata
 
     /**
      * @throws \Egal\Model\Exceptions\DuplicatePrimaryKeyModelMetadataException
-     * @throws \Egal\Model\Exceptions\ModelMetadataTagContainsSpaceException
      * @throws \Egal\Model\Exceptions\UnsupportedModelMetadataPropertyTypeException
      */
     protected function scanPropertyTag(
@@ -384,13 +382,6 @@ class ModelMetadata
 
         switch ($tagName) {
             case 'validation-rules':
-                // Check string not contain spaces.
-                $pattern = '/[^\s]+/';
-
-                if (!preg_match($pattern, $bodyTemplate, $matches) || $matches[0] !== $bodyTemplate) {
-                    throw ModelMetadataTagContainsSpaceException::make($tagName);
-                }
-
                 $this->validationRules[$propertyVariableName] = explode('|', $bodyTemplate);
 
                 break;
