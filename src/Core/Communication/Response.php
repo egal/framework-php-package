@@ -11,6 +11,7 @@ use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\ActionResultMessage;
+use Egal\Core\Messages\HasActionMessageInterface;
 use Egal\Core\Messages\Message;
 use Egal\Core\Messages\StartProcessingMessage;
 
@@ -60,9 +61,7 @@ class Response
         if ($this->getActionErrorMessage()) {
             $statusCode = $this->getActionErrorMessage()->getCode();
 
-            return $statusCode !== 0
-                ? $statusCode
-                : 500;
+            return $statusCode !== 0 ? $statusCode : 500;
         }
 
         return 200;
@@ -100,21 +99,19 @@ class Response
 
     public function collectReplyMessage(Message $replyMessage): void
     {
-        $checkAffiliation = function ($message): void {
-            /** @var \Egal\Core\Messages\ActionResultMessage|\Egal\Core\Messages\ActionErrorMessage|\Egal\Core\Messages\StartProcessingMessage $message */
-            if ($message->getActionMessage()->getUuid() !== $this->getActionMessage()->getUuid()) {
-                throw new ReplyMessageNotBelongToRequestException();
-            }
-        };
+        if (!($replyMessage instanceof HasActionMessageInterface)) {
+            throw new UnsupportedReplyMessageTypeException();
+        }
+
+        if ($replyMessage->getActionMessage()->getUuid() !== $this->getActionMessage()->getUuid()) {
+            throw new ReplyMessageNotBelongToRequestException();
+        }
 
         if ($replyMessage instanceof ActionResultMessage) {
-            $checkAffiliation($replyMessage);
             $this->setActionResultMessage($replyMessage);
         } elseif ($replyMessage instanceof ActionErrorMessage) {
-            $checkAffiliation($replyMessage);
             $this->setActionErrorMessage($replyMessage);
         } elseif ($replyMessage instanceof StartProcessingMessage) {
-            $checkAffiliation($replyMessage);
             $this->setStartProcessingMessage($replyMessage);
         } else {
             throw new UnsupportedReplyMessageTypeException();
