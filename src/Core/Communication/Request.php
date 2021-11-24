@@ -54,23 +54,6 @@ class Request extends ActionMessage
         return $this->serviceAuthorization;
     }
 
-    public function waitResponse(): void
-    {
-        $response = new Response();
-        $response->setActionMessage($this);
-        $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
-        $bus = Bus::instance();
-        $bus->startConsumeReplyMessages(static fn (Message $message) => $response->collectReplyMessage($message));
-
-        while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
-            $bus->consumeReplyMessages($mustDieAt - microtime(true));
-        }
-
-        $bus->stopConsumeReplyMessages();
-        $response->collect();
-        $this->response = $response;
-    }
-
     public function getResponse(): Response
     {
         return $this->response;
@@ -87,8 +70,20 @@ class Request extends ActionMessage
 
     public function call(): Response
     {
+        $response = new Response();
+        $response->setActionMessage($this);
+        $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
+        $bus = Bus::instance();
+        $bus->startConsumeReplyMessages(static fn (Message $message) => $response->collectReplyMessage($message));
         $this->send();
-        $this->waitResponse();
+
+        while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
+            $bus->consumeReplyMessages($mustDieAt - microtime(true));
+        }
+
+        $bus->stopConsumeReplyMessages();
+        $response->collect();
+        $this->response = $response;
 
         return $this->getResponse();
     }
