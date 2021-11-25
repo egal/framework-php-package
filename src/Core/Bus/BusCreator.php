@@ -1,26 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Bus;
 
 use Egal\Core\Exceptions\BusCreatorException;
-use Exception;
+use Illuminate\Support\Arr;
 
 class BusCreator
 {
 
-    /**
-     * @return Bus
-     * @throws Exception
-     */
     public static function createBus(): Bus
     {
-        $defaultConnection = config('queue.default');
-        $driver = config("queue.connections.$defaultConnection.driver");
-        switch ($driver) {
+        $connectionConfig = config('bus.connections.' . config('bus.default'));
+
+        if ($connectionConfig === null) {
+            throw new BusCreatorException('Bus connection not provided!');
+        }
+
+        switch (Arr::get($connectionConfig, 'driver')) {
             case 'rabbitmq':
-                return new RabbitMQBus();
+                return new RabbitMQBus($connectionConfig);
+            case null:
+                throw new BusCreatorException('Bus connection driver not provided!');
             default:
-                throw new BusCreatorException("Unsupported queue driver type - $driver!");
+                throw new BusCreatorException('Unsupported queue driver type!');
         }
     }
 

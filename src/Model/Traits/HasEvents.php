@@ -12,14 +12,6 @@ use Egal\Core\Events\GlobalEvent;
 trait HasEvents
 {
 
-    /**
-     * @deprecated since v.2.0.0
-     */
-    public function isNeedFireActionEvents(): bool
-    {
-        return $this->isInstanceForAction;
-    }
-
     public static function retrievedWithAction($callback)
     {
         static::registerModelEvent('retrieved.action', $callback);

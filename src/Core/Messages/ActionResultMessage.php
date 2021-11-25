@@ -1,33 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Messages;
 
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
-use Exception;
 
-class ActionResultMessage extends Message
+class ActionResultMessage extends Message implements HasActionMessageInterface
 {
 
     use HasActionMessage;
 
-    protected string $type = MessageType::ACTION_RESULT;
-
     /**
      * @var mixed
      */
-    public $data;
+    protected $data;
 
-    /**
-     * @param array $array
-     * @return ActionResultMessage
-     * @throws Exception
-     */
+    protected string $type = MessageType::ACTION_RESULT;
+
     public static function fromArray(array $array): ActionResultMessage
     {
         if (!isset($array['type'])) {
             throw new UndefinedTypeOfMessageException();
         }
+
         if ($array['type'] !== MessageType::ACTION_RESULT) {
             throw new InitializeMessageFromArrayException('Invalid type substitution!');
         }
@@ -35,10 +32,7 @@ class ActionResultMessage extends Message
         $result = new ActionResultMessage();
         $result->uuid = $array['uuid'];
         $result->data = $array['data'];
-
-        if (isset($array['action_message'])) {
-            $result->actionMessage = ActionMessage::fromArray($array['action_message']);
-        }
+        $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 
         return $result;
     }
@@ -58,6 +52,5 @@ class ActionResultMessage extends Message
     {
         $this->data = $data;
     }
-
 
 }

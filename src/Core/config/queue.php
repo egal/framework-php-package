@@ -35,7 +35,7 @@ return [
                     'passphrase' => env('RABBITMQ_SSL_PASSPHRASE'),
                 ],
                 'queue' => [
-                    'job' => Egal\Core\Jobs\RabbitMQJob::class,
+                    'job' => VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Jobs\RabbitMQJob::class,
                     'exchange' => 'amq.topic',
                     'exchange_type' => 'topic',
                 ],

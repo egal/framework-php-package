@@ -6,14 +6,12 @@ namespace Egal\Core;
 
 use Egal\Core\Bus\Bus;
 use Egal\Core\Bus\BusCreator;
-use Egal\Core\Commands\EgalListenerRunCommand;
 use Egal\Core\Commands\EgalRunCommand;
 use Egal\Core\Commands\GenerateKeyCommand;
 use Egal\Core\Events\EventManager;
 use Egal\Core\Exceptions\EgalCoreInitializationException;
 use Egal\Core\Session\Session;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
-use VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
@@ -36,8 +34,6 @@ class ServiceProvider extends IlluminateServiceProvider
             );
         }
 
-        $this->app->register(LaravelQueueRabbitMQServiceProvider::class);
-
         if ($this->app->runningInConsole()) {
             if (class_exists('Egal\CodeGenerator\ServiceProvider')) {
                 $this->app->register('Egal\CodeGenerator\ServiceProvider');
@@ -53,7 +49,6 @@ class ServiceProvider extends IlluminateServiceProvider
 
             $this->commands([
                 EgalRunCommand::class,
-                EgalListenerRunCommand::class,
                 GenerateKeyCommand::class,
             ]);
         }
@@ -70,6 +65,7 @@ class ServiceProvider extends IlluminateServiceProvider
     private function mergeConfigs(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/config/app.php', 'app');
+        $this->mergeConfigFrom(__DIR__ . '/config/bus.php', 'bus');
         $this->mergeConfigFrom(__DIR__ . '/config/auth.php', 'auth');
         $this->mergeConfigFrom(__DIR__ . '/config/database.php', 'database');
         $this->mergeConfigFrom(__DIR__ . '/config/queue.php', 'queue');

@@ -10,6 +10,9 @@
     <rule ref="PSR12">
         <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
     </rule>
+    <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
+        <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
+    </rule>
 
     <rule ref="Generic.Commenting.DocComment.NonParamGroup">
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
@@ -80,10 +83,11 @@
         <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
         <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned"/>
         <exclude name="Squiz.Commenting.ClassComment.TagNotAllowed"/>
+        <exclude name="Squiz.PHP.NonExecutableCode.ReturnNotRequired"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
         <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
-        <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+        <exclude-pattern>src/model/Traits/UsesBuilder.php</exclude-pattern>
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
@@ -92,7 +96,7 @@
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
-        <exclude-pattern>model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.BlockComment.LineIndent">
         <exclude-pattern>*/config/*</exclude-pattern>
@@ -105,6 +109,12 @@
     </rule>
     <rule ref="Squiz.Commenting.ClassComment.TagNotAllowed">
         <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.ControlStructures.SwitchDeclaration.EmptyCase">
+        <exclude-pattern>src/Core/Communication/Response.php</exclude-pattern>
+    </rule>
+    <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
+        <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard">
@@ -132,6 +142,7 @@
         <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
         <exclude name="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired"/>
         <exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
@@ -165,16 +176,13 @@
             <property name="maxLinesLength" value="50"/>
         </properties>
     </rule>
-    <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed">
-        <exclude-pattern>code-generator/Commands/MigrationCreateMakeCommand.php</exclude-pattern>
-    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
         <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
-        <exclude-pattern>model/Model.php</exclude-pattern>
-        <exclude-pattern>model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/model/Model.php</exclude-pattern>
+        <exclude-pattern>src/model/Builder.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
         <exclude-pattern>*FilterConditionApplier.php</exclude-pattern>
@@ -187,19 +195,14 @@
         <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
-        <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/core/ActionCaller/ActionCaller.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification">
-        <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/EventMessage.php</exclude-pattern>
     </rule>
-    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
-        <exclude-pattern>core/ActionCaller/ActionCaller.php</exclude-pattern>
-        <exclude-pattern>src/Core/Messages/ActionErrorMessage.php</exclude-pattern>
-        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
-        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
-        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
-        <exclude-pattern>src/Model/Filter/FilterConditions/SimpleFilterConditionApplier.php</exclude-pattern>
-        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
+    <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix">
+        <exclude-pattern>src/Core/Messages/HasActionMessageInterface.php</exclude-pattern>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
         <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>

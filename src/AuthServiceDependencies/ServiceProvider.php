@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Egal\AuthServiceDependencies;
 
-use Egal\AuthServiceDependencies\Commands\RegisterServiceCommand;
 use Egal\AuthServiceDependencies\Exceptions\IncorrectAppServicesEnvironmentVariablePatternException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -14,12 +13,6 @@ class ServiceProvider extends BaseServiceProvider
 
     public function register(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                RegisterServiceCommand::class,
-            ]);
-        }
-
         $this->registerServices();
     }
 

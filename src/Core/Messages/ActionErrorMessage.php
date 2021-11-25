@@ -7,7 +7,7 @@ namespace Egal\Core\Messages;
 use Egal\Core\Exceptions\InitializeMessageFromArrayException;
 use Egal\Core\Exceptions\UndefinedTypeOfMessageException;
 
-class ActionErrorMessage extends Message
+class ActionErrorMessage extends Message implements HasActionMessageInterface
 {
 
     use HasActionMessage;
@@ -43,10 +43,7 @@ class ActionErrorMessage extends Message
         $result->message = $array['message'];
         $result->code = $array['code'];
         $result->internalCode = $array['internal_code'] ?? null;
-
-        if (isset($array['action_message'])) {
-            $result->actionMessage = ActionMessage::fromArray($array['action_message']);
-        }
+        $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 
         return $result;
     }

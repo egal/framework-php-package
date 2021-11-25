@@ -1,9 +1,8 @@
 <?php
 
-namespace Egal\Model\Traits;
+declare(strict_types=1);
 
-use Egal\Model\Model;
-use ReflectionException;
+namespace Egal\Model\Traits;
 
 /**
  * Trait защиты от XSS атак.
@@ -11,7 +10,7 @@ use ReflectionException;
  * Позволяет защитить как все поля, так и выбранные в {@see XssGuardable::$ignoreXssShieldingFields}.
  * А также имеет возможность переопределения Cast класса в {@see XssGuardable::$xssShieldingCastClass}
  *
- * @mixin Model
+ * @mixin \Egal\Model\Model
  */
 trait XssGuard
 {
@@ -20,19 +19,21 @@ trait XssGuard
      * Инициализатор, дополнение конструктора модели
      *
      * При инициализации экземпляра класса выставляет на поля {@see XssGuardable::$xssShieldingCastClass},
-     * не указанные в {@see XssGuardable::$ignoreXssShieldingFields}
+     * не указанные в {@see XssGuardable::$ignoreXssShieldingFields}.
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @noinspection PhpUnused
      */
-    public function initializeXssGuard()
+    public function initializeXssGuard(): void
     {
-        # TODO: Проверить используется ли в static XssGuardable
+        // TODO: Проверить используется ли в static XssGuardable.
         $casts = [];
-        $fieldNames = array_diff($this->getModelMetadata()->getDatabaseFields(), $this->ignoreXssShieldingFields);
+        $fieldNames = array_diff($this->getModelMetadata()->getFields(), $this->ignoreXssShieldingFields);
+
         foreach ($fieldNames as $fieldName) {
             $casts[$fieldName] = $this->xssShieldingCastClass;
         }
+
         $this->mergeCasts($casts);
     }
 

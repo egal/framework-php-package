@@ -106,17 +106,17 @@ trait UsesValidator
     protected static function bootUsesValidator(): void
     {
         static::saving(static function (Model $entity): void {
-            $entity->fireModelEvent('validating', true);
+            $entity->fireModelEvent('validating');
 
-            if ($entity->isNeedFireActionEvents()) {
-                $entity->fireActionEvent('validating.action', true);
+            if ($entity->isInstanceForAction) {
+                $entity->fireActionEvent('validating.action');
                 $entity->validate();
-                $entity->fireActionEvent('validated.action', true);
+                $entity->fireActionEvent('validated.action');
             } else {
                 $entity->validate();
             }
 
-            $entity->fireModelEvent('validated', true);
+            $entity->fireModelEvent('validated');
         });
     }
 
