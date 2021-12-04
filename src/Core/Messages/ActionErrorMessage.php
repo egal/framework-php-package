@@ -12,16 +12,16 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
 
     use HasActionMessage;
 
-    /**
-     * @var mixed
-     */
-    protected $data;
-
     protected int $code;
 
     protected string $message;
 
     protected ?string $internalCode;
+
+    /**
+     * @var mixed
+     */
+    protected $data;
 
     protected string $type = MessageType::ACTION_ERROR;
 
