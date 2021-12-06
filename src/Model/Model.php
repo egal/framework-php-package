@@ -95,19 +95,19 @@ abstract class Model extends EloquentModel
     /**
      * Getting entity.
      *
-     * @param int|string $id Entity identification.
+     * @param int|string $keyValue Entity identification.
      * @param string[] $withs Array of relations displayed for an entity.
      * @return mixed[] Entity as an associative array.
      */
-    public static function actionGetItem($id, array $withs = []): array
+    public static function actionGetItem($keyValue, array $withs = []): array
     {
         $instance = new static();
         $instance->makeIsInstanceForAction();
-        $instance->validateKey($id);
+        $instance->validateKey($keyValue);
 
         return $instance->newQuery()
             ->makeModelIsInstanceForAction()
-            ->where('id', '=', $id)
+            ->where($instance->getKeyName(), '=', $keyValue)
             ->with($withs)
             ->firstOrFail()
             ->toArray();
@@ -226,27 +226,27 @@ abstract class Model extends EloquentModel
     /**
      * Entity update
      *
-     * @param int|string|null $id Entity identification.
+     * @param int|string|null $keyValue Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
      * @throws \Egal\Model\Exceptions\UpdateException
      */
-    public static function actionUpdate($id = null, array $attributes = []): array
+    public static function actionUpdate($keyValue = null, array $attributes = []): array
     {
         $instance = new static();
 
-        if (!isset($id)) {
+        if (!isset($keyValue)) {
             if (!isset($attributes[$instance->getKeyName()])) {
                 throw new UpdateException('The identifier of the entity being updated is not specified!');
             }
 
-            $id = $attributes[$instance->getKeyName()];
+            $keyValue = $attributes[$instance->getKeyName()];
         }
 
-        $instance->validateKey($id);
+        $instance->validateKey($keyValue);
 
         /** @var \Egal\Model\Model $entity */
-        $entity = $instance->newQuery()->findOrFail($id);
+        $entity = $instance->newQuery()->findOrFail($keyValue);
         $entity->makeIsInstanceForAction();
         $entity->update($attributes);
 
@@ -274,11 +274,11 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not specified index ' . $objectIndex . '!');
             }
 
-            $key = $attributes[$instance->getKeyName()];
-            $instance->validateKey($key);
+            $keyValue = $attributes[$instance->getKeyName()];
+            $instance->validateKey($keyValue);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($key);
+            $entity = $instance->newQuery()->find($keyValue);
 
             if (!$entity) {
                 DB::rollBack();
@@ -338,17 +338,17 @@ abstract class Model extends EloquentModel
     /**
      * Deleting an entity.
      *
-     * @param int|string $id Entity identification.
+     * @param int|string $keyValue Entity identification.
      * @return string[]
      * @throws \Egal\Model\Exceptions\NotFoundException
      */
-    public static function actionDelete($id): array
+    public static function actionDelete($keyValue): array
     {
         $instance = new static();
-        $instance->validateKey($id);
+        $instance->validateKey($keyValue);
 
         /** @var \Egal\Model\Model $entity */
-        $entity = $instance->newQuery()->find($id);
+        $entity = $instance->newQuery()->find($keyValue);
 
         if (!$entity) {
             throw new NotFoundException();
@@ -363,26 +363,26 @@ abstract class Model extends EloquentModel
     /**
      * Multiple deletion of entities
      *
-     * @param int[]|string[] $ids Array of identifiers for the entities to be deleted.
+     * @param int[]|string[] $keyValues Array of identifiers for the entities to be deleted.
      * @throws \Egal\Model\Exceptions\DeleteManyException
      * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
      */
-    public static function actionDeleteMany(array $ids): ?bool
+    public static function actionDeleteMany(array $keyValues): ?bool
     {
         $instance = new static();
-        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
+        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($keyValues));
         DB::beginTransaction();
 
-        foreach ($ids as $id) {
-            $instance->validateKey($id);
+        foreach ($keyValues as $keyValue) {
+            $instance->validateKey($keyValue);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($id);
+            $entity = $instance->newQuery()->find($keyValue);
 
             if (!$entity) {
                 DB::rollBack();
 
-                throw new DeleteManyException('Object not found with index  ' . $id . '!');
+                throw new DeleteManyException('Object not found with index  ' . $keyValue . '!');
             }
 
             try {
