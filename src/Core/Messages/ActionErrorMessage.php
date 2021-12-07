@@ -18,6 +18,11 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
 
     protected ?string $internalCode;
 
+    /**
+     * @var mixed[]
+     */
+    protected ?array $data;
+
     protected string $type = MessageType::ACTION_ERROR;
 
     public function __construct(string $message = '', int $code = 500)
@@ -43,6 +48,7 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
         $result->message = $array['message'];
         $result->code = $array['code'];
         $result->internalCode = $array['internal_code'] ?? null;
+        $result->data = $array['data'] ?? null;
         $result->actionMessage = ActionMessage::fromArray($array[MessageType::ACTION]);
 
         return $result;
@@ -76,6 +82,16 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
     public function getInternalCode(): ?string
     {
         return $this->internalCode;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
+    public function setData(?array $data): void
+    {
+        $this->data = $data;
     }
 
 }

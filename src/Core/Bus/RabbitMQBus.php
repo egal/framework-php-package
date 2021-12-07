@@ -20,6 +20,7 @@ use Egal\Core\Messages\MessageCreator;
 use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
+use Egal\Exception\HasData;
 use Egal\Exception\HasInternalCode;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
@@ -237,6 +238,10 @@ class RabbitMQBus extends Bus
                 default:
                     $actionErrorMessage->setCode($exception->getCode());
                     break;
+            }
+
+            if ($exception instanceof HasData) {
+                $actionErrorMessage->setData($exception->getData());
             }
 
             $actionErrorMessage->setActionMessage(Session::getActionMessage());

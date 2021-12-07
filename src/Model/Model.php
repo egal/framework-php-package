@@ -107,7 +107,7 @@ abstract class Model extends EloquentModel
 
         return $instance->newQuery()
             ->makeModelIsInstanceForAction()
-            ->where('id', '=', $id)
+            ->find($id)
             ->with($withs)
             ->firstOrFail()
             ->toArray();
