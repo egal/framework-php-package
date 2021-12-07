@@ -84,18 +84,12 @@ class ActionErrorMessage extends Message implements HasActionMessageInterface
         return $this->internalCode;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getData()
+    public function getData(): ?array
     {
         return $this->data;
     }
 
-    /**
-     * @param mixed $data
-     */
-    public function setData($data): void
+    public function setData(?array $data): void
     {
         $this->data = $data;
     }
