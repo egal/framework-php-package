@@ -107,7 +107,7 @@ abstract class Model extends EloquentModel
 
         return $instance->newQuery()
             ->makeModelIsInstanceForAction()
-            ->where('id', '=', $id)
+            ->find($id)
             ->with($withs)
             ->firstOrFail()
             ->toArray();
@@ -274,11 +274,11 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not specified index ' . $objectIndex . '!');
             }
 
-            $key = $attributes[$instance->getKeyName()];
-            $instance->validateKey($key);
+            $id = $attributes[$instance->getKeyName()];
+            $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($key);
+            $entity = $instance->newQuery()->find($id);
 
             if (!$entity) {
                 DB::rollBack();
