@@ -50,7 +50,7 @@ class FireActionModelEventsTest extends TestCase
             [
                 FireActionModelEventsTestSavedWithActionEvent::class,
                 fn() => FireActionModelEventsTestProductStub::actionUpdate(1, ['name' => 'saved_product']),
-                FireActionModelEventsTestRetrievedWithActionEvent::class
+                null
             ],
             [
                 FireActionModelEventsTestCreatingWithActionEvent::class,
@@ -60,12 +60,12 @@ class FireActionModelEventsTest extends TestCase
             [
                 FireActionModelEventsTestUpdatedWithActionEvent::class,
                 fn() => FireActionModelEventsTestProductStub::actionUpdate(1, ['name' => 'updated_product']),
-                FireActionModelEventsTestRetrievedWithActionEvent::class
+                null
             ],
             [
                 FireActionModelEventsTestDeletingWithActionEvent::class,
                 fn() => FireActionModelEventsTestProductStub::actionDelete(1),
-                FireActionModelEventsTestRetrievedWithActionEvent::class
+                null
             ]
         ];
     }

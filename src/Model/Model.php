@@ -243,6 +243,7 @@ abstract class Model extends EloquentModel
             $id = $attributes[$instance->getKeyName()];
         }
 
+        $instance->makeIsInstanceForAction();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -274,11 +275,12 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not specified index ' . $objectIndex . '!');
             }
 
-            $id = $attributes[$instance->getKeyName()];
-            $instance->validateKey($id);
+            $key = $attributes[$instance->getKeyName()];
+            $instance->makeIsInstanceForAction();
+            $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($id);
+            $entity = $instance->newQuery()->find($key);
 
             if (!$entity) {
                 DB::rollBack();
@@ -308,7 +310,7 @@ abstract class Model extends EloquentModel
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
         $instance = new static();
-        $builder = $instance->newQuery();
+        $builder = $instance->newQuery()->makeModelIsInstanceForAction();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
         $entities = $builder->get();
@@ -345,6 +347,7 @@ abstract class Model extends EloquentModel
     public static function actionDelete($id): array
     {
         $instance = new static();
+        $instance->makeIsInstanceForAction();
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
@@ -374,6 +377,7 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($ids as $id) {
+            $instance->makeIsInstanceForAction();
             $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
@@ -410,7 +414,7 @@ abstract class Model extends EloquentModel
     public static function actionDeleteManyRaw(array $filter = []): array
     {
         $instance = new static();
-        $builder = $instance->newQuery();
+        $builder = $instance->newQuery()->makeModelIsInstanceForAction();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
         $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
