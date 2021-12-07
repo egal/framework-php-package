@@ -21,7 +21,7 @@ use Egal\Core\Messages\MessageType;
 use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
 use Egal\Exception\HasInternalCode;
-use Egal\Exception\HasObjects;
+use Egal\Exception\HasData;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -240,8 +240,8 @@ class RabbitMQBus extends Bus
                     break;
             }
 
-            if ($exception instanceof HasObjects) {
-                $actionErrorMessage->setData($exception->getObjects());
+            if ($exception instanceof HasData) {
+                $actionErrorMessage->setData($exception->getData());
             }
 
             $actionErrorMessage->setActionMessage(Session::getActionMessage());
