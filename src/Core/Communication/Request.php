@@ -74,6 +74,11 @@ class Request extends ActionMessage
         $response->setActionMessage($this);
         $mustDieAt = microtime(true) + config('app.request.wait_reply_message_ttl');
         $bus = Bus::instance();
+
+        if ($this->isServiceAuthorizationEnabled()) {
+            $this->authorizeService();
+        }
+
         $bus->startConsumeReplyMessages(static fn (Message $message) => $response->collectReplyMessage($message));
         $this->send();
 
@@ -90,10 +95,6 @@ class Request extends ActionMessage
 
     public function send(): void
     {
-        if ($this->isServiceAuthorizationEnabled()) {
-            $this->authorizeService();
-        }
-
         $this->publish();
     }
 
