@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\Exception;
 
-interface HasData
+interface HasDataInterface
 {
 
     public function getData(): array;
