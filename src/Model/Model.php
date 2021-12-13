@@ -107,9 +107,8 @@ abstract class Model extends EloquentModel
 
         return $instance->newQuery()
             ->makeModelIsInstanceForAction()
-            ->find($id)
+            ->findOrFail($id)
             ->with($withs)
-            ->firstOrFail()
             ->toArray();
     }
 
@@ -278,7 +277,7 @@ abstract class Model extends EloquentModel
             $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($id);
+            $entity = $instance->newQuery()->findOrFail($id);
 
             if (!$entity) {
                 DB::rollBack();
@@ -348,7 +347,7 @@ abstract class Model extends EloquentModel
         $instance->validateKey($id);
 
         /** @var \Egal\Model\Model $entity */
-        $entity = $instance->newQuery()->find($id);
+        $entity = $instance->newQuery()->findOrFail($id);
 
         if (!$entity) {
             throw new NotFoundException();
@@ -377,7 +376,7 @@ abstract class Model extends EloquentModel
             $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($id);
+            $entity = $instance->newQuery()->findOrFail($id);
 
             if (!$entity) {
                 DB::rollBack();
