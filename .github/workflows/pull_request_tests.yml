@@ -59,6 +59,7 @@ jobs:
             ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
           if [ "${DIFF}" == '' ]; then exit 0; fi
           bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF
+      - run: cat .phpcs.results.xml
 
   PHPUnit80:
     runs-on: ubuntu-latest
