@@ -9,6 +9,7 @@
 
     <rule ref="PSR12">
         <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
+        <exclude name="PSR12.Classes.OpeningBraceSpace.Found"/>
     </rule>
     <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
         <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
@@ -17,11 +18,9 @@
     <rule ref="Generic.Commenting.DocComment.NonParamGroup">
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
     </rule>
-    <rule ref="Generic.Commenting.Todo.CommentFound">
-        <exclude name="Generic.Commenting.Todo.CommentFound"/>
+    <rule ref="Generic.Commenting.Todo.CommentFound">        <exclude name="Generic.Commenting.Todo.CommentFound"/>
     </rule>
-    <rule ref="Generic.Commenting.Todo.TaskFound">
-        <exclude name="Generic.Commenting.Todo.TaskFound"/>
+    <rule ref="Generic.Commenting.Todo.TaskFound">        <exclude name="Generic.Commenting.Todo.TaskFound"/>
     </rule>
     <rule ref="Generic.Formatting.MultipleStatementAlignment.NotSame">
         <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
