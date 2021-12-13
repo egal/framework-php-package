@@ -49,6 +49,7 @@ jobs:
               --no-interaction \
               --no-progress
       - run: cat src/Model/Model.php
+      - run: docker-compose run --rm php cat src/Model/Model.php
       - name: Run a PHPCS
         run: |
           DIFF="$(git diff \
