@@ -9,6 +9,7 @@
 
     <rule ref="PSR12">
         <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
+        <exclude name="PSR12.Classes.OpeningBraceSpace.Found"/>
     </rule>
     <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
         <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
