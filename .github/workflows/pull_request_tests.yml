@@ -48,6 +48,7 @@ jobs:
               --dev \
               --no-interaction \
               --no-progress
+      - run: cat src/Model/Model.php
       - name: Run a PHPCS
         run: |
           DIFF="$(git diff \
