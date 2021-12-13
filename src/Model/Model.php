@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 
 abstract class Model extends EloquentModel
 {
+
     use HasDefaultLimits;
     use HasEvents;
     use HashGuardable;
