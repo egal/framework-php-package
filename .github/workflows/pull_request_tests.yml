@@ -60,6 +60,17 @@ jobs:
           if [ "${DIFF}" == '' ]; then exit 0; fi
           bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF || true
       - run: cat .phpcs.results.xml && exit 1
+      - run: bash bin/phpcbf.sh src/Model/Model.php
+      - run: cat src/Model/Model.php
+      - name: Run a PHPCS
+        run: |
+          DIFF="$(git diff \
+            --name-only \
+            --diff-filter=dr \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
+          if [ "${DIFF}" == '' ]; then exit 0; fi
+          bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF
 
   PHPUnit80:
     runs-on: ubuntu-latest
