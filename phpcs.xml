@@ -18,9 +18,11 @@
     <rule ref="Generic.Commenting.DocComment.NonParamGroup">
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
     </rule>
-    <rule ref="Generic.Commenting.Todo.CommentFound">        <exclude name="Generic.Commenting.Todo.CommentFound"/>
+    <rule ref="Generic.Commenting.Todo.CommentFound">
+        <exclude name="Generic.Commenting.Todo.CommentFound"/>
     </rule>
-    <rule ref="Generic.Commenting.Todo.TaskFound">        <exclude name="Generic.Commenting.Todo.TaskFound"/>
+    <rule ref="Generic.Commenting.Todo.TaskFound">
+        <exclude name="Generic.Commenting.Todo.TaskFound"/>
     </rule>
     <rule ref="Generic.Formatting.MultipleStatementAlignment.NotSame">
         <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
@@ -131,7 +133,8 @@
         <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
         <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
-        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
+        <exclude
+            name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
         <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint"/>
         <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
@@ -236,7 +239,8 @@
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
         <exclude-pattern>src/Centrifugo/CentrifugoBroadcastable.php</exclude-pattern>
     </rule>
-    <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant">
+    <rule
+        ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant">
         <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
     </rule>
 
