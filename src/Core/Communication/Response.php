@@ -60,7 +60,9 @@ class Response
         if ($this->getActionErrorMessage()) {
             $statusCode = $this->getActionErrorMessage()->getCode();
 
-            return $statusCode !== 0 ? $statusCode : 500;
+            return $statusCode !== 0
+                ? $statusCode
+                : 500;
         }
 
         return 200;
