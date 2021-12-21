@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
-use Egal\Core\Exceptions\ReplyMessageNotBelongToRequestException;
 use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
@@ -61,7 +60,9 @@ class Response
         if ($this->getActionErrorMessage()) {
             $statusCode = $this->getActionErrorMessage()->getCode();
 
-            return $statusCode !== 0 ? $statusCode : 500;
+            return $statusCode !== 0
+                ? $statusCode
+                : 500;
         }
 
         return 200;
@@ -104,7 +105,7 @@ class Response
         }
 
         if ($replyMessage->getActionMessage()->getUuid() !== $this->getActionMessage()->getUuid()) {
-            throw new ReplyMessageNotBelongToRequestException();
+            return;
         }
 
         if ($replyMessage instanceof ActionResultMessage) {
