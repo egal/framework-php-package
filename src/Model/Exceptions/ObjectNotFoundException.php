@@ -13,7 +13,7 @@ class ObjectNotFoundException extends Exception
 
     protected $code = 404;
 
-    public static function make(string $index): self
+    public static function make($index): self
     {
         $exception = new static();
 
