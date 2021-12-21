@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\Model;
 
-use Egal\Model\Exceptions\DeleteManyException;
 use Egal\Model\Exceptions\ObjectNotFoundException;
-use Egal\Model\Exceptions\NotFoundException;
 use Egal\Model\Exceptions\UpdateException;
 use Egal\Model\Exceptions\UpdateManyException;
 use Egal\Model\Filter\FilterPart;
@@ -23,7 +21,6 @@ use Egal\Model\Traits\XssGuardable;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 abstract class Model extends EloquentModel
@@ -100,7 +97,7 @@ abstract class Model extends EloquentModel
      * @param int|string $id Entity identification.
      * @param string[] $withs Array of relations displayed for an entity.
      * @return mixed[] Entity as an associative array.
-     * @throws ObjectNotFoundException
+     * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
     public static function actionGetItem($id, array $withs = []): array
     {
@@ -237,7 +234,7 @@ abstract class Model extends EloquentModel
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
      * @throws \Egal\Model\Exceptions\UpdateException
-     * @throws ObjectNotFoundException
+     * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
     public static function actionUpdate($id = null, array $attributes = []): array
     {
@@ -273,7 +270,7 @@ abstract class Model extends EloquentModel
      * @param mixed[] $objects Array of updatable objects (objects must contain an identification key).
      * @return mixed[]
      * @throws \Egal\Model\Exceptions\UpdateManyException
-     * @throws ObjectNotFoundException
+     * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
     public static function actionUpdateMany(array $objects = []): array
     {
@@ -356,8 +353,7 @@ abstract class Model extends EloquentModel
      *
      * @param int|string $id Entity identification.
      * @return string[]
-     * @throws \Egal\Model\Exceptions\NotFoundException
-     * @throws ObjectNotFoundException
+     * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
     public static function actionDelete($id): array
     {
@@ -382,9 +378,8 @@ abstract class Model extends EloquentModel
      * Multiple deletion of entities
      *
      * @param int[]|string[] $ids Array of identifiers for the entities to be deleted.
-     * @throws \Egal\Model\Exceptions\DeleteManyException
      * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
-     * @throws ObjectNotFoundException
+     * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
     public static function actionDeleteMany(array $ids): ?bool
     {
