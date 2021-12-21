@@ -286,17 +286,17 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not specified index ' . $objectIndex . '!');
             }
 
-            $key = $attributes[$instance->getKeyName()];
+            $id = $attributes[$instance->getKeyName()];
             $instance->makeIsInstanceForAction();
-            $instance->validateKey($key);
+            $instance->validateKey($id);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($key);
+            $entity = $instance->newQuery()->find($id);
 
             if (!$entity) {
                 DB::rollBack();
 
-                throw ObjectNotFoundException::make($objectIndex);
+                throw ObjectNotFoundException::make($id);
             }
 
             $entity->makeIsInstanceForAction();

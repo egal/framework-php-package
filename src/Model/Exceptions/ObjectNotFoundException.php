@@ -14,15 +14,15 @@ class ObjectNotFoundException extends Exception
     protected $code = 404;
 
     /**
-     * @param mixed $index
+     * @param mixed $id
      * @return static
      */
-    public static function make($index): self
+    public static function make($id): self
     {
         $exception = new static();
 
         if (config('app.debug')) {
-            $exception->message = 'Object not found with ' . $index . ' index!';
+            $exception->message = 'Object not found with ' . $id . ' identifier!';
         }
 
         return $exception;
