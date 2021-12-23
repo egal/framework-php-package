@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Egal\Core\Communication;
 
 use Carbon\Carbon;
-use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
 use Egal\Core\Exceptions\RequestException;
@@ -13,7 +12,6 @@ use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Session\Session;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class Request extends ActionMessage
 {
@@ -109,9 +107,10 @@ class Request extends ActionMessage
         }
 
         $token = Cache::get($this->serviceName . '.service.token');
-        list($header, $payload, $signature) = explode (".", $token);
+        $tokenPayload = explode('.', $token)[1];
+        $tokenAliveUntil = json_decode(base64_decode($tokenPayload), true)['alive_until'];
 
-        if (!$token || Carbon::now('UTC') >= Carbon::parse(json_decode(base64_decode($payload), true)['alive_until'])) {
+        if (!$token || Carbon::now('UTC') >= Carbon::parse($tokenAliveUntil)) {
             $token = config('app.service_name') === $this->authServiceName
                 ? $this->getItselfServiceServiceToken()
                 : $this->getServiceServiceToken();
