@@ -15,7 +15,7 @@ use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Exceptions\TokenSignatureInvalidException;
 use Egal\Core\Messages\ActionMessage;
-use Firebase\JWT\SignatureInvalidException;
+use Exception;
 
 final class Session
 {
@@ -110,11 +110,7 @@ final class Session
             return;
         }
 
-        try {
-            self::setToken($actionMessage->getToken());
-        } catch (SignatureInvalidException $exception) {
-            throw new TokenSignatureInvalidException();
-        }
+        self::setToken($actionMessage->getToken());
     }
 
     public static function setServiceServiceToken(ServiceServiceToken $serviceServiceToken): void
@@ -155,7 +151,11 @@ final class Session
 
     private static function setToken(string $encodedToken): void
     {
-        $decodedToken = Token::decode($encodedToken, config('app.service_key'));
+        try {
+            $decodedToken = Token::decode($encodedToken, config('app.service_key'));
+        } catch (Exception $exception) {
+            throw new TokenSignatureInvalidException();
+        }
 
         switch ($decodedToken['type']) {
             case TokenType::USER_SERVICE:
