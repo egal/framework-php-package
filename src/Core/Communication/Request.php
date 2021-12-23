@@ -106,7 +106,8 @@ class Request extends ActionMessage
             throw new RequestException('Token already exists! Service authorization is impossible!');
         }
 
-        $token = Cache::get($this->serviceName . '.service.token');
+        $sstCacheKey = 'sst.to.' . $this->serviceName;
+        $token = Cache::get($sstCacheKey);
         $tokenPayload = isset($token)
             ? explode('.', $token)[1]
             : null;
@@ -118,7 +119,7 @@ class Request extends ActionMessage
             $token = config('app.service_name') === $this->authServiceName
                 ? $this->getItselfServiceServiceToken()
                 : $this->getServiceServiceToken();
-            Cache::put($this->serviceName . '.service.token', $token);
+            Cache::put($sstCacheKey, $token);
         }
 
         $this->setToken($token);
