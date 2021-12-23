@@ -107,8 +107,12 @@ class Request extends ActionMessage
         }
 
         $token = Cache::get($this->serviceName . '.service.token');
-        $tokenPayload = explode('.', $token)[1];
-        $tokenAliveUntil = json_decode(base64_decode($tokenPayload), true)['alive_until'];
+        $tokenPayload = isset($token)
+            ? explode('.', $token)[1]
+            : null;
+        $tokenAliveUntil = isset($token)
+            ? json_decode(base64_decode($tokenPayload), true)['alive_until']
+            : null;
 
         if (!$token || Carbon::now('UTC') >= Carbon::parse($tokenAliveUntil)) {
             $token = config('app.service_name') === $this->authServiceName
