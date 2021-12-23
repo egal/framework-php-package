@@ -159,4 +159,14 @@ class Response
         return isset($this->actionErrorMessage) || isset($this->actionResultMessage);
     }
 
+    /**
+     * @return mixed|string
+     */
+    public function getResultOrError()
+    {
+        return $this->getStatusCode() !== 200
+            ? $this->getActionErrorMessage()->getMessage()
+            : $this->getActionResultMessage()->getData();
+    }
+
 }
