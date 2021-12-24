@@ -13,7 +13,7 @@ use Egal\Auth\Tokens\UserServiceToken;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
-use Egal\Core\Exceptions\TokenSignatureInvalidException;
+use Egal\Core\Exceptions\UnableDecodeTokenException;
 use Egal\Core\Messages\ActionMessage;
 use Exception;
 
@@ -154,7 +154,7 @@ final class Session
         try {
             $decodedToken = Token::decode($encodedToken, config('app.service_key'));
         } catch (Exception $exception) {
-            throw new TokenSignatureInvalidException();
+            throw new UnableDecodeTokenException();
         }
 
         switch ($decodedToken['type']) {
