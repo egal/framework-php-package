@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
+use Egal\Auth\Exceptions\TokenTypeNotSpecifiedException;
 use Egal\Auth\Exceptions\UndefinedTokenTypeException;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
@@ -156,6 +157,10 @@ final class Session
     private static function setToken(string $encodedToken): void
     {
         $decodedToken = Token::decode($encodedToken, config('app.service_key'));
+
+        if (!in_array('type', $decodedToken)) {
+            throw new TokenTypeNotSpecifiedException();
+        }
 
         switch ($decodedToken['type']) {
             case TokenType::USER_SERVICE:
