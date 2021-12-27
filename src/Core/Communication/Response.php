@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
+use Egal\Core\Exceptions\NoResultMessageException;
 use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
@@ -160,13 +161,18 @@ class Response
     }
 
     /**
-     * @return mixed|string
+     * @return mixed
      */
-    public function getResultOrError()
+    public function getResultData()
     {
-        return $this->getStatusCode() !== 200
-            ? $this->getActionErrorMessage()->getMessage()
-            : $this->getActionResultMessage()->getData();
+        $actionResultMessage = $this->getActionResultMessage();
+
+        if (empty($actionResultMessage)) {
+            $error = $this->getErrorMessage();
+            throw new NoResultMessageException($error, $this->getStatusCode());
+        }
+
+        return $actionResultMessage->getData();
     }
 
 }
