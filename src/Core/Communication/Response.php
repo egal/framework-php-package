@@ -162,13 +162,15 @@ class Response
 
     /**
      * @return mixed
+     * @throws \Egal\Core\Exceptions\NoResultMessageException
      */
     public function getResultData()
     {
         $actionResultMessage = $this->getActionResultMessage();
 
-        if (empty($actionResultMessage)) {
+        if ($actionResultMessage === null) {
             $error = $this->getErrorMessage();
+
             throw new NoResultMessageException($error, $this->getStatusCode());
         }
 
