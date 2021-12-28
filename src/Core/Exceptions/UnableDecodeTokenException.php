@@ -6,10 +6,10 @@ namespace Egal\Core\Exceptions;
 
 use Exception;
 
-class TokenSignatureInvalidException extends Exception
+class UnableDecodeTokenException extends Exception
 {
 
-    protected $message = 'Invalid token signature!';
+    protected $message = 'Unable to decode token!';
 
     protected $code = 401;
 
