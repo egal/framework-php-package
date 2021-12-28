@@ -158,7 +158,7 @@ final class Session
             throw new UnableDecodeTokenException();
         }
 
-        if (!in_array('type', $decodedToken)) {
+        if (!in_array('type', array_keys($decodedToken))) {
             throw new TokenTypeNotSpecifiedException();
         }
 
