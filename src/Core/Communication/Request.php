@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Egal\Core\Communication;
 
+use Carbon\Carbon;
 use Egal\Core\ActionCaller\ActionCaller;
 use Egal\Core\Bus\Bus;
 use Egal\Core\Exceptions\RequestException;
 use Egal\Core\Messages\ActionMessage;
 use Egal\Core\Messages\Message;
 use Egal\Core\Session\Session;
+use Illuminate\Support\Facades\Cache;
 
 class Request extends ActionMessage
 {
@@ -98,20 +100,40 @@ class Request extends ActionMessage
         $this->publish();
     }
 
+    public function getServiceServiceToken(): string
+    {
+        $token = $this->getServiceServiceTokenFromCache();
+
+        $tokenFromCachePayload = $token !== null
+            ? explode('.', $token)[1]
+            : null;
+        $tokenFromCacheAliveUntil = $token !== null
+            ? json_decode(base64_decode($tokenFromCachePayload), true)['alive_until']
+            : null;
+
+        if (!$token || Carbon::now('UTC') >= Carbon::parse($tokenFromCacheAliveUntil)) {
+            $token = config('app.service_name') === $this->authServiceName
+                ? $this->getItselfServiceServiceTokenFromAuth()
+                : $this->getServiceServiceTokenFromAuthService();
+
+            $this->putServiceServiceTokenToCache($token);
+        }
+
+        return $token;
+    }
+
     private function authorizeService(): void
     {
         if ($this->isTokenExist()) {
-            throw new RequestException('Token already exists! Service autorization is imposible!');
+            throw new RequestException('Token already exists! Service authorization is impossible!');
         }
 
-        $this->setToken(
-            config('app.service_name') === $this->authServiceName
-                ? $this->getItselfServiceServiceToken()
-                : $this->getServiceServiceToken()
-        );
+        $token = $this->getServiceServiceToken();
+
+        $this->setToken($token);
     }
 
-    private function getItselfServiceServiceToken(): string
+    private function getItselfServiceServiceTokenFromAuth(): string
     {
         $masterActionMessage = Session::isActionMessageExists()
             ? Session::getActionMessage()
@@ -152,7 +174,7 @@ class Request extends ActionMessage
         return $sst;
     }
 
-    private function getServiceServiceToken(): string
+    private function getServiceServiceTokenFromAuthService(): string
     {
         $serviceMasterTokenRequest = new Request(
             $this->authServiceName,
@@ -179,6 +201,28 @@ class Request extends ActionMessage
         $serviceServiceTokenResponse->throwActionErrorMessageIfExists();
 
         return $serviceServiceTokenResponse->getActionResultMessage()->getData();
+    }
+
+    /**
+     * @return array
+     */
+    private function getServiceServiceTokenFromCache(): ?string
+    {
+        $sstCacheKey = $this->getServiceServiceTokenCacheKey();
+
+        return Cache::get($sstCacheKey);
+    }
+
+    private function putServiceServiceTokenToCache(string $token): void
+    {
+        $sstCacheKey = $this->getServiceServiceTokenCacheKey();
+
+        Cache::put($sstCacheKey, $token);
+    }
+
+    private function getServiceServiceTokenCacheKey(): string
+    {
+        return 'sst.to.' . $this->serviceName;
     }
 
 }

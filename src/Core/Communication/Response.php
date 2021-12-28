@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Core\Communication;
 
 use Egal\Core\Exceptions\ImpossibilityDeterminingStatusOfResponseException;
+use Egal\Core\Exceptions\NoResultMessageException;
 use Egal\Core\Exceptions\ResponseException;
 use Egal\Core\Exceptions\UnsupportedReplyMessageTypeException;
 use Egal\Core\Messages\ActionErrorMessage;
@@ -157,6 +158,23 @@ class Response
     public function isReplyMessagesCollected(): bool
     {
         return isset($this->actionErrorMessage) || isset($this->actionResultMessage);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Egal\Core\Exceptions\NoResultMessageException
+     */
+    public function getResultData()
+    {
+        $actionResultMessage = $this->getActionResultMessage();
+
+        if ($actionResultMessage === null) {
+            $error = $this->getErrorMessage();
+
+            throw new NoResultMessageException($error, $this->getStatusCode());
+        }
+
+        return $actionResultMessage->getData();
     }
 
 }
