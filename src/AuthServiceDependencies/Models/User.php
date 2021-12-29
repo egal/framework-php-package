@@ -7,10 +7,12 @@ namespace Egal\AuthServiceDependencies\Models;
 use Egal\Auth\Tokens\UserMasterRefreshToken;
 use Egal\Auth\Tokens\UserMasterToken;
 use Egal\Auth\Tokens\UserServiceToken;
+use Egal\AuthServiceDependencies\Exceptions\NotValidTokenAuthIdentificationException;
 use Egal\AuthServiceDependencies\Exceptions\ServiceNotFoundException;
 use Egal\AuthServiceDependencies\Exceptions\UserNotIdentifiedException;
 use Egal\Model\Model;
 use Egal\Model\ModelManager;
+use Ramsey\Uuid\Uuid;
 
 abstract class User extends Model
 {
@@ -44,7 +46,13 @@ abstract class User extends Model
         $umt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
-        $user = static::find($umt->getAuthIdentification());
+        $uuid = $umt->getAuthIdentification();
+
+        if (!Uuid::isValid($uuid)) {
+            throw new NotValidTokenAuthIdentificationException();
+        }
+
+        $user = static::find($uuid);
         $service = self::getServiceModel()::find($serviceName);
 
         if (!$user) {
