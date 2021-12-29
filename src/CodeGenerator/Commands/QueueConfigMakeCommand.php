@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\CodeGenerator\Commands;
 
+use BadMethodCallException;
 use Egal\CodeGenerator\Exceptions\ConfigMakeException;
 use Exception;
 use Illuminate\Console\Command;
@@ -31,8 +32,12 @@ class QueueConfigMakeCommand extends Command
 
         try {
             $this->$makeFunction();
-        } catch (Exception $exception) {
-            throw new ConfigMakeException();
+        }
+        catch (BadMethodCallException $exception) {
+            throw new ConfigMakeException('Invalid name for generating config');
+        }
+        catch (Exception $exception){
+            throw new ConfigMakeException($exception->getMessage());
         }
     }
 
