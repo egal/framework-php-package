@@ -44,7 +44,7 @@ class UserServiceToken extends Token
     public function authInformationAboutRolesExistsOrFail(): bool
     {
         if (!$this->authInformationAboutRolesExists()) {
-            throw new UserServiceTokenException('Missing information about roles!');
+            throw new UserServiceTokenException('Token missing information about roles!');
         }
         return true;
     }
@@ -56,7 +56,7 @@ class UserServiceToken extends Token
     public function authInformationAboutPermissionsExistsOrFail(): bool
     {
         if (!$this->authInformationAboutPermissionsExists()) {
-            throw new UserServiceTokenException('Missing information about permissions!');
+            throw new UserServiceTokenException('Token missing information about permissions!');
         }
         return true;
     }
