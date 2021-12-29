@@ -8,8 +8,6 @@ use Egal\Auth\Tokens\ServiceMasterToken;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\AuthServiceDependencies\Exceptions\ServiceLoginException;
 use Egal\AuthServiceDependencies\Exceptions\ServiceLoginToServiceException;
-use Egal\AuthServiceDependencies\Exceptions\ServiceNotFoundException;
-use Egal\AuthServiceDependencies\Exceptions\ServiceNotFoundAuthException;
 
 abstract class Service
 {
