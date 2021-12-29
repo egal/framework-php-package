@@ -53,6 +53,7 @@ class UserMasterRefreshToken extends Token
                 throw new InitializeUserMasterRefreshTokenException('Incomplete token information!');
             }
         }
+
         $token = new UserMasterRefreshToken();
 
         if ($array['type'] !== TokenType::USER_MASTER_REFRESH) {

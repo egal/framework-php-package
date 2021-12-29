@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
-use Egal\Auth\Exceptions\TokenTypeNotSpecifiedException;
 use Egal\Auth\Exceptions\IncorrectTokenTypeException;
+use Egal\Auth\Exceptions\TokenTypeNotSpecifiedException;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
 use Egal\Auth\Tokens\TokenType;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Auth\Tokens;
 
 use Egal\Auth\Exceptions\InitializeServiceMasterTokenException;
@@ -14,6 +16,29 @@ class ServiceMasterToken extends Token
      * @var string|int
      */
     private $authIdentification;
+
+    /**
+     * @param array $array
+     * @throws \Egal\Auth\Exceptions\InitializeServiceMasterTokenException
+     */
+    public static function fromArray(array $array): ServiceMasterToken
+    {
+        foreach (['type', 'auth_identification'] as $index) {
+            if (!array_key_exists($index, $array)) {
+                throw new InitializeServiceMasterTokenException('Incomplete token information!');
+            }
+        }
+
+        if ($array['type'] !== TokenType::SERVICE_MASTER) {
+            throw new InitializeServiceMasterTokenException('Token type mismatch!');
+        }
+
+        $token = new ServiceMasterToken();
+        $token->setAuthIdentification($array['auth_identification']);
+        $token->aliveUntil = Carbon::parse($array['alive_until']);
+
+        return $token;
+    }
 
     /**
      * @return int|string
@@ -36,30 +61,8 @@ class ServiceMasterToken extends Token
         return [
             'type' => $this->type,
             'auth_identification' => $this->authIdentification,
-            'alive_until' => $this->aliveUntil->toISOString()
+            'alive_until' => $this->aliveUntil->toISOString(),
         ];
-    }
-
-    /**
-     * @param array $array
-     * @return ServiceMasterToken
-     * @throws InitializeServiceMasterTokenException
-     */
-    public static function fromArray(array $array): ServiceMasterToken
-    {
-        foreach (['type', 'auth_identification'] as $index) {
-            if (!array_key_exists($index, $array)) {
-                throw new InitializeServiceMasterTokenException('Incomplete token information!');
-            }
-        }
-        if (TokenType::SERVICE_MASTER !== $array['type']) {
-            throw new InitializeServiceMasterTokenException('Token type mismatch!');
-        }
-        $token = new ServiceMasterToken();
-        $token->setAuthIdentification($array['auth_identification']);
-        $token->aliveUntil = Carbon::parse($array['alive_until']);
-
-        return $token;
     }
 
 }

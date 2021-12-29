@@ -45,13 +45,13 @@ abstract class User extends Model
         $umt = UserMasterToken::fromJWT($token, config('app.service_key'));
         $umt->isAliveOrFail();
 
-        /** @var \Egal\AuthServiceDependencies\Models\User $user */
         $uuid = $umt->getAuthIdentification();
 
         if (!Uuid::isValid($uuid)) {
             throw new NotValidTokenAuthIdentificationException();
         }
 
+        /** @var \Egal\AuthServiceDependencies\Models\User $user */
         $user = static::find($uuid);
         $service = self::getServiceModel()::find($serviceName);
 
