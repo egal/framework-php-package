@@ -49,11 +49,11 @@ class ServiceMasterToken extends Token
     {
         foreach (['type', 'auth_identification'] as $index) {
             if (!array_key_exists($index, $array)) {
-                throw new InitializeServiceMasterTokenException('Incomplete information!');
+                throw new InitializeServiceMasterTokenException('Incomplete token information!');
             }
         }
         if (TokenType::SERVICE_MASTER !== $array['type']) {
-            throw new InitializeServiceMasterTokenException('Type mismatch!');
+            throw new InitializeServiceMasterTokenException('Token type mismatch!');
         }
         $token = new ServiceMasterToken();
         $token->setAuthIdentification($array['auth_identification']);

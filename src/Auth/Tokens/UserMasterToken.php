@@ -49,12 +49,12 @@ class UserMasterToken extends Token
             ['type', 'auth_identification'] as $index
         ) {
             if (!array_key_exists($index, $array)) {
-                throw new InitializeUserMasterTokenException('Incomplete information!');
+                throw new InitializeUserMasterTokenException('Incomplete token information!');
             }
         }
         $token = new UserMasterToken();
         if (TokenType::USER_MASTER !== $array['type']) {
-            throw new InitializeUserMasterTokenException('Type mismatch!');
+            throw new InitializeUserMasterTokenException('Token type mismatch!');
         }
         $token->setAuthIdentification($array['auth_identification']);
         $token->aliveUntil = Carbon::parse($array['alive_until']);

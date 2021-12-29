@@ -56,11 +56,11 @@ class ServiceServiceToken extends Token
     {
         foreach (['type', 'auth_information'] as $index) {
             if (!array_key_exists($index, $array)) {
-                throw new InitializeServiceServiceTokenException('Incomplete information!');
+                throw new InitializeServiceServiceTokenException('Incomplete token information!');
             }
         }
         if (TokenType::SERVICE_SERVICE !== $array['type']) {
-            throw new InitializeServiceServiceTokenException('Type mismatch!');
+            throw new InitializeServiceServiceTokenException('Token type mismatch!');
         }
         $token = new ServiceServiceToken();
         $token->setAuthInformation((array)$array['auth_information']);

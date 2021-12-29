@@ -6,7 +6,7 @@ namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Auth\Exceptions\TokenTypeNotSpecifiedException;
-use Egal\Auth\Exceptions\UndefinedTokenTypeException;
+use Egal\Auth\Exceptions\IncorrectTokenTypeException;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
 use Egal\Auth\Tokens\TokenType;
@@ -170,7 +170,7 @@ final class Session
                 self::setServiceServiceToken(ServiceServiceToken::fromArray($decodedToken));
                 break;
             default:
-                throw new UndefinedTokenTypeException();
+                throw new IncorrectTokenTypeException();
         }
     }
 

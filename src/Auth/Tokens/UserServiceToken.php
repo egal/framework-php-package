@@ -132,12 +132,12 @@ class UserServiceToken extends Token
             ['type', 'auth_information'] as $index
         ) {
             if (!array_key_exists($index, $array)) {
-                throw new InitializeUserServiceTokenException('Incomplete information!');
+                throw new InitializeUserServiceTokenException('Incomplete token information!');
             }
         }
         $token = new UserServiceToken();
         if (TokenType::USER_SERVICE !== $array['type']) {
-            throw new InitializeUserServiceTokenException('Type mismatch!');
+            throw new InitializeUserServiceTokenException('Token type mismatch!');
         }
         $token->setAuthInformation((array)$array['auth_information']); #TODO: Разобраться зачем приведение типов
         $token->aliveUntil = Carbon::parse($array['alive_until']);
