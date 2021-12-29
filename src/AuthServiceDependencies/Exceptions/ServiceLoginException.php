@@ -6,10 +6,8 @@ namespace Egal\AuthServiceDependencies\Exceptions;
 
 use Exception;
 
-class ServiceNotFoundAuthException extends Exception
+class ServiceLoginException extends Exception
 {
-
-    protected $message = 'Service not found!';
 
     protected $code = 500;
 

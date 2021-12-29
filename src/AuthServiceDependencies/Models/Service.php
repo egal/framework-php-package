@@ -6,7 +6,9 @@ namespace Egal\AuthServiceDependencies\Models;
 
 use Egal\Auth\Tokens\ServiceMasterToken;
 use Egal\Auth\Tokens\ServiceServiceToken;
-use Egal\AuthServiceDependencies\Exceptions\LoginException;
+use Egal\AuthServiceDependencies\Exceptions\ServiceLoginException;
+use Egal\AuthServiceDependencies\Exceptions\ServiceLoginToServiceException;
+use Egal\AuthServiceDependencies\Exceptions\ServiceNotFoundException;
 use Egal\AuthServiceDependencies\Exceptions\ServiceNotFoundAuthException;
 
 abstract class Service
@@ -46,7 +48,7 @@ abstract class Service
         $service = static::find($serviceName);
 
         if (!$service || $service->getKey() !== $key) {
-            throw new LoginException('Incorrect key or service name!');
+            throw new ServiceLoginException('Incorrect key or service name!');
         }
 
         $smt = new ServiceMasterToken();
@@ -66,13 +68,13 @@ abstract class Service
         $senderService = static::find($smt->getAuthIdentification());
 
         if (!$senderService) {
-            throw new ServiceNotFoundAuthException();
+            throw new ServiceLoginToServiceException('Sender service not found');
         }
 
         $recipientService = static::find($serviceName);
 
         if (!$recipientService) {
-            throw new ServiceNotFoundAuthException();
+            throw new ServiceLoginToServiceException('Recipient service not found');
         }
 
         $sst = new ServiceServiceToken();

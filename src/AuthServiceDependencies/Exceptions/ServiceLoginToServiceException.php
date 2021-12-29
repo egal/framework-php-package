@@ -6,9 +6,9 @@ namespace Egal\AuthServiceDependencies\Exceptions;
 
 use Exception;
 
-class LoginException extends Exception
+class ServiceLoginToServiceException extends Exception
 {
 
-    protected $code = 400;
+    protected $code = 500;
 
 }

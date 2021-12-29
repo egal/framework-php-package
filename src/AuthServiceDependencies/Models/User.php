@@ -7,7 +7,7 @@ namespace Egal\AuthServiceDependencies\Models;
 use Egal\Auth\Tokens\UserMasterRefreshToken;
 use Egal\Auth\Tokens\UserMasterToken;
 use Egal\Auth\Tokens\UserServiceToken;
-use Egal\AuthServiceDependencies\Exceptions\LoginException;
+use Egal\AuthServiceDependencies\Exceptions\ServiceNotFoundException;
 use Egal\AuthServiceDependencies\Exceptions\UserNotIdentifiedException;
 use Egal\Model\Model;
 use Egal\Model\ModelManager;
@@ -52,7 +52,7 @@ abstract class User extends Model
         }
 
         if (!$service) {
-            throw new LoginException('Service not found!');
+            throw ServiceNotFoundException::make($serviceName);
         }
 
         $ust = new UserServiceToken();
