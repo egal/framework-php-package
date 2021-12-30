@@ -58,12 +58,14 @@ class QueueConfigMakeCommand extends Command
      */
     private function copyConfig(string $from, string $to): void
     {
-        $isConfirmed = $this->confirm('Configuration file already exists. Replace?', false);
 
-        if (file_exists($to) && !$isConfirmed) {
-            $this->warn('Canceled!');
+        if (file_exists($to)) {
+            $isConfirmed = $this->confirm('Configuration file already exists. Replace?', false);
 
-            return;
+            if (!$isConfirmed) {
+                $this->warn('Canceled!');
+                return;
+            }
         }
 
         if (!copy($from, $to)) {
