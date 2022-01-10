@@ -61,6 +61,7 @@ class QueueConfigMakeCommand extends Command
 
         if (file_exists($to)) {
             $isConfirmed = $this->confirm('Configuration file already exists. Replace?', false);
+
             if (!$isConfirmed) {
                 $this->warn('Canceled!');
                 return;
