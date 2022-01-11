@@ -9,6 +9,7 @@ use Egal\Model\Filter\FilterCondition;
 use Egal\Model\Filter\FilterPart;
 use Egal\Model\Order\Order;
 use Egal\Model\Order\OrderDirectionType;
+use Egal\Model\Pagination\Pagination;
 
 class Collection extends \Illuminate\Support\Collection
 {
@@ -18,6 +19,8 @@ class Collection extends \Illuminate\Support\Collection
     private const GREATER_OR_EQUAL_OPERATOR = 'ge';
     private const LESS_THEN_OPERATOR = 'lt';
     private const LESS_OR_EQUAL_OPERATOR = 'le';
+
+    protected $model;
 
     private static function getFilterConditionArrayFromFilterPart(FilterPart $filterPart)
     {
@@ -107,7 +110,6 @@ class Collection extends \Illuminate\Support\Collection
         $filterConditionArray = static::getFilterConditionArrayFromFilterPart($filterPart);
 
         return $this->filter(function ($value, $key) use ($filterConditionArray) {
-            dump(static::getFilter($filterConditionArray, $key, $value));
             return static::getFilter($filterConditionArray, $key, $value);
         });
     }
@@ -169,5 +171,23 @@ class Collection extends \Illuminate\Support\Collection
         }
 
         return $filter;
+    }
+
+    public function paginate(?array $paginationArray)
+    {
+        $pagination = Pagination::fromArray($paginationArray);
+        $pagination->getPage() ?: $pagination->setPage($this->model->getPage());
+        $pagination->getPerPage() ?: $pagination->setPerPage($this->model->getPerPage());
+
+        if ($pagination->getPerPage() > $this->model->getMaxPerPage()) {
+            $pagination->setPerPage($this->model->getMaxPerPage());
+        }
+
+        return $this->forPage($pagination->getPage(), $pagination->getPerPage());
+    }
+
+    public function setModel($model)
+    {
+        $this->model = $model;
     }
 }

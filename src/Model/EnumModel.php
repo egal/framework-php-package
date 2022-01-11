@@ -17,12 +17,12 @@ abstract class EnumModel
     /**
      * @throws ReflectionException
      */
-    public static function getItemsCollection(): Collection
+    public function getItemsCollection(): Collection
     {
         $class = static::class;
 
         if (!isset(static::$cache[$class])) {
-            $items = new Collection();
+            $items = $this->newCollection();
 
             $reflection = new \ReflectionClass($class);
             $keyValuesArray = $reflection->getConstants();
@@ -40,11 +40,13 @@ abstract class EnumModel
         return static::$cache[$class];
     }
 
-    public static function actionGetItems(array $filter = [], array $order = []): array
+    public static function actionGetItems(?array $pagination = null, array $filter = [], array $order = []): array
     {
-        $items = static::getItemsCollection()
+        $instance = new static();
+        $items = $instance->getItemsCollection()
             ->setFilterFromArray($filter)
             ->setOrderFromArray($order)
+            ->paginate($pagination)
             ->values();
 
         return [
@@ -54,7 +56,8 @@ abstract class EnumModel
 
     public static function actionGetItem($keyValue): array
     {
-        $item = static::getItemsCollection()
+        $instance = new static();
+        $item = $instance->getItemsCollection()
             ->where('key', $keyValue)
             ->firstOrFail();
         return $item;
@@ -62,7 +65,19 @@ abstract class EnumModel
 
     public static function actionGetCount(): array
     {
-        return ['count' => static::getItemsCollection()->count()];
+        $instance = new static();
+        $collection = $instance->getItemsCollection();
+
+        return [
+            'count' => $collection->count()
+        ];
+    }
+
+    private function newCollection()
+    {
+        $collection = new Collection();
+        $collection->setModel($this);
+        return $collection;
     }
 
 }
