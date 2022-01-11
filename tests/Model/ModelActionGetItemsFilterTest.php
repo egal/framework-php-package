@@ -3,7 +3,7 @@
 namespace Egal\Tests\Model;
 
 use Carbon\Carbon;
-use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
+use Egal\Model\Filter\FilterConditions\SimpleBuilderFilterConditionApplier;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
@@ -320,22 +320,22 @@ class ModelActionGetItemsFilterTest extends TestCase
     }
 
     /**
-     * @dataProvider productsFilterDataProviderEq   {@see SimpleFilterConditionApplier::EQUAL_OPERATOR}
-     * @dataProvider productsFilterDataProviderEqi  {@see SimpleFilterConditionApplier::EQUAL_IGNORE_CASE_OPERATOR}
-     * @dataProvider productsFilterDataProviderNe   {@see SimpleFilterConditionApplier::NOT_EQUAL_OPERATOR}
-     * @dataProvider productsFilterDataProviderNei  {@see SimpleFilterConditionApplier::NOT_EQUAL_IGNORE_CASE_OPERATOR}
-     * @dataProvider productsFilterDataProviderGt   {@see SimpleFilterConditionApplier::GREATER_THEN_OPERATOR}
-     * @dataProvider productsFilterDataProviderGe   {@see SimpleFilterConditionApplier::GREATER_OR_EQUAL_OPERATOR}
-     * @dataProvider productsFilterDataProviderLt   {@see SimpleFilterConditionApplier::LESS_THEN_OPERATOR}
-     * @dataProvider productsFilterDataProviderLe   {@see SimpleFilterConditionApplier::LESS_OR_EQUAL_OPERATOR}
-     * @dataProvider productsFilterDataProviderCo   {@see SimpleFilterConditionApplier::CONTAIN_OPERATOR}
-     * @dataProvider productsFilterDataProviderCoi  {@see SimpleFilterConditionApplier::CONTAIN_IGNORE_CASE_OPERATOR}
-     * @dataProvider productsFilterDataProviderNc   {@see SimpleFilterConditionApplier::NOT_CONTAIN_OPERATOR}
-     * @dataProvider productsFilterDataProviderNci  {@see SimpleFilterConditionApplier::NOT_CONTAIN_IGNORE_CASE_OPERATOR}
-     * @dataProvider productsFilterDataProviderSw   {@see SimpleFilterConditionApplier::START_WITH_OPERATOR}
-     * @dataProvider productsFilterDataProviderSwi  {@see SimpleFilterConditionApplier::START_WITH_IGNORE_CASE_OPERATOR}
-     * @dataProvider productsFilterDataProviderEw   {@see SimpleFilterConditionApplier::END_WITH_OPERATOR}
-     * @dataProvider productsFilterDataProviderEwi  {@see SimpleFilterConditionApplier::END_WITH_IGNORE_CASE_OPERATOR}
+     * @dataProvider productsFilterDataProviderEq   {@see SimpleBuilderFilterConditionApplier::EQUAL_OPERATOR}
+     * @dataProvider productsFilterDataProviderEqi  {@see SimpleBuilderFilterConditionApplier::EQUAL_IGNORE_CASE_OPERATOR}
+     * @dataProvider productsFilterDataProviderNe   {@see SimpleBuilderFilterConditionApplier::NOT_EQUAL_OPERATOR}
+     * @dataProvider productsFilterDataProviderNei  {@see SimpleBuilderFilterConditionApplier::NOT_EQUAL_IGNORE_CASE_OPERATOR}
+     * @dataProvider productsFilterDataProviderGt   {@see SimpleBuilderFilterConditionApplier::GREATER_THEN_OPERATOR}
+     * @dataProvider productsFilterDataProviderGe   {@see SimpleBuilderFilterConditionApplier::GREATER_OR_EQUAL_OPERATOR}
+     * @dataProvider productsFilterDataProviderLt   {@see SimpleBuilderFilterConditionApplier::LESS_THEN_OPERATOR}
+     * @dataProvider productsFilterDataProviderLe   {@see SimpleBuilderFilterConditionApplier::LESS_OR_EQUAL_OPERATOR}
+     * @dataProvider productsFilterDataProviderCo   {@see SimpleBuilderFilterConditionApplier::CONTAIN_OPERATOR}
+     * @dataProvider productsFilterDataProviderCoi  {@see SimpleBuilderFilterConditionApplier::CONTAIN_IGNORE_CASE_OPERATOR}
+     * @dataProvider productsFilterDataProviderNc   {@see SimpleBuilderFilterConditionApplier::NOT_CONTAIN_OPERATOR}
+     * @dataProvider productsFilterDataProviderNci  {@see SimpleBuilderFilterConditionApplier::NOT_CONTAIN_IGNORE_CASE_OPERATOR}
+     * @dataProvider productsFilterDataProviderSw   {@see SimpleBuilderFilterConditionApplier::START_WITH_OPERATOR}
+     * @dataProvider productsFilterDataProviderSwi  {@see SimpleBuilderFilterConditionApplier::START_WITH_IGNORE_CASE_OPERATOR}
+     * @dataProvider productsFilterDataProviderEw   {@see SimpleBuilderFilterConditionApplier::END_WITH_OPERATOR}
+     * @dataProvider productsFilterDataProviderEwi  {@see SimpleBuilderFilterConditionApplier::END_WITH_IGNORE_CASE_OPERATOR}
      */
     public function testProductsFilter(?array $filter, ?string $expectException, array $equalsExpect)
     {

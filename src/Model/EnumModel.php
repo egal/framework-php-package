@@ -17,12 +17,12 @@ abstract class EnumModel
     /**
      * @throws ReflectionException
      */
-    public static function toArray()
+    public static function getItemsCollection(): Collection
     {
         $class = static::class;
 
         if (!isset(static::$cache[$class])) {
-            $items = [];
+            $items = new Collection();
 
             $reflection = new \ReflectionClass($class);
             $keyValuesArray = $reflection->getConstants();
@@ -31,7 +31,7 @@ abstract class EnumModel
                 $item['key'] = $key;
                 $item['value'] = $value;
                 $item['description'] = static::descriptions()[$value];
-                $items[] = $item;
+                $items->push($item);
             }
 
             static::$cache[$class] = $items;
@@ -40,21 +40,29 @@ abstract class EnumModel
         return static::$cache[$class];
     }
 
-    public static function actionGetItems(): array
+    public static function actionGetItems(array $filter = [], array $order = []): array
     {
-       return static::toArray();
+        $items = static::getItemsCollection()
+            ->setFilterFromArray($filter)
+            ->setOrderFromArray($order)
+            ->values();
+
+        return [
+            'items' => $items->toArray(),
+        ];
     }
 
     public static function actionGetItem($keyValue): array
     {
-        return array_filter(static::toArray(), function($value, $key) use ($keyValue) {
-            return $key == 'key' || $value == $keyValue;
-        }, ARRAY_FILTER_USE_BOTH);
+        $item = static::getItemsCollection()
+            ->where('key', $keyValue)
+            ->firstOrFail();
+        return $item;
     }
 
     public static function actionGetCount(): array
     {
-        return ['count' => count(static::toArray())];
+        return ['count' => static::getItemsCollection()->count()];
     }
 
 }

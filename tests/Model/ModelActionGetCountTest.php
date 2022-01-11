@@ -3,7 +3,7 @@
 namespace Egal\Tests\Model;
 
 use Carbon\Carbon;
-use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
+use Egal\Model\Filter\FilterConditions\SimpleBuilderFilterConditionApplier;
 use Egal\Model\Metadata\ModelMetadata;
 use Egal\Model\Model;
 use Egal\Tests\DatabaseSchema;
