@@ -173,7 +173,7 @@ class Collection extends \Illuminate\Support\Collection
         return $filter;
     }
 
-    public function paginate(?array $paginationArray)
+    public function paginate(array $paginationArray)
     {
         $pagination = Pagination::fromArray($paginationArray);
         $pagination->getPage() ?: $pagination->setPage($this->model->getPage());

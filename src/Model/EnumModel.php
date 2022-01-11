@@ -9,6 +9,9 @@ abstract class EnumModel
 
     protected static array $cache = [];
 
+    protected int $page = 1;
+    protected int $perPage = 15;
+
     public static function descriptions(): array
     {
         return [];
@@ -40,7 +43,7 @@ abstract class EnumModel
         return static::$cache[$class];
     }
 
-    public static function actionGetItems(?array $pagination = null, array $filter = [], array $order = []): array
+    public static function actionGetItems(array $pagination = [], array $filter = [], array $order = []): array
     {
         $instance = new static();
         $items = $instance->getItemsCollection()
