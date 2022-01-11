@@ -83,4 +83,20 @@ abstract class EnumModel
         return $collection;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getPerPage(): ?int
+    {
+        return $this->perPage;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPage(): ?int
+    {
+        return $this->page;
+    }
+
 }
