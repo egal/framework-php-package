@@ -11,6 +11,7 @@ abstract class EnumModel
 
     protected int $page = 1;
     protected int $perPage = 15;
+    protected int $maxPerPage = 100;
 
     public static function descriptions(): array
     {
@@ -97,6 +98,14 @@ abstract class EnumModel
     public function getPage(): ?int
     {
         return $this->page;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxPerPage(): int
+    {
+        return $this->maxPerPage;
     }
 
 }
