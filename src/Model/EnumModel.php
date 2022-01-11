@@ -2,6 +2,7 @@
 
 namespace Egal\Model;
 
+use Egal\Model\Exceptions\ObjectNotFoundException;
 use Egal\Model\Traits\Pagination;
 use ReflectionException;
 
@@ -67,7 +68,12 @@ abstract class EnumModel
         $instance = new static();
         $item = $instance->getItemsCollection()
             ->where('key', $keyValue)
-            ->firstOrFail();
+            ->first();
+
+        if (!$item) {
+            throw ObjectNotFoundException::make($keyValue);
+        }
+
         return $item;
     }
 
