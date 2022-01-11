@@ -11,23 +11,23 @@ class EnumModelTest extends TestCase
     public function enumGetItemsDataProvider()
     {
         return [
-//            [
-//                [],
-//                [
-//                    "items" => [
-//                        [
-//                            "key" => "INCOMPLETE",
-//                            "value" => "incomplete",
-//                            "description" => "test description"
-//                        ],
-//                        [
-//                            "key" => "COMPLETE",
-//                            "value" => "complete",
-//                            "description" => "test description"
-//                        ]
-//                        ]
-//                ],
-//            ],
+            [
+                [],
+                [
+                    "items" => [
+                        [
+                            "key" => "INCOMPLETE",
+                            "value" => "incomplete",
+                            "description" => "test description"
+                        ],
+                        [
+                            "key" => "COMPLETE",
+                            "value" => "complete",
+                            "description" => "test description"
+                        ]
+                        ]
+                ],
+            ],
             [
                 [
                     ['key', 'eq', "INCOMPLETE"],
@@ -42,52 +42,52 @@ class EnumModelTest extends TestCase
                     ]
                 ],
             ],
-//            [
-//                [
-//                    ['key', 'eq', "NON EXIST"],
-//                ],
-//                [
-//                    "items" => []
-//                ],
-//            ],
-//            [
-//                [],
-//                [
-//                    "items" => [
-//                        [
-//                            "key" => "INCOMPLETE",
-//                            "value" => "incomplete",
-//                            "description" => "test description"
-//                        ],
-//                        [
-//                            "key" => "COMPLETE",
-//                            "value" => "complete",
-//                            "description" => "test description"
-//                        ]
-//                    ]
-//                ],
-//            ],
-//            [
-//                [
-//                    ['value', 'eq', "incomplete"],
-//                    'OR',
-//                    ['value', 'eq', "complete"],
-//                ],
-//                [
-//                    "items" => [
-//                        [
-//                            "key" => "INCOMPLETE",
-//                            "value" => "incomplete",
-//                            "description" => "test description"
-//                        ],
-//                        [
-//                            "key" => "COMPLETE",
-//                            "value" => "complete",
-//                            "description" => "test description"
-//                        ]
-//                    ]
-//                ],
-//            ],
+            [
+                [
+                    ['key', 'eq', "NON EXIST"],
+                ],
+                [
+                    "items" => []
+                ],
+            ],
+            [
+                [],
+                [
+                    "items" => [
+                        [
+                            "key" => "INCOMPLETE",
+                            "value" => "incomplete",
+                            "description" => "test description"
+                        ],
+                        [
+                            "key" => "COMPLETE",
+                            "value" => "complete",
+                            "description" => "test description"
+                        ]
+                    ]
+                ],
+            ],
+            [
+                [
+                    ['value', 'eq', "incomplete"],
+                    'OR',
+                    ['value', 'eq', "complete"],
+                ],
+                [
+                    "items" => [
+                        [
+                            "key" => "INCOMPLETE",
+                            "value" => "incomplete",
+                            "description" => "test description"
+                        ],
+                        [
+                            "key" => "COMPLETE",
+                            "value" => "complete",
+                            "description" => "test description"
+                        ]
+                    ]
+                ],
+            ],
         ];
     }
 
@@ -125,10 +125,7 @@ class EnumModelTest extends TestCase
      */
     public function testEnumGetItems(array $filter, array $expectResult)
     {
-        $actualResult = EnumModelActionGetItemsTestStatusStub::actionGetItems($filter);
-
-        dump($expectResult);
-        dump($actualResult);
+        $actualResult = EnumModelActionGetItemsTestStatusStub::actionGetItems(null, $filter);
 
         $this->assertEquals($expectResult, $actualResult);
     }

@@ -2,16 +2,16 @@
 
 namespace Egal\Model;
 
+use Egal\Model\Traits\Pagination;
 use ReflectionException;
 
 abstract class EnumModel
 {
+    use Pagination;
 
     protected static array $cache = [];
 
-    protected int $page = 1;
     protected int $perPage = 15;
-    protected int $maxPerPage = 100;
 
     public static function descriptions(): array
     {
@@ -44,13 +44,13 @@ abstract class EnumModel
         return static::$cache[$class];
     }
 
-    public static function actionGetItems(array $pagination = [], array $filter = [], array $order = []): array
+    public static function actionGetItems(?array $pagination, array $filter = [], array $order = []): array
     {
         $instance = new static();
         $items = $instance->getItemsCollection()
+            ->paginate($pagination)
             ->setFilterFromArray($filter)
             ->setOrderFromArray($order)
-            ->paginate($pagination)
             ->values();
 
         return [
@@ -90,22 +90,6 @@ abstract class EnumModel
     public function getPerPage(): ?int
     {
         return $this->perPage;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getPage(): ?int
-    {
-        return $this->page;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxPerPage(): int
-    {
-        return $this->maxPerPage;
     }
 
 }

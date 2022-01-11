@@ -110,7 +110,7 @@ class Collection extends \Illuminate\Support\Collection
         $filterConditionArray = static::getFilterConditionArrayFromFilterPart($filterPart);
 
         return $this->filter(function ($value, $key) use ($filterConditionArray) {
-            return static::getFilter($filterConditionArray, $key, $value);
+            return static::getFilterValue($filterConditionArray, $key, $value);
         });
     }
 
@@ -134,22 +134,22 @@ class Collection extends \Illuminate\Support\Collection
         }
     }
 
-    private static function getFilter(array $filterConditionArray, $key, $value)
+    private static function getFilterValue(array $filterConditionArray, $key, $value)
     {
-        $filter = null;
+        $filterValue = null;
         foreach ($filterConditionArray as $filterCondition) {
             if (array_key_exists('nestedFilter', $filterCondition)) {
-                $comparison = static::getFilter(
+                $comparison = static::getFilterValue(
                     $filterCondition['nestedFilter'],
                     $key,
-                    $filter
+                    $filterValue
                 );
                 switch ($filterCondition['operator']) {
                     case FilterCombiner::AND:
-                        $filter = $key === 1 ? (bool)$comparison : $filter && ($comparison);
+                        $filterValue = $key === 1 ? (bool)$comparison : $filterValue && ($comparison);
                         break;
                     case FilterCombiner::OR:
-                        $filter = $filter || ($comparison);
+                        $filterValue = $filterValue || ($comparison);
                         break;
                 }
             } else {
@@ -161,27 +161,24 @@ class Collection extends \Illuminate\Support\Collection
 
                 switch ($filterCondition['operator']) {
                     case FilterCombiner::AND:
-                        $filter = $key === 0 ? (bool)$comparison : $filter && $comparison;
+                        $filterValue = $key === 0 ? (bool)$comparison : $filterValue && $comparison;
                         break;
                     case FilterCombiner::OR:
-                        $filter = $filter || $comparison;
+                        $filterValue = $filterValue || $comparison;
                         break;
                 }
             }
         }
 
-        return $filter;
+        return $filterValue;
     }
 
-    public function paginate(array $paginationArray)
+    public function paginate(?array $paginationArray)
     {
-        $pagination = Pagination::fromArray($paginationArray);
+        dump($this->model);
+        $pagination = Pagination::fromArray($paginationArray === null ? [] : $paginationArray);
         $pagination->getPage() ?: $pagination->setPage($this->model->getPage());
-        $pagination->getPerPage() ?: $pagination->setPerPage($this->model->getPerPage());
-
-        if ($pagination->getPerPage() > $this->model->getMaxPerPage()) {
-            $pagination->setPerPage($this->model->getMaxPerPage());
-        }
+        $pagination->getPerPage() ?: $pagination->setPerPage($this->model->getMaxPerPage());
 
         return $this->forPage($pagination->getPage(), $pagination->getPerPage());
     }
@@ -189,5 +186,10 @@ class Collection extends \Illuminate\Support\Collection
     public function setModel($model)
     {
         $this->model = $model;
+    }
+
+    public function getModel()
+    {
+        return $this->model;
     }
 }
