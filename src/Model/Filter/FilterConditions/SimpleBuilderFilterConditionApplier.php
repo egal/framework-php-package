@@ -11,7 +11,7 @@ use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
 
-class SimpleBuilderFilterConditionApplier extends BuilderFilterConditionApplier
+class SimpleFilterConditionApplier extends FilterConditionApplier
 {
 
     private const EQUAL_OPERATOR = 'eq';
