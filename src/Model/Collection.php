@@ -10,6 +10,7 @@ use Egal\Model\Filter\FilterPart;
 use Egal\Model\Order\Order;
 use Egal\Model\Order\OrderDirectionType;
 use Egal\Model\Pagination\Pagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Collection extends \Illuminate\Support\Collection
 {
@@ -175,12 +176,13 @@ class Collection extends \Illuminate\Support\Collection
 
     public function paginate(?array $paginationArray)
     {
-        dump($this->model);
         $pagination = Pagination::fromArray($paginationArray === null ? [] : $paginationArray);
-        $pagination->getPage() ?: $pagination->setPage($this->model->getPage());
-        $pagination->getPerPage() ?: $pagination->setPerPage($this->model->getMaxPerPage());
+        $page = $pagination->getPage();
+        $page ?: $pagination->setPage($this->model->getPage());
+        $perPage = $pagination->getPerPage();
+        $perPage ?: $pagination->setPerPage($this->model->getMaxPerPage());
 
-        return $this->forPage($pagination->getPage(), $pagination->getPerPage());
+        return new LengthAwarePaginator($this->forPage($page, $perPage), $this->count(), $perPage, $page);
     }
 
     public function setModel($model)

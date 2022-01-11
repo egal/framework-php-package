@@ -48,13 +48,17 @@ abstract class EnumModel
     {
         $instance = new static();
         $items = $instance->getItemsCollection()
-            ->paginate($pagination)
             ->setFilterFromArray($filter)
             ->setOrderFromArray($order)
             ->values();
 
+        $paginator = $items->paginate($pagination);
+
         return [
-            'items' => $items->toArray(),
+            'items' => $paginator->items(),
+            'current_page' => $paginator->currentPage(),
+            'total_count' => $paginator->total(),
+            'per_page' => $paginator->perPage(),
         ];
     }
 
