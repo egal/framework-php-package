@@ -50,8 +50,7 @@ abstract class EnumModel
         $instance = new static();
         $items = $instance->getItemsCollection()
             ->setFilterFromArray($filter)
-            ->setOrderFromArray($order)
-            ->values();
+            ->setOrderFromArray($order);
 
         $paginator = $items->paginate($pagination);
 
@@ -63,15 +62,15 @@ abstract class EnumModel
         ];
     }
 
-    public static function actionGetItem($keyValue): array
+    public static function actionGetItem($id): array
     {
         $instance = new static();
         $item = $instance->getItemsCollection()
-            ->where('key', $keyValue)
+            ->where('key', $id)
             ->first();
 
         if (!$item) {
-            throw ObjectNotFoundException::make($keyValue);
+            throw ObjectNotFoundException::make($id);
         }
 
         return $item;

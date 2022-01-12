@@ -21,6 +21,9 @@ class Collection extends \Illuminate\Support\Collection
     private const LESS_THEN_OPERATOR = 'lt';
     private const LESS_OR_EQUAL_OPERATOR = 'le';
 
+    /**
+     * @var Model|EnumModel
+     */
     protected $model;
 
     private static function getFilterConditionArrayFromFilterPart(FilterPart $filterPart)
@@ -67,7 +70,7 @@ class Collection extends \Illuminate\Support\Collection
     public function setFilterFromArray(array $array): self
     {
         if ($array !== []) {
-            return $this->setFilter(FilterPart::fromArray($array));
+              return $this->setFilter(FilterPart::fromArray($array));
         }
 
         return $this;
@@ -76,7 +79,7 @@ class Collection extends \Illuminate\Support\Collection
     public function setOrderFromArray(array $array): self
     {
         if ($array !== []) {
-            return $this->setOrder(Order::fromArray($array));
+            $this->setOrder(Order::fromArray($array));
         }
 
         return $this;
@@ -86,17 +89,17 @@ class Collection extends \Illuminate\Support\Collection
     {
         if ($order instanceof Order) {
             if ($order->getDirection() === OrderDirectionType::DESC) {
-                return $this->sortByDesc($order->getColumn());
+                $this->sortByDesc($order->getColumn());
             } elseif ($order->getDirection() === OrderDirectionType::ASC) {
-                return $this->sortBy($order->getColumn());
+                $this->sortBy($order->getColumn());
             }
         } elseif (is_array_of_classes($order, Order::class)) {
             /** @var \Egal\Model\Order\Order $orderItem */
             foreach ($order as $orderItem) {
                 if ($orderItem->getDirection() === OrderDirectionType::DESC) {
-                    return $this->sortByDesc($orderItem->getColumn());
+                    $this->sortByDesc($orderItem->getColumn());
                 } elseif ($orderItem->getDirection() === OrderDirectionType::ASC) {
-                    return $this->sortBy($orderItem->getColumn());
+                    $this->sortBy($orderItem->getColumn());
                 }
             }
         } else {
@@ -106,10 +109,9 @@ class Collection extends \Illuminate\Support\Collection
         return $this;
     }
 
-    private function setFilter(FilterPart $filterPart)
+    private function setFilter(FilterPart $filterPart): self
     {
         $filterConditionArray = static::getFilterConditionArrayFromFilterPart($filterPart);
-
         return $this->filter(function ($value, $key) use ($filterConditionArray) {
             return static::getFilterValue($filterConditionArray, $key, $value);
         });
@@ -177,12 +179,12 @@ class Collection extends \Illuminate\Support\Collection
     public function paginate(?array $paginationArray)
     {
         $pagination = Pagination::fromArray($paginationArray === null ? [] : $paginationArray);
+        $pagination->getPage() ?: $pagination->setPage($this->model->getPage());
+        $pagination->getPerPage() ?: $pagination->setPerPage($this->model->getMaxPerPage());
         $page = $pagination->getPage();
-        $page ?: $pagination->setPage($this->model->getPage());
         $perPage = $pagination->getPerPage();
-        $perPage ?: $pagination->setPerPage($this->model->getMaxPerPage());
 
-        return new LengthAwarePaginator($this->forPage($page, $perPage), $this->count(), $perPage, $page);
+        return new LengthAwarePaginator($this->forPage($page, $perPage)->values(), $this->count(), $perPage, $page);
     }
 
     public function setModel($model)
@@ -193,5 +195,13 @@ class Collection extends \Illuminate\Support\Collection
     public function getModel()
     {
         return $this->model;
+    }
+
+    public function filter(callable $callback = null)
+    {
+        $collection = parent::filter($callback);
+        $collection->setModel($this->model);
+
+        return $collection;
     }
 }

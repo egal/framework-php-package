@@ -3,7 +3,6 @@
 namespace Egal\Tests\Model;
 
 use Egal\Model\EnumModel;
-use Illuminate\Support\ItemNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class EnumModelTest extends TestCase
@@ -14,18 +13,16 @@ class EnumModelTest extends TestCase
             [
                 [],
                 [
-                    "items" => [
-                        [
-                            "key" => "INCOMPLETE",
-                            "value" => "incomplete",
-                            "description" => "test description"
-                        ],
-                        [
-                            "key" => "COMPLETE",
-                            "value" => "complete",
-                            "description" => "test description"
-                        ]
-                        ]
+                    [
+                        "key" => "INCOMPLETE",
+                        "value" => "incomplete",
+                        "description" => "test description"
+                    ],
+                    [
+                        "key" => "COMPLETE",
+                        "value" => "complete",
+                        "description" => "test description"
+                    ]
                 ],
             ],
             [
@@ -33,12 +30,10 @@ class EnumModelTest extends TestCase
                     ['key', 'eq', "INCOMPLETE"],
                 ],
                 [
-                    "items" => [
-                        [
-                            "key" => "INCOMPLETE",
-                            "value" => "incomplete",
-                            "description" => "test description"
-                        ]
+                    [
+                        "key" => "INCOMPLETE",
+                        "value" => "incomplete",
+                        "description" => "test description"
                     ]
                 ],
             ],
@@ -46,26 +41,7 @@ class EnumModelTest extends TestCase
                 [
                     ['key', 'eq', "NON EXIST"],
                 ],
-                [
-                    "items" => []
-                ],
-            ],
-            [
                 [],
-                [
-                    "items" => [
-                        [
-                            "key" => "INCOMPLETE",
-                            "value" => "incomplete",
-                            "description" => "test description"
-                        ],
-                        [
-                            "key" => "COMPLETE",
-                            "value" => "complete",
-                            "description" => "test description"
-                        ]
-                    ]
-                ],
             ],
             [
                 [
@@ -74,17 +50,15 @@ class EnumModelTest extends TestCase
                     ['value', 'eq', "complete"],
                 ],
                 [
-                    "items" => [
-                        [
-                            "key" => "INCOMPLETE",
-                            "value" => "incomplete",
-                            "description" => "test description"
-                        ],
-                        [
-                            "key" => "COMPLETE",
-                            "value" => "complete",
-                            "description" => "test description"
-                        ]
+                    [
+                        "key" => "INCOMPLETE",
+                        "value" => "incomplete",
+                        "description" => "test description"
+                    ],
+                    [
+                        "key" => "COMPLETE",
+                        "value" => "complete",
+                        "description" => "test description"
                     ]
                 ],
             ],
@@ -102,11 +76,6 @@ class EnumModelTest extends TestCase
                     "description" => "test description"
                 ],
                 null
-            ],
-            [
-                "NON EXIST",
-                [],
-                ItemNotFoundException::class
             ],
             [
                 "COMPLETE",
@@ -127,7 +96,7 @@ class EnumModelTest extends TestCase
     {
         $actualResult = EnumModelActionGetItemsTestStatusStub::actionGetItems(null, $filter);
 
-        $this->assertEquals($expectResult, $actualResult);
+        $this->assertEquals($expectResult, $actualResult['items']);
     }
 
     /**
