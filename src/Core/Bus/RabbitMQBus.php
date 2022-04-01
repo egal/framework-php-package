@@ -22,7 +22,6 @@ use Egal\Core\Messages\StartProcessingMessage;
 use Egal\Core\Session\Session;
 use Egal\Exception\HasData;
 use Egal\Exception\HasInternalCode;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Channel\AMQPChannel;
