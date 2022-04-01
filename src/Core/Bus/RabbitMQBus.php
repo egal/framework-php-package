@@ -231,14 +231,7 @@ class RabbitMQBus extends Bus
             $actionErrorMessage = new ActionErrorMessage();
             $actionErrorMessage->setMessage($exception->getMessage());
 
-            switch (get_class($exception)) {
-                case QueryException::class:
-                    $actionErrorMessage->setCode(500);
-                    break;
-                default:
-                    $actionErrorMessage->setCode($exception->getCode());
-                    break;
-            }
+            $actionErrorMessage->setCode(is_string($exception->getCode()) ? 500 : $exception->getCode());
 
             if ($exception instanceof HasData) {
                 $actionErrorMessage->setData($exception->getData());
