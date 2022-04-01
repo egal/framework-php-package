@@ -56,8 +56,8 @@ jobs:
             ${{ github.event.pull_request.base.sha }} \
             ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
           if [ "${DIFF}" == '' ]; then exit 0; fi
-          bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF
           bash bin/phpcbf.sh src/Core/Bus/RabbitMQBus.php
+          bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF
 
   PHPUnit80:
     runs-on: ubuntu-latest
