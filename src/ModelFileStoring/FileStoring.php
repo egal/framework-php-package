@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Egal\ModelFileStoring;
 
+use Egal\Model\Exceptions\ValidateException;
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 /**
@@ -48,11 +50,22 @@ trait FileStoring
         return $contentName;
     }
 
-    public static function actionUpload(string $fileBasename, string $contents): array
+    public static function actionUpload(array $attributes): array
     {
+        $validator = Validator::make($attributes, [
+            'file_basename' => 'required|string',
+            'contents' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
+            throw $exception;
+        }
+
         $file = new static();
-        $path = $file->generatePath($fileBasename);
-        $file->disk->put($path, $contents, $file->getVisibility());
+        $path = $file->generatePath($attributes['fileBasename']);
+        $file->disk->put($path, $attributes['contents'], $file->getVisibility());
 
         return ['path' => $path];
     }

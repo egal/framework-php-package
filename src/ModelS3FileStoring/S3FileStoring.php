@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Egal\ModelS3FileStoring;
 
 use Aws\S3\S3ClientInterface;
+use Egal\Model\Exceptions\ValidateException;
 use Egal\ModelFileStoring\FileStoring;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @mixin \Egal\Model\Model
@@ -25,10 +27,20 @@ trait S3FileStoring
         $this->client = $this->disk->getDriver()->getAdapter()->getClient();
     }
 
-    public static function actionCreateMultipartUpload(string $fileBasename): array
+    public static function actionCreateMultipartUpload(array $attributes): array
     {
+        $validator = Validator::make($attributes, [
+            'file_basename' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
+            throw $exception;
+        }
+
         $file = new static();
-        $path = $file->generatePath($fileBasename);
+        $path = $file->generatePath($attributes['fileBasename']);
         $result = $file->client->createMultipartUpload([
             'Bucket' => $file->getBucketName(),
             'Key' => $path,
@@ -40,23 +52,49 @@ trait S3FileStoring
         ];
     }
 
-    public static function actionUploadPart(string $uploadId, string $path, int $partNumber, string $contents): array
+    public static function actionUploadPart(array $attributes): array
     {
+        $validator = Validator::make($attributes, [
+            'upload_id' => 'required|string',
+            'path' => 'required|string',
+            'part_number' => 'required|int',
+            'contents' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
+            throw $exception;
+        }
+
         $file = new static();
         $file->client->uploadPart([
             'Bucket' => $file->getBucketName(),
-            'Key' => $path,
-            'UploadId' => $uploadId,
-            'PartNumber' => $partNumber,
-            'Body' => $contents,
+            'Key' => $attributes['path'],
+            'UploadId' => $attributes['uploadId'],
+            'PartNumber' => $attributes['partNumber'],
+            'Body' => $attributes['contents'],
         ]);
 
         return ['message' => 'Uploaded!'];
     }
 
-    public static function actionCompleteMultipartUpload(string $path, string $uploadId): array
+    public static function actionCompleteMultipartUpload(array $attributes): array
     {
+        $validator = Validator::make($attributes, [
+            'path' => 'required|string',
+            'upload_id' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
+            throw $exception;
+        }
+
         $file = new static();
+        $path = $attributes['path'];
+        $uploadId = $attributes['uploadId'];
         $file->client->completeMultipartUpload([
             'Bucket' => $file->getBucketName(),
             'Key' => $path,
