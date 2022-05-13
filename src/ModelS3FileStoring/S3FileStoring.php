@@ -40,7 +40,7 @@ trait S3FileStoring
         }
 
         $file = new static();
-        $path = $file->generatePath($attributes['fileBasename']);
+        $path = $file->generatePath($attributes['file_basename']);
         $result = $file->client->createMultipartUpload([
             'Bucket' => $file->getBucketName(),
             'Key' => $path,
@@ -71,8 +71,8 @@ trait S3FileStoring
         $file->client->uploadPart([
             'Bucket' => $file->getBucketName(),
             'Key' => $attributes['path'],
-            'UploadId' => $attributes['uploadId'],
-            'PartNumber' => $attributes['partNumber'],
+            'UploadId' => $attributes['upload_id'],
+            'PartNumber' => $attributes['part_number'],
             'Body' => $attributes['contents'],
         ]);
 
@@ -94,7 +94,7 @@ trait S3FileStoring
 
         $file = new static();
         $path = $attributes['path'];
-        $uploadId = $attributes['uploadId'];
+        $uploadId = $attributes['upload_id'];
         $file->client->completeMultipartUpload([
             'Bucket' => $file->getBucketName(),
             'Key' => $path,
