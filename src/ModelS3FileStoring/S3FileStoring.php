@@ -29,13 +29,15 @@ trait S3FileStoring
 
     public static function actionCreateMultipartUpload(array $attributes): array
     {
-        $validator = Validator::make($attributes, [
-            'file_basename' => 'required|string'
-        ]);
+        $validator = Validator::make(
+            $attributes,
+            ['file_basename' => 'required|string']
+        );
 
         if ($validator->fails()) {
             $exception = new ValidateException();
             $exception->setMessageBag($validator->errors());
+
             throw $exception;
         }
 
@@ -54,16 +56,20 @@ trait S3FileStoring
 
     public static function actionUploadPart(array $attributes): array
     {
-        $validator = Validator::make($attributes, [
-            'upload_id' => 'required|string',
-            'path' => 'required|string',
-            'part_number' => 'required|int',
-            'contents' => 'required|string'
-        ]);
+        $validator = Validator::make(
+            $attributes,
+            [
+                'upload_id' => 'required|string',
+                'path' => 'required|string',
+                'part_number' => 'required|int',
+                'contents' => 'required|string',
+            ]
+        );
 
         if ($validator->fails()) {
             $exception = new ValidateException();
             $exception->setMessageBag($validator->errors());
+
             throw $exception;
         }
 
@@ -81,14 +87,18 @@ trait S3FileStoring
 
     public static function actionCompleteMultipartUpload(array $attributes): array
     {
-        $validator = Validator::make($attributes, [
-            'path' => 'required|string',
-            'upload_id' => 'required|string'
-        ]);
+        $validator = Validator::make(
+            $attributes,
+            [
+                'path' => 'required|string',
+                'upload_id' => 'required|string',
+            ]
+        );
 
         if ($validator->fails()) {
             $exception = new ValidateException();
             $exception->setMessageBag($validator->errors());
+
             throw $exception;
         }
 

@@ -52,14 +52,18 @@ trait FileStoring
 
     public static function actionUpload(array $attributes): array
     {
-        $validator = Validator::make($attributes, [
-            'file_basename' => 'required|string',
-            'contents' => 'required|string'
-        ]);
+        $validator = Validator::make(
+            $attributes,
+            [
+                'file_basename' => 'required|string',
+                'contents' => 'required|string',
+            ]
+        );
 
         if ($validator->fails()) {
             $exception = new ValidateException();
             $exception->setMessageBag($validator->errors());
+
             throw $exception;
         }
 
