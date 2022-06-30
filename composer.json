@@ -4,13 +4,13 @@
     "type": "library",
     "license": "Apache-2.0",
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^7.4|^8.1",
         "ext-json": "*",
         "ext-pcntl": "*",
         "laravel/lumen-framework": "^8.0",
         "laravel/helpers": "^1.4",
         "phpdocumentor/reflection-docblock": "^5.2",
-        "php-amqplib/php-amqplib": "^2.12|^3",
+        "php-amqplib/php-amqplib": "^3.2",
         "firebase/php-jwt": "^5.2.0",
         "centrifugal/phpcent": "~4.0",
         "league/flysystem-aws-s3-v3": "^1"

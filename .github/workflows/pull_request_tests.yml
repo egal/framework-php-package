@@ -58,12 +58,12 @@ jobs:
           if [ "${DIFF}" == '' ]; then exit 0; fi
           bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF
 
-  PHPUnit80:
+  PHPUnit81:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up PHP Dockerfile
-        run: echo PHP_DOCKERFILE='php80.Dockerfile' > .env
+        run: echo PHP_DOCKERFILE='php81.Dockerfile' > .env
       - name: Docker Compose build and pull
         run: |
           docker-compose pull
