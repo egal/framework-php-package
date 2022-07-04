@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Policies;
+
+use App\Models\{{ model }};
+use Egal\Core\Auth\User;
+
+class {{ class }}
+{
+     public function showAny(?User $user): bool
+        {
+            return false;
+        }
+
+        public function createAny(?User $user): bool
+        {
+            return false;
+        }
+
+        public function updateAny(?User $user): bool
+        {
+            return false;
+        }
+
+        public function deleteAny(?User $user): bool
+        {
+            return false;
+        }
+
+        public function show(?User $user, {{ model }} $post): bool
+        {
+            return false;
+        }
+
+        public function create(?User $user, {{ model }} $post): bool
+        {
+            return false;
+        }
+
+        public function update(?User $user, {{ model }} $post): bool
+        {
+            return false;
+        }
+
+        public function delete(?User $user, {{ model }} $post): bool
+        {
+            return false;
+        }
+}

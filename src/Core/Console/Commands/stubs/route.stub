@@ -1,0 +1,1 @@
+EgalRoute::rest(\App\Models\{{ model }}::class, \App\Http\Policies\{{ model }}Policy::class);

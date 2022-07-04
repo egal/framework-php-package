@@ -1,74 +1,67 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Egal\Core;
 
-use Egal\Core\Bus\Bus;
-use Egal\Core\Bus\BusCreator;
-use Egal\Core\Commands\EgalRunCommand;
-use Egal\Core\Commands\GenerateKeyCommand;
-use Egal\Core\Events\EventManager;
-use Egal\Core\Exceptions\EgalCoreInitializationException;
-use Egal\Core\Session\Session;
-use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
+use Egal\Core\Auth\Gate;
+use Egal\Core\Http\Route;
+use Egal\Core\Rest\Controller;
+use Egal\Core\Rest\Filter\Parser as FilterParser;
+use Egal\Core\Rest\Select\Parser as SelectParser;
+use Egal\Core\Rest\Scope\Parser as ScopeParser;
+use Egal\Core\Rest\Order\Parser as OrderParser;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
-class ServiceProvider extends IlluminateServiceProvider
+class ServiceProvider extends BaseServiceProvider
 {
 
-    /**
-     * Indicates if the download of the provider is pending.
-     */
-    protected bool $defer = true;
-
-    /**
-     * @var string[]
-     */
-    protected array $commands = [];
-
-    public function register(): void
+    public function register()
     {
-        if (!($this->app instanceof Application)) {
-            throw new EgalCoreInitializationException(
-                'Application needs instants of ' . Application::class . ' detected ' . get_class($this->app) . '!'
-            );
+        $this->app->singleton('egal.gate', fn($app) => new Gate());
+        $this->app->singleton('egal.rest', fn($app) => new Controller());
+        $this->app->singleton('egal.route', fn($app) => new Route());
+        $this->app->singleton('egal.filter.parser', fn($app) => new FilterParser());
+        $this->app->singleton('egal.select.parser', fn($app) => new SelectParser());
+        $this->app->singleton('egal.scope.parser', fn($app) => new ScopeParser());
+        $this->app->singleton('egal.order.parser', fn($app) => new OrderParser());
+
+        if (class_exists('Egal\Core\Console\ServiceProvider')) {
+            $this->app->register('Egal\Core\Console\ServiceProvider');
         }
 
-        if ($this->app->runningInConsole()) {
-            if (class_exists('Egal\CodeGenerator\ServiceProvider')) {
-                $this->app->register('Egal\CodeGenerator\ServiceProvider');
-            }
-
-            if (class_exists('Egal\Validation\ServiceProvider')) {
-                $this->app->register('Egal\Validation\ServiceProvider');
-            }
-
-            if (class_exists('Egal\Model\ServiceProvider')) {
-                $this->app->register('Egal\Model\ServiceProvider');
-            }
-
-            $this->commands([
-                EgalRunCommand::class,
-                GenerateKeyCommand::class,
-            ]);
+        if (class_exists('Egal\Core\Auth\ServiceProvider')) {
+            $this->app->register('Egal\Core\Auth\ServiceProvider');
         }
 
-        $this->app->singleton(Bus::class, static fn (): Bus => BusCreator::createBus());
-        $this->app->singleton(Session::class, static fn () => new Session());
-        $this->app->singleton(EventManager::class, static fn () => new EventManager());
+        if (class_exists('Egal\Core\Auth\RouteServiceProvider')) {
+            $this->app->register('Egal\Core\Auth\RouteServiceProvider');
+        }
 
-        $this->commands([]);
+        Collection::macro('paginate', function (int $perPage = 15, string $pageName = 'page', int $page = null, int $total = null, array $options = []): LengthAwarePaginator {
+            $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
 
-        $this->mergeConfigs();
+            $results = $this->forPage($page, $perPage)->values();
+
+            $total = $total ?: $this->count();
+
+            $options += [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => $pageName,
+            ];
+
+            return new LengthAwarePaginator($results, $total, $perPage, $page, $options);
+        });
     }
 
-    private function mergeConfigs(): void
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/app.php', 'app');
-        $this->mergeConfigFrom(__DIR__ . '/config/bus.php', 'bus');
-        $this->mergeConfigFrom(__DIR__ . '/config/auth.php', 'auth');
-        $this->mergeConfigFrom(__DIR__ . '/config/database.php', 'database');
-        $this->mergeConfigFrom(__DIR__ . '/config/queue.php', 'queue');
+
     }
 
 }
