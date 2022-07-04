@@ -19,7 +19,7 @@
     },
     "autoload": {
         "files": [
-            "egal/src/Core/functions/dump.php"
+            "src/Core/functions/dump.php"
         ],
         "psr-4": {
             "Egal\\": "src/"
