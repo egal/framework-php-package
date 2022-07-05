@@ -2,8 +2,6 @@
 
 namespace Egal\Tests\Core\Rest\Select;
 
-use App\Models\Channel;
-use App\Models\Comment;
 use Carbon\Carbon;
 use Egal\Core\Database\Metadata\Field as FieldMetadata;
 use Egal\Core\Database\Metadata\Model as ModelMetadata;
@@ -45,26 +43,26 @@ class SelectApplierTest extends TestCase
     public function selectApplierDataProviderField()
     {
         return [
-//            [
-//                [new Field("title")],
-//                ["title"]
-//            ],
-//            [
-//                [new Field("title"), new Field("id")],
-//                ["title", "id"]
-//            ],
-//            [
-//                [],
-//                EmptySelectException::class
-//            ],
-//            [
-//                [new Field("title"), new Field("id"), new Field("created_at")],
-//                ["title", "id", "created_at"]
-//            ],
-//            [
-//                [new Field("title"), new Field("id"), new Field("channel_id")],
-//                ["title", "id", "channel_id"]
-//            ],
+            [
+                [new Field("title")],
+                ["title"]
+            ],
+            [
+                [new Field("title"), new Field("id")],
+                ["title", "id"]
+            ],
+            [
+                [],
+                EmptySelectException::class
+            ],
+            [
+                [new Field("title"), new Field("id"), new Field("created_at")],
+                ["title", "id", "created_at"]
+            ],
+            [
+                [new Field("title"), new Field("id"), new Field("channel_id")],
+                ["title", "id", "channel_id"]
+            ],
         ];
     }
 
@@ -75,10 +73,10 @@ class SelectApplierTest extends TestCase
                 [new Field("channel_id"), new RelationField("id", "channel"), new RelationField("title", "channel")],
                 ["channel_id", "channel"]
             ],
-//            [
-//                [new Field("title"), new RelationField("id", "channel"), new RelationField("title", "channel")],
-//                ["title", "channel"]
-//            ]
+            [
+                [new Field("title"), new RelationField("id", "channel"), new RelationField("title", "channel")],
+                ["title", "channel"]
+            ]
         ];
     }
 
@@ -170,12 +168,12 @@ class ModelSelectApplierTestPost extends Model
 
     public function channel(): BelongsTo
     {
-        return $this->belongsTo(Channel::class);
+        return $this->belongsTo(ModelSelectApplierTestChannel::class);
     }
 
     public function comments(): MorphMany
     {
-        return $this->morphMany(Comment::class, 'commentable');
+        return $this->morphMany(ModelSelectApplierTestComment::class, 'commentable');
     }
 
     public function scopeCreatedAfterToday($query)

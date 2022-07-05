@@ -225,7 +225,6 @@ class FilterApplierTest extends TestCase
 
     protected function dropSchema(): void
     {
-        json_encode();
         $this->schema()->drop('comments');
         $this->schema()->drop('posts');
         $this->schema()->drop('channels');
