@@ -18,6 +18,11 @@ class ServiceProvider extends IlluminateServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
+
+            $this->publishes([
+                __DIR__.'/../config/auth.php' => config_path('auth.php'),
+            ], 'config');
+
             if (! class_exists('CreateUsersTable')) {
                 $this->publishes([
                     __DIR__ . '/../../database/migrations/create_users_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_users_table.php'),
