@@ -35,7 +35,7 @@ class Controller extends BaseController
             $request['password'] = Hash::make($request['password']);
             User::query()->create(['email' => $request['email'], 'password' => $request['password']]);
 
-            return response()->setStatusCode(Response::HTTP_OK);
+            return response()->noContent()->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
 
             return response()->json($this->getExceptionResponseData($exception))->setStatusCode($exception->getCode());
@@ -81,7 +81,7 @@ class Controller extends BaseController
                     $request->session()->put('access_token', $accessToken);
                     $request->session()->put('refresh_token', $refreshToken);
 
-                    return response()->json()->setStatusCode(Response::HTTP_OK);
+                    return response()->noContent()->setStatusCode(Response::HTTP_OK);
                 case AuthorizationType::Header->value:
                     $tokens = ['access_token' => $accessToken, 'refresh_token' => $refreshToken];
 

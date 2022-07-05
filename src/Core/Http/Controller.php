@@ -89,7 +89,7 @@ class Controller extends BaseController
         try {
             Rest::delete($modelClass, $key);
 
-            return response()->setStatusCode(Response::HTTP_OK);
+            return response()->noContent()->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
 
             return response()->json($this->getExceptionResponseData($exception))->setStatusCode($exception->getCode());
