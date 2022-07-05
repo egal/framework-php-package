@@ -38,7 +38,7 @@ class Controller extends BaseController
 
             return response()->json([
                 'exception' => $exceptionResponseData
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 
@@ -56,7 +56,7 @@ class Controller extends BaseController
 
             return response()->json([
                 'exception' => $exceptionResponseData
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 
@@ -78,7 +78,7 @@ class Controller extends BaseController
 
             return response()->json([
                 'exception' => $exceptionResponseData
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 
@@ -100,7 +100,7 @@ class Controller extends BaseController
 
             return response()->json([
                 'exception' => $exceptionResponseData
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 
@@ -117,7 +117,7 @@ class Controller extends BaseController
 
             return response()->json([
                 'exception' => $exceptionResponseData ?? null
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 
@@ -134,7 +134,7 @@ class Controller extends BaseController
 
             return response()->json([
                 'exception' => $exceptionResponseData
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 

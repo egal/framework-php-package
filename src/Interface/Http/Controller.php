@@ -29,7 +29,7 @@ class Controller
 
             return response()->json([
                 'exception' => $exceptionResponseData
-            ])->setStatusCode($exceptionResponseData['code']);
+            ])->setStatusCode($exception->getCode());
         }
     }
 
