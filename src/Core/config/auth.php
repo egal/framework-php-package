@@ -40,4 +40,6 @@ return [
 
     ],
 
+    'auth_service_name' => env('AUTH_SERVICE_NAME', 'auth'),
+
 ];

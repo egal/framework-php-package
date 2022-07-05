@@ -34,6 +34,8 @@ class Request extends ActionMessage
     public function __construct(string $serviceName, string $modelName, string $actionName, array $parameters = [])
     {
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
+
+        $this->setAuthServiceName(config('auth.auth_service_name'));
     }
 
     public function setAuthServiceName(string $authServiceName): void
