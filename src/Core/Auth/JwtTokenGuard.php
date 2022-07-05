@@ -21,11 +21,11 @@ class JwtTokenGuard implements Guard
 
     public function user()
     {
-        switch ($this->request->header('AuthorizationType')) {
-            case AuthorizationType::Cookie->value:
+        switch ($this->request->header('Authorization-Type')) {
+            case AuthorizationType::Cookie:
                 $token = $this->request->session()->get('access_token');
                 break;
-            case AuthorizationType::Header->value:
+            case AuthorizationType::Header:
                 $token = $this->request->header('Authorization');
                 break;
             default:
