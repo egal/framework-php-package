@@ -2,8 +2,8 @@
 
 namespace Egal\Core\Auth;
 
-enum AuthorizationType
+enum AuthorizationType: string
 {
-    case Cookie;
-    case Header;
+    case Cookie = 'cookie';
+    case Header = 'header';
 }
