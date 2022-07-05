@@ -15,22 +15,22 @@ class Controller
     public function show(Request $request, $label)
     {
         try {
-            Log::debug('components', Manager::getComponents());
             $component = Manager::getComponentByLabel($label);
+
+            return response()->json([
+                'data' => $component->toArray()
+            ])->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
             $exceptionResponseData = [
                 'message' => $exception->getMessage(),
-                'code' => $exception->getCode(),
                 'internal_code' => $exception instanceof HasInternalCode ? $exception->getInternalCode() : null,
                 'data' => $exception instanceof HasData ? $exception->getData() : null
             ];
-        }
 
-        return response()->json([
-            'message' => null,
-            'data' => isset($component) ? $component->toArray() : null,
-            'exception' => $exceptionResponseData ?? null
-        ])->setStatusCode(isset($exceptionResponseData) ? $exceptionResponseData['code'] : Response::HTTP_OK);
+            return response()->json([
+                'exception' => $exceptionResponseData
+            ])->setStatusCode($exceptionResponseData['code']);
+        }
     }
 
 }
