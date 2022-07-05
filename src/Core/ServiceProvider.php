@@ -3,7 +3,6 @@
 namespace Egal\Core;
 
 use Egal\Core\Auth\Gate;
-use Egal\Core\Http\ForceJsonMiddleware;
 use Egal\Core\Http\Route;
 use Egal\Core\Rest\Controller;
 use Egal\Core\Rest\Filter\Parser as FilterParser;
@@ -13,7 +12,6 @@ use Egal\Core\Rest\Order\Parser as OrderParser;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Illuminate\Contracts\Http\Kernel;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -27,6 +25,10 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->singleton('egal.select.parser', fn($app) => new SelectParser());
         $this->app->singleton('egal.scope.parser', fn($app) => new ScopeParser());
         $this->app->singleton('egal.order.parser', fn($app) => new OrderParser());
+
+        if (class_exists('Egal\Core\Http\ServiceProvider')) {
+            $this->app->register('Egal\Core\Http\ServiceProvider');
+        }
 
         if (class_exists('Egal\Core\Console\ServiceProvider')) {
             $this->app->register('Egal\Core\Console\ServiceProvider');
@@ -61,9 +63,8 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function boot(Kernel $kernel)
+    public function boot()
     {
-        $kernel->pushMiddleware(ForceJsonMiddleware::class);
     }
 
 }
