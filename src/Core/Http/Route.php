@@ -35,6 +35,9 @@ class Route
         IlluminateRoute::get("metadata/$pluralName", [Controller::class, 'metadata'])
             ->defaults('model_class', $modelClass);
 
+        IlluminateRoute::fallback(function (){
+            abort(404, 'API resource not found');
+
         if (!is_iterable($policies)) {
             $policies = [$policies];
         }
