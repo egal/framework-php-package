@@ -37,7 +37,7 @@ class RouteServiceProvider extends ServiceProvider
     {
 
         $this->routes(function () {
-            Route::middleware('session')
+            Route::middleware(['session', 'api'])
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
         });
