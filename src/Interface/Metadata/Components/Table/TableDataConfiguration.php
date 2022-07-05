@@ -11,10 +11,13 @@ class TableDataConfiguration extends Configuration
 
     protected string $requestModel;
 
+    // TODO отдавать строкой
     protected ?array $requestRelations;
 
+    // TODO отдавать строкой, нужен конвертер из FilterQuery в string
     protected ?FilterQuery $requestFilter;
 
+    // TODO отдавать строкой
     protected ?array $requestOrder;
 
     public static function make():self
