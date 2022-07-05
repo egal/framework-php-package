@@ -23,7 +23,7 @@ class JwtTokenGuard implements Guard
     {
         switch ($this->request->header('Authorization-Type')) {
             case AuthorizationType::Cookie->value:
-                $token = $this->request->session()->get('access_token');
+                $token = $this->request->hasSession() ? $this->request->session()->get('access_token') : null;
                 break;
             case AuthorizationType::Header->value:
                 $token = $this->request->header('Authorization');
