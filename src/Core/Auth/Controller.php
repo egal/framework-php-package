@@ -77,12 +77,12 @@ class Controller extends BaseController
             }
 
             switch ($request->header('Authorization-Type')) {
-                case AuthorizationType::Cookie:
+                case AuthorizationType::Cookie->value:
                     $request->session()->put('access_token', $accessToken);
                     $request->session()->put('refresh_token', $refreshToken);
 
                     return response()->json()->setStatusCode(Response::HTTP_OK);
-                case AuthorizationType::Header:
+                case AuthorizationType::Header->value:
                     $tokens = ['access_token' => $accessToken, 'refresh_token' => $refreshToken];
 
                     return response()->json($tokens)->setStatusCode(Response::HTTP_OK);
