@@ -30,7 +30,7 @@ class JwtTokenGuard implements Guard
                 break;
             default:
                 // TODO отдельный exception
-                throw new Exception("Not specified header 'Authorization-Type'!", Response::HTTP_BAD_REQUEST);
+                throw new Exception("Not specified correct 'Authorization-Type' header!", Response::HTTP_BAD_REQUEST);
         }
 
         if ($token === null) {

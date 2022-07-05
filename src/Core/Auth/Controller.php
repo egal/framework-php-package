@@ -88,7 +88,7 @@ class Controller extends BaseController
                     return response()->json($tokens)->setStatusCode(Response::HTTP_OK);
                 default:
                     // TODO отдельный exception
-                    throw new Exception("Not specified header 'Authorization-Type'!", Response::HTTP_BAD_REQUEST);
+                    throw new Exception("Not specified correct 'Authorization-Type' header!", Response::HTTP_BAD_REQUEST);
             }
         } catch (Exception $exception) {
             return response()->json($this->getExceptionResponseData($exception))->setStatusCode($exception->getCode());
