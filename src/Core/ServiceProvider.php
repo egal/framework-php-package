@@ -3,6 +3,7 @@
 namespace Egal\Core;
 
 use Egal\Core\Auth\Gate;
+use Egal\Core\Http\ForceJsonMiddleware;
 use Egal\Core\Http\Route;
 use Egal\Core\Rest\Controller;
 use Egal\Core\Rest\Filter\Parser as FilterParser;
@@ -12,6 +13,7 @@ use Egal\Core\Rest\Order\Parser as OrderParser;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Illuminate\Contracts\Http\Kernel;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -59,9 +61,9 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Kernel $kernel)
     {
-
+        $kernel->pushMiddleware(ForceJsonMiddleware::class);
     }
 
 }
