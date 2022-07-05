@@ -8,6 +8,7 @@ use Firebase\JWT\Key;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class JwtTokenGuard implements Guard
 {
@@ -20,7 +21,17 @@ class JwtTokenGuard implements Guard
 
     public function user()
     {
-        $token = $this->request->header('Authorization') ?? $this->request->session()->get('access_token');
+        switch ($this->request->header('AuthorizationType')) {
+            case AuthorizationType::Cookie:
+                $token = $this->request->session()->get('access_token');
+                break;
+            case AuthorizationType::Header:
+                $token = $this->request->header('Authorization');
+                break;
+            default:
+                // TODO отдельный exception
+                throw new Exception("Not specified header 'Authorization-Type'!", Response::HTTP_BAD_REQUEST);
+        }
 
         if ($token === null) {
             $this->user = null;

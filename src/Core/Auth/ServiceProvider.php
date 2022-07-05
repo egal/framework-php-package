@@ -9,6 +9,8 @@ class ServiceProvider extends IlluminateServiceProvider
 {
     public function boot () {
 
+        $this->loadRoutesFrom(__DIR__.'/../routes/auth-routes.php');
+
         Auth::extend('jwt_token', function ($app, $name, array $config) {
             $request = app('request');
 

@@ -17,18 +17,13 @@ class Controller
         try {
             $component = Manager::getComponentByLabel($label);
 
-            return response()->json([
-                'data' => $component->toArray()
-            ])->setStatusCode(Response::HTTP_OK);
+            return response()->json($component->toArray())->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
-            $exceptionResponseData = [
+
+            return response()->json([
                 'message' => $exception->getMessage(),
                 'internal_code' => $exception instanceof HasInternalCode ? $exception->getInternalCode() : null,
                 'data' => $exception instanceof HasData ? $exception->getData() : null
-            ];
-
-            return response()->json([
-                'exception' => $exceptionResponseData
             ])->setStatusCode($exception->getCode());
         }
     }

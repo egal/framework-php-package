@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route as IlluminateRoute;
+use Illuminate\Support\Facades\Route;
 
-IlluminateRoute::fallback(function () {
+Route::fallback(function () {
     abort(404, 'API resource not found');
 });
