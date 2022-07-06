@@ -42,7 +42,7 @@ class JwtTokenGuard implements Guard
 
         $decoded = JWT::decode($token, new Key(config('auth.public_key'), 'RS256'));
 
-        if ($decoded->typ !== 'access') {
+        if ($decoded->type !== 'access') {
             throw new Exception('Invalid token type!');
         }
 

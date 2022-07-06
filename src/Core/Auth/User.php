@@ -8,6 +8,8 @@ use Egal\Core\Database\Model;
 use Egal\Core\Facades\Gate;
 use Firebase\JWT\JWT;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model as IlluminateModel;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -17,16 +19,22 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
 {
     // TODO: Добавить sub, остальное перенести из auth-service v.2
     use \Illuminate\Auth\Authenticatable;
+    use HasFactory;
+    use HasRelationships;
+
 
     protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = [
-      'email',
-      'password'
+    protected $hidden = [
+        'password',
     ];
 
+    protected $guarder = [
+        'created_at',
+        'updated_at',
+    ];
     /**
      * @var string[]
      */
@@ -36,8 +44,14 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
     {
         parent::boot();
         static::creating(function (self $user) {
-            Log::debug('here');
             $user->id = Str::uuid()->toString();
+        });
+        static::created(function (User $user) {
+            $defaultRoles = Role::query()
+                ->where('is_default', true)
+                ->get();
+            $user->roles()
+                ->attach($defaultRoles->pluck('id'));
         });
     }
 
@@ -70,7 +84,7 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
     public function makeAccessToken(): string
     {
         return JWT::encode([
-            'typ' => 'access',
+            'type' => 'access',
             'exp' => Carbon::now()->addSeconds(24 * 60 * 60),
             'id' => $this->id,
             'roles' => $this->roles ?? [],
@@ -80,7 +94,7 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
     public function makeRefreshToken(): string
     {
         return JWT::encode([
-            'typ' => 'refresh',
+            'type' => 'refresh',
             'exp' => Carbon::now()->addSeconds(30 * 24 * 60 * 60),
         ], config('auth.private_key'), 'RS256');
     }

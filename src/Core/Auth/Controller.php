@@ -32,8 +32,10 @@ class Controller extends BaseController
                 throw $exception;
             }
 
-            $request['password'] = Hash::make($request['password']);
-            User::query()->create(['email' => $request['email'], 'password' => $request['password']]);
+            $user = new User();
+            $user->setAttribute('email', $request['email']);
+            $user->setAttribute('password', Hash::make($request['password']));
+            $user->save();
 
             return response()->noContent()->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
