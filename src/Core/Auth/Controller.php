@@ -78,6 +78,7 @@ class Controller extends BaseController
 
             switch ($request->header('Authorization-Type')) {
                 case AuthorizationType::Cookie->value:
+                    // TODO хранение сессии в redis
                     $request->session()->put('access_token', $accessToken);
                     $request->session()->put('refresh_token', $refreshToken);
 
