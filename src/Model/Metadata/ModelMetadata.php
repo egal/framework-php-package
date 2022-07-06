@@ -364,7 +364,7 @@ class ModelMetadata
                 break;
             case 'primary-key':
                 if (isset($this->primaryKey)) {
-                    throw new DuplicatePrimaryKeyModelMetadataException();
+                    throw DuplicatePrimaryKeyModelMetadataException::make($this->modelShortName);
                 }
 
                 if ($propertyVariableName) {

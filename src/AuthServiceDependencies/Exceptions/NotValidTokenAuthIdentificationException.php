@@ -6,11 +6,11 @@ namespace Egal\AuthServiceDependencies\Exceptions;
 
 use Exception;
 
-class ServiceNotFoundAuthException extends Exception
+class NotValidTokenAuthIdentificationException extends Exception
 {
 
-    protected $message = 'Service not found!';
-
     protected $code = 400;
+
+    protected $message = 'Not valid token auth identification!';
 
 }

@@ -13,10 +13,10 @@ class IncorrectAppServicesEnvironmentVariablePatternException extends Exception
 
     protected $message = 'Incorrect app services environment variable pattern!';
 
-    public static function make(string $string): self
+    public static function make(string $errorPart): self
     {
         $result = new static();
-        $result->message .= ' [' . $string . ']';
+        $result->message .= PHP_EOL . 'Error part: ' . $errorPart;
 
         return $result;
     }

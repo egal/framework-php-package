@@ -50,13 +50,14 @@ class UserMasterRefreshToken extends Token
     {
         foreach (['type', 'auth_identification'] as $index) {
             if (!array_key_exists($index, $array)) {
-                throw new InitializeUserMasterRefreshTokenException('Incomplete information!');
+                throw new InitializeUserMasterRefreshTokenException('Incomplete token information!');
             }
         }
+
         $token = new UserMasterRefreshToken();
 
         if ($array['type'] !== TokenType::USER_MASTER_REFRESH) {
-            throw new InitializeUserMasterRefreshTokenException('Type mismatch!');
+            throw new InitializeUserMasterRefreshTokenException('Token type mismatch!');
         }
 
         $token->setAuthIdentification($array['auth_identification']);
