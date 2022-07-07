@@ -63,12 +63,12 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
 
     public function hasRole(string $name): bool
     {
-        return in_array($name, $this->roles->pluck('name'));
+        return in_array($name, $this->roles->pluck('name')->toArray());
     }
 
     public function hasRoles(array $roles): bool
     {
-        return count(array_intersect($this->roles->pluck('name'), $roles)) == count($roles);
+        return count(array_intersect($this->roles->pluck('name')->toArray(), $roles)) == count($roles);
     }
 
     public function roles(): BelongsToMany
