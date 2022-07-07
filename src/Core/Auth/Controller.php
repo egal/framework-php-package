@@ -65,7 +65,7 @@ class Controller extends BaseController
             if ($user) {
 
                 if (Hash::check($request['password'], $user->password)) {
-                    $accessToken = AccessToken::fromUser($user);
+                    $accessToken = AccessToken::fromUser($user)->generateJWT();
                     $refreshToken = (new RefreshToken())->generateJWT();
                 } else {
                     // TODO отдельный exception
