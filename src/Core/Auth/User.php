@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model as IlluminateModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -75,9 +76,9 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
         return count(array_intersect($this->roles, $roles)) == count($roles);
     }
 
-    public function roles(): array
+    public function roles(): HasMany
     {
-        return $this->roles;
+        return $this->hasMany(Role::class);
     }
 
     public function makeAccessToken(): string
