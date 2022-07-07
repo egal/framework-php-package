@@ -62,7 +62,7 @@ abstract class Token
 
     public function getType(): string
     {
-        return $this->type;
+        return $this->type->value;
     }
 
     public function getExp(): Carbon
