@@ -55,7 +55,7 @@ class JwtTokenGuard implements Guard
                 throw new Exception('Error! User model class must be implements of ' . UserModelInterface::class . '!');
             }
 
-            $userModel = $userModel->findById($decoded->id);
+            $userModel = $userModel->findById($decoded->sub);
         }
 
         $this->user = $userModel;
