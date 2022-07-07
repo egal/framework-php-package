@@ -11,7 +11,7 @@ class SetUserRoleCommand extends Command
 {
     protected $signature = 'egal:auth:set-user-role
         {userEmail :     The email of the user}
-        {roleName:       The name of the role}';
+        {roleName :       The name of the role}';
 
     protected $description = 'Set role for user';
 

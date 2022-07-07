@@ -11,7 +11,7 @@ class UnsetUserRoleCommand extends Command
 {
     protected $signature = 'egal:auth:unset-user-role
         {userEmail :     The email of the user}
-        {roleName:       The name of the role}';
+        {roleName :       The name of the role}';
 
     protected $description = 'Unset role for user';
 
