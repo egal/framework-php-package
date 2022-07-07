@@ -34,10 +34,6 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
         'created_at',
         'updated_at',
     ];
-    /**
-     * @var string[]
-     */
-    private array $roles;
 
     protected static function boot()
     {
@@ -67,12 +63,12 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
 
     public function hasRole(string $name): bool
     {
-        return in_array($name, $this->roles);
+        return in_array($name, $this->roles->toArray());
     }
 
     public function hasRoles(array $roles): bool
     {
-        return count(array_intersect($this->roles, $roles)) == count($roles);
+        return count(array_intersect($this->roles->toArray(), $roles)) == count($roles);
     }
 
     protected function getRoles(): array
