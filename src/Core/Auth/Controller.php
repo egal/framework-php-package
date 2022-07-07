@@ -60,7 +60,6 @@ class Controller extends BaseController
                 throw $exception;
             }
 
-            Auth::attempt(['email' => $request['email'], 'password' => $request['password']]);
             /** @var User $user */
             $user = User::query()->where('email', $request['email'])->first();
             if ($user) {
