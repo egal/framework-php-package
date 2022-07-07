@@ -15,13 +15,14 @@ class AccessToken extends Token
 
     public static function fromArray(array $array): Token
     {
-        if (!in_array(['type', 'exp', 'sub', 'roles'], array_keys($array))) {
+        $requiredKeys = ['type', 'exp', 'sub', 'roles'];
+        if (count(array_intersect($requiredKeys, array_keys($array))) !== count($requiredKeys)) {
             // TODO отдельный exception
             throw new Exception('Incomplete token information!', Response::HTTP_BAD_REQUEST);
         }
 
         $token = new self();
-        if (TokenType::Access !== $array['type']) {
+        if (TokenType::Access->value !== $array['type']) {
             // TODO отдельный exception
             throw new Exception('Token type mismatch!', Response::HTTP_BAD_REQUEST);
         }
