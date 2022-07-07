@@ -25,7 +25,7 @@ class CreateRoleCommand extends Command
             Role::query()
                 ->create(['name' => $this->argument('name'), 'is_default' => $this->option('default')]);
 
-            $this->info("Role `{$role->name}` ". "created");
+            $this->info("Role `{$this->argument('name')}` ". "created");
         }
     }
 }
