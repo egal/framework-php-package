@@ -3,8 +3,6 @@
 namespace Egal\Core\Auth;
 
 use Exception;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
@@ -38,11 +36,10 @@ class JwtTokenGuard implements Guard
             return $this->user;
         }
 
-        // TODO проверка времени жизни токена
+        $accessToken = AccessToken::fromJWT($token);
+        $accessToken->isAliveOrFail();
 
-        $decoded = JWT::decode($token, new Key(config('auth.public_key'), 'RS256'));
-
-        if ($decoded->type !== 'access') {
+        if ($accessToken->getType() !== 'access') {
             throw new Exception('Invalid token type!');
         }
 
@@ -55,7 +52,7 @@ class JwtTokenGuard implements Guard
                 throw new Exception('Error! User model class must be implements of ' . UserModelInterface::class . '!');
             }
 
-            $userModel = $userModel->findById($decoded->sub);
+            $userModel = $userModel->findById($accessToken->getSub());
         }
 
         $this->user = $userModel;

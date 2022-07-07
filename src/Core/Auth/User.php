@@ -76,24 +76,6 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
         return $this->belongsToMany(Role::class, 'user_roles');
     }
 
-    public function makeAccessToken(): string
-    {
-        return JWT::encode([
-            'type' => 'access',
-            'exp' => Carbon::now()->addSeconds(24 * 60 * 60),
-            'sub' => $this->getAttribute($this->getKeyName()),
-            'roles' => $this->roles ?? [],
-        ], config('auth.private_key'), 'RS256');
-    }
-
-    public function makeRefreshToken(): string
-    {
-        return JWT::encode([
-            'type' => 'refresh',
-            'exp' => Carbon::now()->addSeconds(30 * 24 * 60 * 60),
-        ], config('auth.private_key'), 'RS256');
-    }
-
     public function can(Ability $ability, Model|string $model): bool
     {
         return Gate::check($this, $ability, $model);
