@@ -9,7 +9,7 @@ class CreateRoleCommand extends Command
 {
     protected $signature = 'egal:auth:create-role
         {name :     The name of the role}
-        {--default: Whether the role should be default}';
+        {--default : Whether the role should be default}';
 
     protected $description = 'Create a role';
 
