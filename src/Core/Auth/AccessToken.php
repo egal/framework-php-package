@@ -15,7 +15,7 @@ class AccessToken extends Token
 
     public static function fromArray(array $array): Token
     {
-        if (!in_array(['type', 'exp', 'sub', 'roles'], $array)) {
+        if (!in_array(['type', 'exp', 'sub', 'roles'], array_keys($array))) {
             // TODO отдельный exception
             throw new Exception('Incomplete token information!', Response::HTTP_BAD_REQUEST);
         }

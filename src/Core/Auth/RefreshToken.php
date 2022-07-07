@@ -11,7 +11,7 @@ class RefreshToken extends Token
 
     public static function fromArray(array $array): Token
     {
-        if (!in_array(['type', 'exp'], $array)) {
+        if (!in_array(['type', 'exp'], array_keys($array))) {
             // TODO отдельный exception
             throw new Exception('Incomplete token information!', Response::HTTP_BAD_REQUEST);
         }
