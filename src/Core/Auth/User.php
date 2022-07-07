@@ -75,7 +75,7 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
         return count(array_intersect($this->roles, $roles)) == count($roles);
     }
 
-    public function getRoles(): array
+    public function roles(): array
     {
         return $this->roles;
     }
