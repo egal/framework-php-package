@@ -38,10 +38,6 @@ class ServiceProvider extends BaseServiceProvider
             $this->app->register('Egal\Core\Auth\ServiceProvider');
         }
 
-        if (class_exists('Egal\Core\Auth\RouteServiceProvider')) {
-            $this->app->register('Egal\Core\Auth\RouteServiceProvider');
-        }
-
         Collection::macro('paginate', function (int $perPage = 15, string $pageName = 'page', int $page = null, int $total = null, array $options = []): LengthAwarePaginator {
             $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
 

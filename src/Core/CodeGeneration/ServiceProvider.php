@@ -1,10 +1,10 @@
 <?php
 
-namespace Egal\Core\Console;
+namespace Egal\Core\CodeGeneration;
 
-use Egal\Core\Console\Commands\MakeModelCommand;
-use Egal\Core\Console\Commands\MakePolicyCommand;
-use Egal\Core\Console\Commands\MakeRouteCommand;
+use Egal\Core\CodeGeneration\Commands\MakeModelCommand;
+use Egal\Core\CodeGeneration\Commands\MakePolicyCommand;
+use Egal\Core\CodeGeneration\Commands\MakeRouteCommand;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
 
 class ServiceProvider extends IlluminateServiceProvider

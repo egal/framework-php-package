@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Egal\Core\Console\Commands;
+namespace Egal\Core\CodeGeneration\Commands;
 
 use Egal\Core\Exceptions\ReadingStudFileException;
 use Illuminate\Console\Command as IlluminateCommand;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Egal\Core\Console\Commands;
+namespace Egal\Core\CodeGeneration\Commands;
 
 use Egal\Core\Database\Model;
 use Illuminate\Support\Str;

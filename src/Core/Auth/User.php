@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 
 class User extends IlluminateModel implements UserModelInterface, Authenticatable
 {
-    // TODO: Добавить sub, остальное перенести из auth-service v.2
     use \Illuminate\Auth\Authenticatable;
     use HasFactory;
     use HasRelationships;
@@ -44,7 +43,7 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
     {
         parent::boot();
         static::creating(function (self $user) {
-            $user->id = Str::uuid()->toString();
+            $user->setAttribute($user->getKeyName(), (string) Str::uuid());
         });
         static::created(function (User $user) {
             $defaultRoles = Role::query()
@@ -86,7 +85,7 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
         return JWT::encode([
             'type' => 'access',
             'exp' => Carbon::now()->addSeconds(24 * 60 * 60),
-            'id' => $this->id,
+            'sub' => $this->getAttribute($this->getKeyName()),
             'roles' => $this->roles ?? [],
         ], config('auth.private_key'), 'RS256');
     }
