@@ -13,7 +13,7 @@ class RefreshToken extends Token
     {
         if (!in_array(['type', 'exp'], $array)) {
             // TODO отдельный exception
-            throw new Exception('Incomplete information!', Response::HTTP_BAD_REQUEST);
+            throw new Exception('Incomplete token information!', Response::HTTP_BAD_REQUEST);
         }
 
         $token = new self();
