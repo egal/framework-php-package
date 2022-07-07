@@ -20,7 +20,7 @@ abstract class Token
     public function __construct()
     {
         $this->exp = Carbon::now('UTC')
-            ->addSeconds(config('auth.tokens.access_token.ttl', static::DEFAULT_TTL));
+            ->addSeconds(config('auth.tokens.' . class_basename(static::class) . '.ttl', static::DEFAULT_TTL));
     }
 
     /**

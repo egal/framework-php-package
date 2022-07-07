@@ -5,7 +5,6 @@ namespace Egal\Core\Auth;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 class AccessToken extends Token
 {
@@ -28,6 +27,7 @@ class AccessToken extends Token
         }
         $token->sub = $array['sub'];
         $token->roles = $array['roles'];
+        $token->exp = Carbon::parse($array['exp']);
 
         return $token;
     }
