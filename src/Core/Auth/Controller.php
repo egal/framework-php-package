@@ -15,15 +15,13 @@ use Illuminate\Support\Facades\Validator;
 
 class Controller extends BaseController
 {
-    // TODO обновление токена
     public function register(Request $request)
     {
+        $user = new User();
+        $metadata = $user->getMetadata();
+
         try {
-            // TODO должно из метаданных подтягиваться
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6',
-            ]);
+            $validator = Validator::make($request->toArray(), $metadata->getValidationRules());
 
             if ($validator->fails()) {
                 $exception = new ValidateException();
@@ -32,7 +30,6 @@ class Controller extends BaseController
                 throw $exception;
             }
 
-            $user = new User();
             $user->setAttribute('email', $request['email']);
             $user->setAttribute('password', Hash::make($request['password']));
             $user->save();
@@ -46,12 +43,11 @@ class Controller extends BaseController
 
     public function login(Request $request)
     {
+        $userModel = new User();
+        $metadata = $userModel->getMetadata();
+
         try {
-            // TODO должно из метаданных подтягиваться
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|string|email|max:255',
-                'password' => 'required|string|min:6',
-            ]);
+            $validator = Validator::make($request->toArray(), $metadata->getValidationRules());
 
             if ($validator->fails()) {
                 $exception = new ValidateException();
@@ -95,6 +91,11 @@ class Controller extends BaseController
         } catch (Exception $exception) {
             return response()->json($this->getExceptionResponseData($exception))->setStatusCode($exception->getCode());
         }
+    }
+
+    public function refreshToken(Request $request)
+    {
+        // TODO обновление токена
     }
 
     private function getExceptionResponseData(Exception $exception): array

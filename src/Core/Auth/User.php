@@ -6,16 +6,13 @@ use Egal\Core\Database\Metadata\Field as FieldMetadata;
 use Egal\Core\Database\Metadata\Model as ModelMetadata;
 use Egal\Core\Database\Model;
 use Egal\Core\Facades\Gate;
-use Firebase\JWT\JWT;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model as IlluminateModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-class User extends IlluminateModel implements UserModelInterface, Authenticatable
+class User extends Model implements UserModelInterface, Authenticatable
 {
     use \Illuminate\Auth\Authenticatable;
     use HasFactory;
@@ -54,10 +51,12 @@ class User extends IlluminateModel implements UserModelInterface, Authenticatabl
     {
         return ModelMetadata::make(static::class)
             ->fields(
-                FieldMetadata::make('name')
+                FieldMetadata::make('email')
                     ->required()
-                    ->validationRules(['string'])
-                    ->fillable()
+                    ->validationRules(['string','email','max:255','unique:users']),
+                FieldMetadata::make('password')
+                    ->required()
+                    ->validationRules(['string','min:6'])
             );
     }
 
