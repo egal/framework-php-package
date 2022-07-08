@@ -71,6 +71,7 @@ class Applier
 
     private static function validateCondition(Model $modelMetadata, Query|FieldCondition $condition)
     {
+        // TODO валидация по метаданным модели
 //        if ($condition instanceof Query) {
 //            self::validateQuery($modelMetadata, $condition);
 //        } else {

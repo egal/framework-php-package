@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Applier
 {
+    // TODO валидацию филдов по метаданным модели
     public static function apply(Builder $query, array $fieldObjects): Builder
     {
         if ($fieldObjects === []) {

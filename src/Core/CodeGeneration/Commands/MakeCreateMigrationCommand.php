@@ -37,6 +37,8 @@ class MakeCreateMigrationCommand extends MakeCommand
         $this->fileBaseName = Str::snake(date('Y_m_d_His') . $this->className);
         $this->filePath = base_path('database/migrations') . '/' . $this->fileBaseName . '.php';
 
+        // TODO перенести со 2й версии
+
     }
 
 }

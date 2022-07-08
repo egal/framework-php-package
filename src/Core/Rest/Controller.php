@@ -33,6 +33,8 @@ class Controller
         OrderApplier::apply($builder, $order);
 
         $collection = $builder->get();
+        // TODO неоптимальная реализация (получаются все записи с БД),
+        // TODO нужно перенести в PaginationApplier, используя 2 запроса к БД на получение общего числа записей и записей текущей страницы
         $paginator = $collection->paginate($pagination->getPerPage(), 'page', $pagination->getPage());
 
         foreach ($collection as $object) {
