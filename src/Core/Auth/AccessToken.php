@@ -42,6 +42,12 @@ class AccessToken extends Token
         return $token;
     }
 
+    public function getUser(): UserModelInterface
+    {
+        $user = new User();
+        return $user->newQuery()->where($user->getKeyName(), '=', $this->sub)->firstOrFail();
+    }
+
     public function toArray(): array
     {
         return [

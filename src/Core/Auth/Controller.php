@@ -59,7 +59,7 @@ class Controller extends BaseController
 
                 if (Hash::check($request['password'], $user->password)) {
                     $accessToken = AccessToken::fromUser($user)->generateJWT();
-                    $refreshToken = (new RefreshToken())->generateJWT();
+                    $refreshToken = RefreshToken::fromUser($user)->generateJWT();
                 } else {
                     // TODO отдельный exception
                     throw new Exception("Password mismatch", Response::HTTP_BAD_REQUEST);
@@ -98,14 +98,14 @@ class Controller extends BaseController
                     // TODO хранение сессии в redis
                     $user = RefreshToken::fromJWT($request->session()->get('refresh_token'))->getUser();
                     $accessToken = AccessToken::fromUser($user)->generateJWT();
-                    $refreshToken = (new RefreshToken())->generateJWT();
+                    $refreshToken = RefreshToken::fromUser($user)->generateJWT();
                     $request->session()->put('access_token', $accessToken);
                     $request->session()->put('refresh_token', $refreshToken);
                     return response()->noContent()->setStatusCode(Response::HTTP_OK);
                 case AuthorizationType::Header->value:
                     $user = RefreshToken::fromJWT($request->header('Refresh-Token'))->getUser();
                     $accessToken = AccessToken::fromUser($user)->generateJWT();
-                    $refreshToken = (new RefreshToken())->generateJWT();
+                    $refreshToken = RefreshToken::fromUser($user)->generateJWT();
                     $tokens = ['access_token' => $accessToken, 'refresh_token' => $refreshToken];
                     return response()->json($tokens)->setStatusCode(Response::HTTP_OK);
                 default:

@@ -37,6 +37,15 @@ class RefreshToken extends Token
         ];
     }
 
+    public static function fromUser(UserModelInterface $user): self
+    {
+        $token = new self();
+
+        $token->sub = $user->getAttribute($user->getKeyName());
+
+        return $token;
+    }
+
     public function getUser(): UserModelInterface
     {
         $user = new User();
