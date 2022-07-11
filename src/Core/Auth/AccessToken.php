@@ -32,7 +32,7 @@ class AccessToken extends Token
         return $token;
     }
 
-    public static function fromUser(User $user): self
+    public static function fromUser(UserModelInterface $user): self
     {
         $token = new self();
 

@@ -2,10 +2,8 @@
 
 namespace Egal\Core\Auth;
 
-use Carbon\Carbon;
 use Egal\Core\Database\Model;
 use Egal\Core\Exceptions\NoAccessException;
-use Illuminate\Support\Facades\Log;
 
 class Gate
 {

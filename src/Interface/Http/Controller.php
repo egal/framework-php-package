@@ -8,7 +8,6 @@ use Egal\Interface\Facades\Manager;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class Controller
 {

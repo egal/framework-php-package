@@ -36,4 +36,10 @@ class RefreshToken extends Token
             'sub' => $this->sub
         ];
     }
+
+    public function getUser(): UserModelInterface
+    {
+        $user = new User();
+        return $user->newQuery()->where($user->getKeyName(), '=', $this->sub)->firstOrFail();
+    }
 }
