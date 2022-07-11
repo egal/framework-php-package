@@ -74,23 +74,13 @@ class Controller
         Gate::allowed(Auth::guard('token')->user(), Ability::CreateAny, $modelClass);
 
         $model = $this->newModelInstance($modelClass);
-        $metadata = $model->getMetadata();
-
-        # TODO: Add messages.
-        # TODO: What is $customAttributes param in Validator::make.
-        $validator = Validator::make($attributes, $metadata->getValidationRules());
-
-        if ($validator->fails()) {
-            $exception = new ValidateException();
-            $exception->setMessageBag($validator->errors());
-
-            throw $exception;
-        }
 
         $object = $model->fill($attributes);
-        $object->save();
+        $object->validate();
 
         Gate::allowed(Auth::guard('token')->user(), Ability::Create, $object);
+
+        $object->save();
 
         $keyName = $model->getKeyName();
         return  [$keyName => $object->$keyName];
@@ -102,6 +92,8 @@ class Controller
 
         $model = $this->newModelInstance($modelClass);
         $object = $model->newQuery()->find($key);
+        $object->fill($attributes);
+        $object->validate();
 
         if (!$object) {
             throw new ObjectNotFoundException();
@@ -109,17 +101,7 @@ class Controller
 
         Gate::allowed(Auth::guard('token')->user(), Ability::Update, $object);
 
-        $metadata = $model->getMetadata();
-        $validator = Validator::make($attributes, $metadata->getValidationRules());
-
-        if ($validator->fails()) {
-            $exception = new ValidateException();
-            $exception->setMessageBag($validator->errors());
-
-            throw $exception;
-        }
-
-        $object->update($attributes);
+        $object->save();
 
         $keyName = $model->getKeyName();
         return  [$keyName => $object->$keyName];

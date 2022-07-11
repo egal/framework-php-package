@@ -43,11 +43,8 @@ class Controller extends BaseController
 
     public function login(Request $request)
     {
-        $userModel = new User();
-        $metadata = $userModel->getMetadata();
-
         try {
-            $validator = Validator::make($request->toArray(), $metadata->getValidationRules());
+            $validator = Validator::make($request->toArray(), ['email' => 'string', 'password' => 'string']);
 
             if ($validator->fails()) {
                 $exception = new ValidateException();
