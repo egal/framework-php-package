@@ -5,11 +5,11 @@ namespace Egal\Core\Auth;
 use Egal\Core\Exceptions\HasData;
 use Egal\Core\Exceptions\HasInternalCode;
 use Egal\Core\Exceptions\ValidateException;
+use Egal\Core\Facades\AuthManager;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +17,7 @@ class Controller extends BaseController
 {
     public function register(Request $request)
     {
-        $user = new User();
+        $user = AuthManager::newUser();
         $metadata = $user->getMetadata();
 
         try {
@@ -53,8 +53,8 @@ class Controller extends BaseController
                 throw $exception;
             }
 
-            /** @var User $user */
-            $user = User::query()->where('email', $request['email'])->first();
+            /** @var UserModelInterface $user */
+            $user = AuthManager::newUser()->newQuery()->where('email', $request['email'])->first();
             if ($user) {
 
                 if (Hash::check($request['password'], $user->password)) {

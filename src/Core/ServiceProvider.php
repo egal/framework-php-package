@@ -3,6 +3,7 @@
 namespace Egal\Core;
 
 use Egal\Core\Auth\Gate;
+use Egal\Core\Auth\Manager as AuthManager;
 use Egal\Core\Http\Route;
 use Egal\Core\Rest\Controller;
 use Egal\Core\Rest\Filter\Parser as FilterParser;
@@ -21,6 +22,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->singleton('egal.gate', fn($app) => new Gate());
         $this->app->singleton('egal.rest', fn($app) => new Controller());
         $this->app->singleton('egal.route', fn($app) => new Route());
+        $this->app->singleton('egal.auth.manager', fn($app) => new AuthManager);
         $this->app->singleton('egal.filter.parser', fn($app) => new FilterParser());
         $this->app->singleton('egal.select.parser', fn($app) => new SelectParser());
         $this->app->singleton('egal.scope.parser', fn($app) => new ScopeParser());

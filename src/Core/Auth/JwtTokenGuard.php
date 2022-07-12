@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Auth;
 
+use Egal\Core\Facades\AuthManager;
 use Exception;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Guard;
@@ -43,17 +44,13 @@ class JwtTokenGuard implements Guard
             throw new Exception('Invalid token type!');
         }
 
-        $userModel = null;
+        $userModel = AuthManager::newUser();
 
-        if ($userModelClass = config('auth.user_model_class', User::class)) {
-            $userModel = new $userModelClass();
-
-            if (!($userModel instanceof UserModelInterface)) {
-                throw new Exception('Error! User model class must be implements of ' . UserModelInterface::class . '!');
-            }
-
-            $userModel = $userModel->findById($accessToken->getSub());
+        if (!($userModel instanceof UserModelInterface)) {
+            throw new Exception('Error! User model class must be implements of ' . UserModelInterface::class . '!');
         }
+
+        $userModel = $userModel->findById($accessToken->getSub());
 
         $this->user = $userModel;
 

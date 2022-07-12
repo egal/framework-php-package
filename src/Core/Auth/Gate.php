@@ -29,7 +29,7 @@ class Gate
     /**
      * @param Model|class-string $model
      */
-    public function check(?User $user, Ability $ability, Model|string $model): bool
+    public function check(?UserModelInterface $user, Ability $ability, Model|string $model): bool
     {
         if (!$this->enabled) {
             return true;
@@ -49,7 +49,7 @@ class Gate
     /**
      * @param Model|class-string $model
      */
-    public function allowed(?User $user, Ability $ability, Model|string $model): bool
+    public function allowed(?UserModelInterface $user, Ability $ability, Model|string $model): bool
     {
         if ($this->check($user, $ability, $model) === false) {
             throw new NoAccessException();

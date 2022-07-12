@@ -2,7 +2,7 @@
 
 namespace Egal\Core\Facades;
 
-use Egal\Core\Auth\User;
+use Egal\Core\Auth\UserModelInterface;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -16,7 +16,7 @@ class Gate extends Facade
         return 'egal.gate';
     }
 
-    public static function user(): User
+    public static function user(): UserModelInterface
     {
         return self::getUser();
     }

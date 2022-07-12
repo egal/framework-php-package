@@ -3,8 +3,8 @@
 namespace Egal\Core\Auth\Commands;
 
 use Egal\Core\Auth\Role;
-use Egal\Core\Auth\User;
 use Egal\Core\Auth\UserRole;
+use Egal\Core\Facades\AuthManager;
 use Illuminate\Console\Command;
 
 class SetUserRoleCommand extends Command
@@ -17,7 +17,7 @@ class SetUserRoleCommand extends Command
 
     public function handle()
     {
-        $user = User::query()->where('email', '=', $this->argument('userEmail'))->first();
+        $user = AuthManager::newUser()->newQuery()->where('email', '=', $this->argument('userEmail'))->first();
         $role = Role::query()->where('name', '=', $this->argument('roleName'))->first();
 
         if (!$user) {

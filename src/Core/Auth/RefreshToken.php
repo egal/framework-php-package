@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Auth;
 
+use Egal\Core\Facades\AuthManager;
 use Exception;
 use Illuminate\Http\Response;
 
@@ -48,7 +49,7 @@ class RefreshToken extends Token
 
     public function getUser(): UserModelInterface
     {
-        $user = new User();
+        $user = AuthManager::newUser();
         return $user->newQuery()->where($user->getKeyName(), '=', $this->sub)->firstOrFail();
     }
 }

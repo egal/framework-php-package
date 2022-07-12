@@ -50,6 +50,7 @@
                 "EgalGate": "Egal\\Core\\Facades\\Gate",
                 "EgalRest": "Egal\\Core\\Facades\\Rest",
                 "EgalRoute": "Egal\\Core\\Facades\\Route",
+                "EgalAuthManager": "Egal\\Core\\Facades\\AuthManager",
                 "EgalInterfaceMetadataManger": "Egal\\Interface\\Facades\\Manager"
             }
         }
