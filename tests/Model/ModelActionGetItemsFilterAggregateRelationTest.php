@@ -124,7 +124,7 @@ class ModelActionGetItemsFilterAggregateRelationTest extends TestCase
 }
 
 /**
- * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
+ * @property int|bool    $id                      {@property-type field}  {@primary-key} {@validation-rules integer}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
  *
@@ -149,7 +149,7 @@ class ModelActionGetItemsFilterAggregateRelationTestCategory extends Model
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $id                           {@property-type field}  {@primary-key}
  * @property int    $category_id                  {@property-type field}  {@validation-rules int}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}

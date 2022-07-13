@@ -174,7 +174,7 @@ class ModelActionGetItemsFilterByRelationTest extends TestCase
 }
 
 /**
- * @property int|bool    $id                      {@property-type field}  {@prymary-key} {@validation-rules integer}
+ * @property int|bool    $id                      {@property-type field}  {@primary-key} {@validation-rules integer}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
  * @property string $sale       Скидка          {@property-type field}  {@validation-rules int}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
@@ -194,7 +194,7 @@ class ModelTestCategory extends Model
 }
 
 /**
- * @property int    $id                            {@property-type field}  {@prymary-key}
+ * @property int    $id                            {@property-type field}  {@primary-key}
  * @property string $name        Название          {@property-type field}  {@validation-rules string}
  * @property int    $category_id Категория         {@property-type field}  {@validation-rules int}
  * @property Carbon $created_at                    {@property-type field}  {@validation-rules date}

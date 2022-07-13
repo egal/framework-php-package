@@ -142,7 +142,7 @@ class ModelActionGetItemsFilterByMorphRelationTest extends TestCase
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $id                           {@property-type field}  {@primary-key}
  * @property string $name       Название          {@property-type field}  {@validation-rules string}
  * @property string $count      Количество        {@property-type field}  {@validation-rules int}
  * @property string $sale       Скидка            {@property-type field}  {@validation-rules int}
@@ -173,7 +173,7 @@ class ModelActionGetItemsFilterByMorphRelationTestProduct extends Model
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $id                           {@property-type field}  {@primary-key}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
  * @property ModelActionGetItemsFilterByMorphRelationTestComment $comment {@property-type relation}
@@ -201,7 +201,7 @@ class ModelActionGetItemsFilterByMorphRelationTestOrder extends Model
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $id                           {@property-type field}  {@primary-key}
  * @property Carbon $created_at                   {@property-type field}  {@validation-rules date}
  * @property Carbon $updated_at                   {@property-type field}  {@validation-rules date}
  * @property        $commentable                  {@property-type relation}
