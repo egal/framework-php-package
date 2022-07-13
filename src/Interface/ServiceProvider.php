@@ -17,6 +17,8 @@ class ServiceProvider extends BaseServiceProvider
     {
         // TODO из конфига брать название файла
         require base_path('./interfaces/components.php');
+
+        $this->loadRoutesFrom(__DIR__.'/routes/show-component-route.php');
     }
 
 }
