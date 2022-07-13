@@ -10,13 +10,15 @@ class Field
 {
 
     private string $name;
+    private DataType $type;
     private array $validationRules;
     private bool $fillable = false;
 
-    public static function make(string $name): self
+    public static function make(string $name, DataType $type): self
     {
         $field = new self();
         $field->setName($name);
+        $field->setType($type);
 
         return $field;
     }
@@ -24,6 +26,20 @@ class Field
     private function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+
+    public function getType(): string
+    {
+        return $this->type->value;
+    }
+
+    public function setType(DataType $type): self
+    {
+        $this->validationRule($type->value);
+        $this->type = $type;
 
         return $this;
     }
@@ -78,22 +94,12 @@ class Field
         return $this->fillable;
     }
 
-    private function getTypeFromValidationRules()
-    {
-        $typesValidationRule = array_intersect($this->getValidationRules(), array_column(DataType::cases(), 'value'));
-
-        if (count($typesValidationRule) > 1) {
-            throw new MetadataException();
-        }
-
-        return array_shift($typesValidationRule);
-    }
-
     public function toArray()
     {
         return [
           'name' => $this->getName(),
-          'type' => $this->getTypeFromValidationRules(),
+          'type' => $this->getType(),
+          'validation_rules' => $this->getValidationRules()
         ];
     }
 
