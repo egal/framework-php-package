@@ -5,7 +5,7 @@ namespace App\Models;
 use Egal\Model\Model as EgalModel;
 
 /**
- * @property $id {@property-type field} {@prymary-key}
+ * @property $id {@property-type field} {@primary-key}
  * @property $name {@property-type field} {@validation-rules required|string}
  * @property $created_at {@property-type field}
  * @property $updated_at {@property-type field}

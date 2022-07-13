@@ -136,7 +136,7 @@ class ModelFilterValidationTest extends TestCase
 }
 
 /**
- * @property $id            {@property-type field}       {@prymary-key}
+ * @property $id            {@property-type field}       {@primary-key}
  * @property $string        {@property-type field}       {@validation-rules string}
  * @property $integer       {@property-type field}       {@validation-rules integer}
  * @property $numeric       {@property-type field}       {@validation-rules numeric}

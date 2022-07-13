@@ -106,7 +106,7 @@ class ModelActionGetItemsFilterWithsTest extends TestCase
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $id                           {@property-type field}  {@primary-key}
  * @property ModelActionGetItemsFilterWithsTestProductStub[] $products {@property-type relation}
  *
  * @action create         {@statuses-access guest}
@@ -131,7 +131,7 @@ class ModelActionGetItemsFilterWithsTestCategoryStub extends Model
 }
 
 /**
- * @property int    $id                           {@property-type field}  {@prymary-key}
+ * @property int    $id                           {@property-type field}  {@primary-key}
  * @property int    $category_id                  {@property-type field}  {@validation-rules int}
  * @property ModelActionGetItemsFilterWithsTestProductStub[] $products {@property-type relation}
  *
