@@ -15,7 +15,7 @@ class ServiceProvider extends BaseServiceProvider
 
     public function boot()
     {
-        // TODO из конфига брать название файла
+        // TODO из конфига брать название файла, env параметр INTERFACE_METADATA_FILE_PATH
         require base_path('./interfaces/components.php');
 
         $this->loadRoutesFrom(__DIR__.'/routes/show-component-route.php');
