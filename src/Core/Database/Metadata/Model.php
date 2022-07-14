@@ -15,6 +15,16 @@ class Model
     private string $class;
 
     /**
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * @var DataType
+     */
+    protected $keyType = DataType::Integer;
+
+    /**
      * @var Field[]
      */
     private array $fields = [];
@@ -57,6 +67,30 @@ class Model
     private function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getPrimaryKey(): string
+    {
+        return $this->primaryKey;
+    }
+
+    public function setPrimaryKey(string $primaryKey): self
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
+
+    public function getKeyType(): string
+    {
+        return $this->keyType->value;
+    }
+
+    public function setKeyType(DataType $keyType): self
+    {
+        $this->keyType = $keyType;
 
         return $this;
     }
