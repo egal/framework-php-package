@@ -17,7 +17,7 @@ class Model
     /**
      * @var string
      */
-    protected $primaryKey = 'id';
+    protected $keyName = 'id';
 
     /**
      * @var DataType
@@ -71,14 +71,14 @@ class Model
         return $this;
     }
 
-    public function getPrimaryKey(): string
+    public function getKeyName(): string
     {
-        return $this->primaryKey;
+        return $this->keyName;
     }
 
-    public function setPrimaryKey(string $primaryKey): self
+    public function setKeyName(string $keyName): self
     {
-        $this->primaryKey = $primaryKey;
+        $this->keyName = $keyName;
 
         return $this;
     }

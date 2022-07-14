@@ -37,7 +37,7 @@ abstract class Model extends BaseModel
     {
         $metadata = $this->getMetadata();
         $this->mergeFillable($metadata->getFillableFieldsNames());
-        $this->setKeyName($metadata->getPrimaryKey());
+        $this->setKeyName($metadata->getKeyName());
         $this->setKeyType($metadata->getKeyType());
     }
 
