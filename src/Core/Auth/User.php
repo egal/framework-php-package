@@ -2,6 +2,7 @@
 
 namespace Egal\Core\Auth;
 
+use Egal\Core\Database\Metadata\DataType;
 use Egal\Core\Database\Metadata\Field as FieldMetadata;
 use Egal\Core\Database\Metadata\Model as ModelMetadata;
 use Egal\Core\Database\Model;
@@ -51,12 +52,12 @@ class User extends Model implements UserModelInterface, Authenticatable
     {
         return ModelMetadata::make(static::class)
             ->fields(
-                FieldMetadata::make('email')
+                FieldMetadata::make('email', DataType::String)
                     ->required()
-                    ->validationRules(['string','email','max:255','unique:users']),
-                FieldMetadata::make('password')
+                    ->validationRules(['email','max:255','unique:users']),
+                FieldMetadata::make('password', DataType::String)
                     ->required()
-                    ->validationRules(['string','min:6'])
+                    ->validationRules(['min:6'])
             );
     }
 

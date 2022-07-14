@@ -2,6 +2,9 @@
 
 namespace Egal\Core\Auth;
 
+use Egal\Core\Database\Metadata\DataType;
+use Egal\Core\Database\Metadata\Field as FieldMetadata;
+use Egal\Core\Database\Metadata\Model as ModelMetadata;
 use Egal\Core\Facades\AuthManager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model as BaseModel;
@@ -38,6 +41,18 @@ class Role extends BaseModel
                 });
             }
         });
+    }
+
+    public function initializeMetadata(): ModelMetadata
+    {
+        return ModelMetadata::make(static::class)
+            ->fields(
+                FieldMetadata::make('name', DataType::String)
+                    ->required()
+                    ->validationRules(['unique:roles']),
+                FieldMetadata::make('is_default', DataType::Boolean)
+                    ->required()
+            );
     }
 
 }
