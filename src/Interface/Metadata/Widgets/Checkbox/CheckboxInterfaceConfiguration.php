@@ -21,7 +21,7 @@ class CheckboxInterfaceConfiguration extends Configuration
         return new self();
     }
 
-    public function isChecked(): bool
+    public function getChecked(): bool
     {
         return $this->checked;
     }
