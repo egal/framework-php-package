@@ -33,7 +33,7 @@ class CheckboxInterfaceConfiguration extends Configuration
         return $this;
     }
 
-    public function isDisabled(): bool
+    public function getDisabled(): bool
     {
         return $this->disabled;
     }
@@ -57,7 +57,7 @@ class CheckboxInterfaceConfiguration extends Configuration
         return $this;
     }
 
-    public function isCheckboxRight(): bool
+    public function getCheckboxRight(): bool
     {
         return $this->checkboxRight;
     }
@@ -69,7 +69,7 @@ class CheckboxInterfaceConfiguration extends Configuration
         return $this;
     }
 
-    public function isIndeterminate(): bool
+    public function getIndeterminate(): bool
     {
         return $this->indeterminate;
     }
