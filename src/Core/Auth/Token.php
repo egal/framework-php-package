@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 abstract class Token
 {
 
-    //TODO задать дефолтные ttl для каждого типа токена
+    //TODO задать дефолтные ttl для каждого типа токена и добавить их в документацию
     public const DEFAULT_TTL = 60;
 
     protected TokenType $type;
