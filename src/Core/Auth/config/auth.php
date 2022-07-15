@@ -119,5 +119,14 @@ return [
     'private_key' => env('AUTH_PRIVATE_KEY'),
     'public_key' => env('AUTH_PUBLIC_KEY'),
 
-    'user_model_class' => User::class
+    'user_model_class' => User::class,
+
+    'tokens' => [
+        'refresh_token' => [
+            'ttl' => env('AUTH_REFRESH_TOKEN_TTL')
+        ],
+        'access_token' => [
+            'ttl' => env('AUTH_ACCESS_TOKEN_TTL')
+        ]
+    ]
 ];

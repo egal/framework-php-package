@@ -7,6 +7,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 abstract class Token
 {
@@ -20,7 +21,7 @@ abstract class Token
     public function __construct()
     {
         $this->exp = Carbon::now('UTC')
-            ->addSeconds(config('auth.tokens.' . class_basename(static::class) . '.ttl', static::DEFAULT_TTL));
+            ->addSeconds(config('auth.tokens.' . Str::snake(class_basename(static::class)) . '.ttl', static::DEFAULT_TTL));
     }
 
     /**
