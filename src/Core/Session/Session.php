@@ -16,6 +16,7 @@ use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Exceptions\UnableDecodeTokenException;
 use Egal\Core\Messages\ActionMessage;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 final class Session
 {
@@ -154,6 +155,8 @@ final class Session
         try {
             $decodedToken = Token::decode($encodedToken, config('app.service_key'));
         } catch (Exception $exception) {
+            Log::warning($exception->getMessage(), ['exception' => $exception]);
+
             throw new UnableDecodeTokenException();
         }
 
