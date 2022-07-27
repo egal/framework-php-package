@@ -23,6 +23,7 @@ use Egal\Core\Session\Session;
 use Egal\Exception\HasData;
 use Egal\Exception\HasInternalCode;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
@@ -209,6 +210,8 @@ class RabbitMQBus extends Bus
      */
     private function processActionMessage(array $body, AMQPMessage $message): void
     {
+        Log::info('Action processing started', ['body' => $body]);
+
         $actionMessage = ActionMessage::fromArray($body);
         $replyTo = $message->get(self::REPLY_TO_PROPERTY_NAME);
         $startProcessingMessage = new StartProcessingMessage();
@@ -225,8 +228,13 @@ class RabbitMQBus extends Bus
                 $actionMessage->getParameters()
             );
             $actionResultMessage->setData($actionCaller->call());
+
+            Log::info('Action result', ['body' => $actionResultMessage->toArray()]);
+
             $this->basicPublish($actionResultMessage, $replyTo);
         } catch (Throwable $exception) {
+            report($exception);
+
             $actionErrorMessage = new ActionErrorMessage();
             $actionErrorMessage->setMessage($exception->getMessage());
 
@@ -241,6 +249,8 @@ class RabbitMQBus extends Bus
             if ($exception instanceof HasInternalCode) {
                 $actionErrorMessage->setInternalCode($exception->getInternalCode());
             }
+
+            Log::info('Action error caught', ['body' => $actionErrorMessage->toArray()]);
 
             $this->basicPublish($actionErrorMessage, $replyTo);
         }
