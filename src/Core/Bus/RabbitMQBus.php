@@ -95,7 +95,7 @@ class RabbitMQBus extends Bus
             true,
             false,
             false,
-            fn(AMQPMessage $message) => $this->processMessage($message)
+            fn (AMQPMessage $message) => $this->processMessage($message)
         );
 
         while (true) {
@@ -131,7 +131,7 @@ class RabbitMQBus extends Bus
             $this->replyQueueExists = true;
         }
 
-        $callback = static fn(AMQPMessage $message) => $callback(MessageCreator::fromJson($message->body));
+        $callback = static fn (AMQPMessage $message) => $callback(MessageCreator::fromJson($message->body));
         $this->channel->callbacks[$this->replyQueueName] = $callback;
     }
 

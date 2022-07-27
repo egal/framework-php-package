@@ -16,7 +16,6 @@ use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Exceptions\UnableDecodeTokenException;
 use Egal\Core\Messages\ActionMessage;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 final class Session
 {
