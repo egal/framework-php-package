@@ -157,7 +157,11 @@ final class Session
         } catch (Exception $exception) {
             Log::warning($exception->getMessage(), ['exception' => $exception]);
 
-            throw new UnableDecodeTokenException();
+            if (config('app.debug')) {
+                throw new UnableDecodeTokenException(get_class($exception) . "{$exception->getMessage()}");
+            } else {
+                throw new UnableDecodeTokenException();
+            }
         }
 
         switch ($decodedToken['type']) {
