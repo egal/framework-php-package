@@ -155,13 +155,9 @@ final class Session
         try {
             $decodedToken = Token::decode($encodedToken, config('app.service_key'));
         } catch (Exception $exception) {
-            Log::warning($exception->getMessage(), ['exception' => $exception]);
-
-            if (config('app.debug')) {
-                throw new UnableDecodeTokenException(get_class($exception) . "{$exception->getMessage()}");
-            } else {
-                throw new UnableDecodeTokenException();
-            }
+            throw config('app.debug')
+                ? $exception
+                : new UnableDecodeTokenException();
         }
 
         switch ($decodedToken['type']) {
