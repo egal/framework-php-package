@@ -11,6 +11,7 @@ class UserServiceToken extends Token
 
     protected string $type = TokenType::USER_SERVICE;
     protected array $authInformation;
+    protected string $targetServiceName;
 
     /**
      * @return array
@@ -117,7 +118,8 @@ class UserServiceToken extends Token
         return [
             'type' => $this->type,
             'auth_information' => $this->authInformation,
-            'alive_until' => $this->aliveUntil->toISOString()
+            'alive_until' => $this->aliveUntil->toISOString(),
+            'target_service_name' => $this->targetServiceName,
         ];
     }
 
@@ -141,7 +143,18 @@ class UserServiceToken extends Token
         }
         $token->setAuthInformation((array)$array['auth_information']); #TODO: Разобраться зачем приведение типов
         $token->aliveUntil = Carbon::parse($array['alive_until']);
+        $token->targetServiceName = $array['target_service_name'];
         return $token;
+    }
+
+    public function getTargetServiceName(): string
+    {
+        return $this->targetServiceName;
+    }
+
+    public function setTargetServiceName(string $targetServiceName): void
+    {
+        $this->targetServiceName = $targetServiceName;
     }
 
 }

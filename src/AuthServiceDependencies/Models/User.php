@@ -58,6 +58,7 @@ abstract class User extends Model
         $ust = new UserServiceToken();
         $ust->setSigningKey($service->getKey());
         $ust->setAuthInformation($user->generateAuthInformation());
+        $ust->setTargetServiceName($serviceName);
 
         return $ust->generateJWT();
     }
