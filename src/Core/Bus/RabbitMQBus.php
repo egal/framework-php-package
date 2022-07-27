@@ -23,6 +23,7 @@ use Egal\Core\Session\Session;
 use Egal\Exception\HasData;
 use Egal\Exception\HasInternalCode;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
@@ -227,6 +228,8 @@ class RabbitMQBus extends Bus
             $actionResultMessage->setData($actionCaller->call());
             $this->basicPublish($actionResultMessage, $replyTo);
         } catch (Throwable $exception) {
+            Log::warning($exception->getMessage(), $exception->getTrace());
+
             $actionErrorMessage = new ActionErrorMessage();
             $actionErrorMessage->setMessage($exception->getMessage());
 
