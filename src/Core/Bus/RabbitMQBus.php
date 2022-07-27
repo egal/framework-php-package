@@ -228,7 +228,7 @@ class RabbitMQBus extends Bus
             $actionResultMessage->setData($actionCaller->call());
             $this->basicPublish($actionResultMessage, $replyTo);
         } catch (Throwable $exception) {
-            Log::warning($exception->getMessage(), $exception->getTrace());
+            Log::warning($exception->getMessage(), ['exception' => $exception]);
 
             $actionErrorMessage = new ActionErrorMessage();
             $actionErrorMessage->setMessage($exception->getMessage());
