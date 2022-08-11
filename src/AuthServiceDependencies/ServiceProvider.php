@@ -24,7 +24,7 @@ class ServiceProvider extends BaseServiceProvider
 
         if ($env) {
             foreach (explode(',', $env) as $service) {
-                if (!preg_match('/^(\w+):(.+)$/', $service, $matches)) {
+                if (!preg_match('/^([\w-]+):(.+)$/', $service, $matches)) {
                     throw IncorrectAppServicesEnvironmentVariablePatternException::make($service);
                 }
 
