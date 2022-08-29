@@ -6,6 +6,7 @@ namespace Egal\Core\Session;
 
 use Egal\Auth\Accesses\StatusAccess;
 use Egal\Auth\Exceptions\UndefinedTokenTypeException;
+use Egal\Auth\Exceptions\WrongTokenTypeException;
 use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
 use Egal\Auth\Tokens\TokenType;
@@ -158,6 +159,10 @@ final class Session
                 ? $exception
                 : new UnableDecodeTokenException();
         }
+        
+        if (!isset($decodedToken['type'])) {
+            throw new UndefinedTokenTypeException();
+        }
 
         switch ($decodedToken['type']) {
             case TokenType::USER_SERVICE:
@@ -167,7 +172,7 @@ final class Session
                 self::setServiceServiceToken(ServiceServiceToken::fromArray($decodedToken));
                 break;
             default:
-                throw new UndefinedTokenTypeException();
+                throw new WrongTokenTypeException();
         }
     }
 

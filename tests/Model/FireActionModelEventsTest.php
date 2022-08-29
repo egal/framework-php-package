@@ -16,6 +16,7 @@ class FireActionModelEventsTest extends TestCase
 
     protected function createSchema(): void
     {
+        $this->schema()->dropIfExists('products');
         $this->schema()->create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

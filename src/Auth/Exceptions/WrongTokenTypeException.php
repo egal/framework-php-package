@@ -6,11 +6,11 @@ namespace Egal\Auth\Exceptions;
 
 use Exception;
 
-class UndefinedTokenTypeException extends Exception
+class WrongTokenTypeException extends Exception
 {
     
-    protected $message = 'Undefined token type!';
-
+    protected $message = 'Wrong token type!';
+    
     protected $code = 401;
 
 }

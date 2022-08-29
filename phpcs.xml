@@ -146,6 +146,9 @@
         <exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
         <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
         <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaFunctionCall"/>
+        <exclude name="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration.MissingTrailingComma"/>
+        <exclude name="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion.RequiredConstructorPropertyPromotion"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint"/>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
         <properties>
@@ -247,4 +250,6 @@
     <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
     <exclude-pattern type="relative-root">*/stubs/*</exclude-pattern>
+
+<!--    <arg name="report-xml" value=".phpcs.results.xml"/>-->
 </ruleset>

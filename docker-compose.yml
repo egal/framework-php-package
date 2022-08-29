@@ -18,6 +18,7 @@ services:
       DB_NAME: postgres
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+    command: sh -c "while(true) do echo 'Is working'; sleep 10; done"
 
   postgres:
     image: postgres

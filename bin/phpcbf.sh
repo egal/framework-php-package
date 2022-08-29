@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "${IMAGE}" ]; then
-    IMAGE="php:7.4.16-cli-buster"
+    IMAGE="php:8.1-cli-buster"
 fi
 
 if [ -z "${DIFFS}" ]; then
