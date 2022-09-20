@@ -73,7 +73,7 @@ class MigrationCreateMakeCommand extends MakeCommand
         $this->setFileContents('{{ table }}', $this->tableName);
 
         $this->parseFields();
-        $body = implode("\n\t\t\t", $this->tableFields);
+        $body = implode("\n" . str_repeat(' ', 12), $this->tableFields);
         $this->setFileContents('{{ body }}', $body);
     }
 
