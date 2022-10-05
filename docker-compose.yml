@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+
+  php:
+    build:
+      context: ./dockerfiles
+      dockerfile: "${PHP_DOCKERFILE:-php81.Dockerfile}"
+#      dockerfile: "${PHP_DOCKERFILE:-php74.Dockerfile}"
+#      dockerfile: "${PHP_DOCKERFILE:-php80.Dockerfile}"
+    working_dir: '/data'
+    volumes:
+      - .:/data
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    command: sh -c "while(true) do echo 'Is working'; sleep 10; done"
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres

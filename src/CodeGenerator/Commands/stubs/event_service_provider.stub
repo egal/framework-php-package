@@ -1,0 +1,32 @@
+<?php /** @noinspection PhpMissingFieldTypeInspection */
+
+namespace App\Providers;
+
+use Egal\Core\Events\EventServiceProvider as ServiceProvider;
+
+class EventServiceProvider extends ServiceProvider
+{
+
+    /**
+     * Определение обработчиков глобальных событий
+     */
+    public array $globalListen = [
+        'service' => [
+            'Model' => [
+                'event-message' => [
+                    ExampleListener::class
+                ]
+            ]
+        ]
+    ];
+
+    /**
+     * Определение обработчиков локальных событий
+     */
+    protected $listen = [
+        ExampleEvent::class => [
+            ExampleListener::class
+        ]
+    ];
+
+}

@@ -1,0 +1,255 @@
+<?xml version="1.0"?>
+<ruleset name="egal/framework">
+    <rule ref="PSR1"/>
+
+    <rule ref="PSR2">
+        <exclude name="PSR2.Classes.ClassDeclaration.CloseBraceAfterBody"/>
+        <exclude name="PSR2.ControlStructures.SwitchDeclaration.TerminatingComment"/>
+    </rule>
+
+    <rule ref="PSR12">
+        <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
+        <exclude name="PSR12.Classes.OpeningBraceSpace.Found"/>
+    </rule>
+    <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
+        <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Generic.Commenting.DocComment.NonParamGroup">
+        <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
+    </rule>
+    <rule ref="Generic.Commenting.Todo.CommentFound">
+        <exclude name="Generic.Commenting.Todo.CommentFound"/>
+    </rule>
+    <rule ref="Generic.Commenting.Todo.TaskFound">
+        <exclude name="Generic.Commenting.Todo.TaskFound"/>
+    </rule>
+    <rule ref="Generic.Formatting.MultipleStatementAlignment.NotSame">
+        <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSame"/>
+    </rule>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+    </rule>
+
+    <rule ref="Squiz">
+        <exclude name="Squiz.WhiteSpace.FunctionClosingBraceSpace.SpacingBeforeClose"/>
+        <exclude name="Squiz.Files.FileExtension.ClassFound"/>
+        <exclude name="Squiz.Commenting.FileComment.Missing"/>
+        <exclude name="Squiz.Commenting.VariableComment.MissingVar"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="Squiz.WhiteSpace.FunctionSpacing.Before"/>
+        <exclude name="Squiz.Commenting.FunctionComment.EmptyThrows"/>
+        <exclude name="Squiz.WhiteSpace.FunctionSpacing.After"/>
+        <exclude name="Squiz.Operators.ComparisonOperatorUsage.ImplicitTrue"/>
+        <exclude name="Squiz.Operators.ComparisonOperatorUsage.NotAllowed"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingReturn"/>
+        <exclude name="Squiz.Commenting.ClosingDeclarationComment.Missing"/>
+        <exclude name="Squiz.PHP.DisallowBooleanStatement.Found"/>
+        <exclude name="Squiz.WhiteSpace.FunctionSpacing.AfterLast"/>
+        <exclude name="Squiz.ControlStructures.ElseIfDeclaration.NotAllowed"/>
+        <exclude name="Squiz.Strings.ConcatenationSpacing.PaddingFound"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
+        <exclude name="Squiz.Commenting.VariableComment.IncorrectVarType"/>
+        <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NoBrackets"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamNameNoMatch"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
+        <exclude name="Squiz.PHP.DisallowInlineIf.Found"/>
+        <exclude name="Squiz.Commenting.BlockComment.WrongStart"/>
+        <exclude name="Squiz.Commenting.InlineComment.DocBlock"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectParamVarName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+        <exclude name="Squiz.Commenting.LongConditionClosingComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.DoubleArrowNotAligned"/>
+        <exclude name="Squiz.WhiteSpace.ObjectOperatorSpacing.Before"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.WhiteSpace.FunctionSpacing.BeforeFirst"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.BreakIndent"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingAfterBreak"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.SpacingBeforeBreak"/>
+        <exclude name="Squiz.Commenting.VariableComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.ClassComment.Missing"/>
+        <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingBefore"/>
+        <exclude name="Squiz.ControlStructures.InlineIfDeclaration.NotSingleLine"/>
+        <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingBefore"/>
+        <exclude name="Squiz.PHP.DisallowComparisonAssignment.AssignedComparison"/>
+        <exclude name="Squiz.Commenting.VariableComment.TagNotAllowed"/>
+        <exclude name="Squiz.Formatting.OperatorBracket.MissingBrackets"/>
+        <exclude name="Squiz.ControlStructures.SwitchDeclaration.EmptyDefault"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
+        <exclude name="Squiz.Objects.ObjectInstantiation.NotAssigned"/>
+        <exclude name="Squiz.Commenting.ClassComment.TagNotAllowed"/>
+        <exclude name="Squiz.PHP.NonExecutableCode.ReturnNotRequired"/>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.TypeHintMissing">
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
+        <exclude-pattern>src/model/Traits/UsesBuilder.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
+        <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing">
+        <exclude-pattern>src/model/Builder.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.BlockComment.LineIndent">
+        <exclude-pattern>*/config/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.BlockComment.FirstLineIndent">
+        <exclude-pattern>*/config/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.NamingConventions.ValidFunctionName.NotCamelCaps">
+        <exclude-pattern>*/helpers.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.ClassComment.TagNotAllowed">
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.ControlStructures.SwitchDeclaration.EmptyCase">
+        <exclude-pattern>src/Core/Communication/Response.php</exclude-pattern>
+    </rule>
+    <rule ref="PSR12.Files.DeclareStatement.SpaceFoundAfterDirectiveValue">
+        <exclude-pattern>src/Core/Commands/EgalRunCommand.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard">
+        <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses.UselessParentheses"/>
+        <exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName.NoMatchBetweenTypeNameAndFileName"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.IncorrectStrictTypesFormat"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces.NonFullyQualified"/>
+        <exclude name="SlevomatCodingStandard.Commenting.RequireOneLinePropertyDocComment.MultiLinePropertyComment"/>
+        <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
+        <exclude name="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall.MissingTrailingComma"/>
+        <exclude name="SlevomatCodingStandard.Functions.StrictCall.StrictParameterMissing"/>
+        <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
+        <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator.DisallowedShortTernaryOperator"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint"/>
+        <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
+        <exclude name="SlevomatCodingStandard.Functions.DisallowArrowFunction.DisallowedArrowFunction"/>
+        <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
+        <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
+        <exclude name="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired"/>
+        <exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
+        <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaFunctionCall"/>
+        <exclude name="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration.MissingTrailingComma"/>
+        <exclude name="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion.RequiredConstructorPropertyPromotion"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint"/>
+    </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing">
+        <properties>
+            <property name="controlStructures" type="array">
+                <element value="if"/>
+                <element value="foreach"/>
+                <element value="for"/>
+                <element value="while"/>
+                <element value="switch"/>
+                <element value="try"/>
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.JumpStatementsSpacing">
+        <properties>
+            <property name="linesCountAfterWhenLastInCaseOrDefault" value="0"/>
+            <property name="linesCountAfterWhenLastInLastCaseOrDefault" value="0"/>
+            <property name="jumpStatements" type="array">
+                <element value="throw"/>
+                <element value="return"/>
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
+        <properties>
+            <property name="maxLinesLength" value="50"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Files.FunctionLength">
+        <properties>
+            <property name="maxLinesLength" value="50"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>src/ModelFileStoring/FileStoring.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoEventDispatcher.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>src/model/Model.php</exclude-pattern>
+        <exclude-pattern>src/model/Builder.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
+        <exclude-pattern>*FilterConditionApplier.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>src/Model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/Core/Exceptions/ExceptionHandler.php</exclude-pattern>
+        <exclude-pattern>src/Auth/Traits/Authenticatable.php</exclude-pattern>
+        <exclude-pattern>src/AuthServiceDependencies/Models/User.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
+        <exclude-pattern>src/core/ActionCaller/ActionCaller.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification">
+        <exclude-pattern>src/core/ActionCaller/ActionCaller.php</exclude-pattern>
+        <exclude-pattern>src/Core/Messages/EventMessage.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix">
+        <exclude-pattern>src/Core/Messages/HasActionMessageInterface.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>model/Traits/UsesBuilder.php</exclude-pattern>
+        <exclude-pattern>model/Builder.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>*Exception.php</exclude-pattern>
+        <exclude-pattern>*Command.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>src/Model/Traits/InstanceForAction.php</exclude-pattern>
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Exception/InternalException.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
+        <exclude-pattern>src/Model/Metadata/ModelMetadata.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>*Command.php</exclude-pattern>
+        <exclude-pattern>core/Exceptions/ExceptionHandler.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion.RequiredConstructorPropertyPromotion">
+        <exclude-pattern>src/Centrifugo/CentrifugoEvent.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint">
+        <exclude-pattern>src/Model/Traits/HasEvents.php</exclude-pattern>
+        <exclude-pattern>src/Centrifugo/Centrifugo.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter">
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcaster.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
+        <exclude-pattern>src/Centrifugo/CentrifugoBroadcastable.php</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant">
+        <exclude-pattern>src/Auth/Tokens/Token.php</exclude-pattern>
+    </rule>
+
+    <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
+    <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
+    <exclude-pattern type="relative-root">*/stubs/*</exclude-pattern>
+
+<!--    <arg name="report-xml" value=".phpcs.results.xml"/>-->
+</ruleset>

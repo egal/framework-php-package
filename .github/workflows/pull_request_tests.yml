@@ -1,0 +1,81 @@
+name: Pull Request Tests
+
+on:
+  pull_request: { }
+
+jobs:
+
+  PHPUnit74:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up PHP Dockerfile
+        run: echo PHP_DOCKERFILE='php74.Dockerfile' > .env
+      - name: Docker Compose build and pull
+        run: |
+          docker-compose pull
+          docker-compose build
+      - name: Install Composer
+        run: |
+          docker-compose run --rm \
+            --user "$(id -u):$(id -g)" \
+            php \
+            composer install \
+              --dev \
+              --no-interaction \
+              --no-progress
+      - name: Run a PHPUnit
+        run: bash bin/phpunit.sh
+
+  PHPCS74:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Set up PHP Dockerfile
+        run: echo PHP_DOCKERFILE='php74.Dockerfile' > .env
+      - name: Docker Compose build and pull
+        run: |
+          docker-compose pull
+          docker-compose build
+      - name: Install Composer
+        run: |
+          docker-compose run --rm \
+            --user "$(id -u):$(id -g)" \
+            php \
+            composer install \
+              --dev \
+              --no-interaction \
+              --no-progress
+      - name: Run a PHPCS
+        run: |
+          DIFF="$(git diff \
+            --name-only \
+            --diff-filter=dr \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.sha }} | grep -E '(.php)$' || test $? = 1)"
+          if [ "${DIFF}" == '' ]; then exit 0; fi
+          bash bin/phpcs.sh --warning-severity=0 --report=full $DIFF
+
+  PHPUnit81:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up PHP Dockerfile
+        run: echo PHP_DOCKERFILE='php81.Dockerfile' > .env
+      - name: Docker Compose build and pull
+        run: |
+          docker-compose pull
+          docker-compose build
+      - name: Install Composer
+        run: |
+          docker-compose run --rm \
+            --user "$(id -u):$(id -g)" \
+            php \
+            composer install \
+              --dev \
+              --no-interaction \
+              --no-progress
+      - name: Run a PHPUnit
+        run: bash bin/phpunit.sh
