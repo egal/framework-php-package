@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Egal\Exception\IrreversibleMigrationException;
+
+class {{ class }} extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::dropIfExists('{{ table }}');
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @throws IrreversibleMigrationException
+     * @return void
+     */
+    public function down()
+    {
+        throw new IrreversibleMigrationException();
+    }
+}
