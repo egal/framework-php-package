@@ -19,27 +19,6 @@ class ModelMetadataManager
 
     public function __construct() { }
 
-    /**
-     * @throws ModelNotFoundException
-     */
-    public function getModelMetadata(string $class): ModelMetadata
-    {
-        if (class_exists($class)) {
-            return $this->modelsMetadata[get_class_short_name($class)] ?? call_user_func([$class, 'constructMetadata']);
-        }
-
-        if (isset($this->modelsMetadata[$class])) {
-            return $this->modelsMetadata[$class];
-        }
-
-        throw ModelNotFoundException::make($class);
-    }
-
-    public function getModelsMetadata(): array
-    {
-        return $this->modelsMetadata;
-    }
-
     public function registerDirectory(string $dir, string $modelsNamespace): void
     {
         $dir = base_path() . '/' . $dir;
@@ -89,6 +68,27 @@ class ModelMetadataManager
         }
 
         $this->modelsMetadata[$classShortName] = $model->constructMetadata();
+    }
+
+    public function getModelsMetadata(): array
+    {
+        return $this->modelsMetadata;
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getModelMetadata(string $class): ModelMetadata
+    {
+        if (class_exists($class)) {
+            return $this->modelsMetadata[get_class_short_name($class)] ?? call_user_func([$class, 'constructMetadata']);
+        }
+
+        if (isset($this->modelsMetadata[$class])) {
+            return $this->modelsMetadata[$class];
+        }
+
+        throw ModelNotFoundException::make($class);
     }
 
 }

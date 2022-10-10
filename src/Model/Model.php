@@ -78,7 +78,7 @@ abstract class Model extends EloquentModel
      */
     public static function actionGetMetadata(): array
     {
-        return ModelMetadataManager::getModelMetadata(static::class)->toArray();
+        return ModelMetadataManager::getModelMetadata(static::class)->toArray(true);
     }
 
     /**
