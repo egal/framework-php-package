@@ -21,7 +21,7 @@ class Request extends ActionMessage
      */
     private Response $response;
 
-    private string $authServiceName = 'auth';
+    private string $authServiceName;
 
     /**
      * Mark is need service authorization or not.
@@ -35,12 +35,7 @@ class Request extends ActionMessage
     {
         parent::__construct($serviceName, $modelName, $actionName, $parameters);
 
-        $this->setAuthServiceName(config('auth.auth_service_name'));
-    }
-
-    public function setAuthServiceName(string $authServiceName): void
-    {
-        $this->authServiceName = $authServiceName;
+        $this->authServiceName = config('auth.auth_service_name') ?? 'auth';
     }
 
     public function disableServiceAuthorization(): void
@@ -83,7 +78,7 @@ class Request extends ActionMessage
             $this->authorizeService();
         }
 
-        $bus->startConsumeReplyMessages(static fn (Message $message) => $response->collectReplyMessage($message));
+        $bus->startConsumeReplyMessages(static fn(Message $message) => $response->collectReplyMessage($message));
         $this->send();
 
         while (microtime(true) < $mustDieAt && !$response->isReplyMessagesCollected()) {
