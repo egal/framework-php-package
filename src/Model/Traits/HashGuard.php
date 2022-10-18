@@ -114,13 +114,13 @@ trait HashGuard
     /**
      * TODO: Сделать консольную команду rehash
      */
-    public static function rehash(array $ids = []): void
+    public static function rehash(array $keys = []): void
     {
-        static::withoutEvents(static function () use ($ids): void {
+        static::withoutEvents(static function () use ($keys): void {
             $query = static::query();
 
-            if ($ids !== []) {
-                $query->whereIn('id', $ids);
+            if ($keys !== []) {
+                $query->whereIn($this->getKeyName(), $keys);
             }
 
             $items = $query->get();

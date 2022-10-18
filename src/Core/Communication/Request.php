@@ -177,10 +177,7 @@ class Request extends ActionMessage
             $this->authServiceName,
             'Service',
             'login',
-            [
-                'service_name' => config('app.service_name'),
-                'key' => config('app.service_key'),
-            ]
+            ['service_name' => config('app.service_name'), 'key' => config('app.service_key')]
         );
         $serviceMasterTokenRequest->disableServiceAuthorization();
         $serviceMasterTokenResponse = $serviceMasterTokenRequest->call();

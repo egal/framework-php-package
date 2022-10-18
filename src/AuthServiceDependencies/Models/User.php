@@ -9,8 +9,8 @@ use Egal\Auth\Tokens\UserMasterToken;
 use Egal\Auth\Tokens\UserServiceToken;
 use Egal\AuthServiceDependencies\Exceptions\LoginException;
 use Egal\AuthServiceDependencies\Exceptions\UserNotIdentifiedException;
+use Egal\Core\Session\Session;
 use Egal\Model\Model;
-use Egal\Model\ModelManager;
 
 abstract class User extends Model
 {
@@ -37,16 +37,17 @@ abstract class User extends Model
         return $this->getAttribute($this->getAuthIdentifierName());
     }
 
-    public static function actionLoginToService(string $token, string $serviceName): string
+    public static function actionLoginToService(string $token, string $service_name): string
     {
+        Session::client()->mayOrFail('loginToService', static::class);
+
         /** @var \Egal\Auth\Tokens\UserMasterToken $umt */
         $umt = UserMasterToken::fromJWT($token, config('app.service_key'));
         $umt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
         $user = static::find($umt->getAuthIdentification());
-        $service = self::getServiceModel()::find($serviceName);
-
+        $service = Service::find($service_name);
         if (!$user) {
             throw new UserNotIdentifiedException();
         }
@@ -58,13 +59,15 @@ abstract class User extends Model
         $ust = new UserServiceToken();
         $ust->setSigningKey($service->getKey());
         $ust->setAuthInformation($user->generateAuthInformation());
-        $ust->setTargetServiceName($serviceName);
+        $ust->setTargetServiceName($service_name);
 
         return $ust->generateJWT();
     }
 
     public static function actionRefreshUserMasterToken(string $token): array
     {
+        Session::client()->mayOrFail('refreshUserMasterToken', static::class);
+
         $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
         $oldUmrt->isAliveOrFail();
 
@@ -89,11 +92,7 @@ abstract class User extends Model
         ];
     }
 
-    public static function getServiceModel(): string
-    {
-        return ModelManager::getModelMetadata('Service')->getModelClass();
-    }
-
+    // TODO: Переделать наполнение токена на основе спецификации протокола
     protected function generateAuthInformation(): array
     {
         return array_merge(

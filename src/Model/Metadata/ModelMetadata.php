@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\Model\Metadata;
 
+use Egal\Auth\Policies\DenyAllPolicy;
 use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\RelationNotFoundException;
@@ -43,6 +44,11 @@ class ModelMetadata
      */
     protected array $actions = [];
 
+    /**
+     * @var string
+     */
+    protected string $policy = DenyAllPolicy::class;
+
     public function __construct(string $modelClass, ?FieldMetadata $key)
     {
         $this->modelClass = $modelClass;
@@ -51,7 +57,7 @@ class ModelMetadata
         $key?->guarded();
     }
 
-    public static function make(string $modelClass, ?FieldMetadata $key = null): self
+    public static function make(string $modelClass, FieldMetadata $key): self
     {
         return new static($modelClass, $key);
     }
@@ -64,8 +70,8 @@ class ModelMetadata
         ];
 
         $modelMetadata['fields'] = array_map(fn(FieldMetadata $field) => $field->toArray(), $this->fields);
-        $modelMetadata['relations'] = array_map(fn(RelationMetadata $relation) => $relation->toArray($loadRelatedMetadata), $this->relations);
         $modelMetadata['fake_fields'] = array_map(fn(FieldMetadata $field) => $field->toArray(), $this->fakeFields);
+        $modelMetadata['relations'] = array_map(fn(RelationMetadata $relation) => $relation->toArray($loadRelatedMetadata), $this->relations);
         $modelMetadata['actions'] = array_map(fn(ActionMetadata $action) => $action->toArray(), $this->actions);
 
         return $modelMetadata;
@@ -117,6 +123,16 @@ class ModelMetadata
     public function addCasts(array $casts): self
     {
         $this->casts = array_merge($this->casts, $casts);
+
+        return $this;
+    }
+
+    /**
+     * @param class-string $policy
+     */
+    public function policy(string $policy): self
+    {
+        $this->policy = $policy;
 
         return $this;
     }
@@ -214,6 +230,20 @@ class ModelMetadata
     }
 
     /**
+     * @throws ActionNotFoundException
+     */
+    public function getAction(string $actionName): ActionMetadata
+    {
+        foreach ($this->actions as $action) {
+            if ($action->getName() === $actionName) {
+                return $action;
+            }
+        }
+
+        throw ActionNotFoundException::make($this->modelClass, $actionName);
+    }
+
+    /**
      * @return string[]
      */
     public function getHiddenFieldsNames(): array
@@ -229,23 +259,14 @@ class ModelMetadata
         return array_map(fn($field) => $field->getName(), array_filter([...$this->fields, ...$this->fakeFields, $this->getKey()], fn($field) => $field->isGuarded()));
     }
 
-    /**
-     * @throws ActionNotFoundException
-     */
-    public function getAction(string $actionName): ActionMetadata
-    {
-        foreach ($this->actions as $action) {
-            if ($action->getName() === $actionName) {
-                return $action;
-            }
-        }
-
-        throw ActionNotFoundException::make($this->modelClass, $actionName);
-    }
-
     public function getCasts(): array
     {
         return $this->casts;
+    }
+
+    public function getPolicy(): string
+    {
+        return $this->policy;
     }
 
 }

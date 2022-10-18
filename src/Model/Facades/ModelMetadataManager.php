@@ -8,7 +8,6 @@ use Egal\Model\Metadata\ModelMetadata;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \Egal\Model\ModelMetadataManager getInstance()
  * @method static void registerDirectory(string $dir, string $modelsNamespace)
  * @method static void registerModel(string $class)
  * @method static ModelMetadata getModelMetadata(string $class)

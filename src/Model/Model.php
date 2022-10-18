@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Egal\Model;
 
+use Egal\Core\Session\Session;
 use Egal\Model\Exceptions\ObjectNotFoundException;
-use Egal\Model\Exceptions\UpdateException;
+use Egal\Model\Exceptions\OrderException;
 use Egal\Model\Exceptions\UpdateManyException;
 use Egal\Model\Facades\ModelMetadataManager;
 use Egal\Model\Filter\FilterPart;
@@ -78,31 +79,39 @@ abstract class Model extends EloquentModel
      */
     public static function actionGetMetadata(): array
     {
-        return ModelMetadataManager::getModelMetadata(static::class)->toArray(true);
+        Session::client()->mayOrFail('retrievingMetadata', static::class);
+        $result = ModelMetadataManager::getModelMetadata(static::class)->toArray(true);
+        Session::client()->mayOrFail('retrievedMetadata', static::class);
+
+        return $result;
     }
 
     /**
      * Getting entity.
      *
-     * @param int|string $id Entity identification.
+     * @param int|string $key Entity identification.
      * @param string[] $relations Array of relations displayed for an entity.
      * @return mixed[] Entity as an associative array.
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionGetItem($id, array $relations = []): array
+    public static function actionGetItem($key, array $relations = []): array
     {
+        Session::client()->mayOrFail('retrieving', static::class);
+
         $instance = new static();
         $instance->makeIsInstanceForAction();
-        $instance->validateKey($id);
+        $instance->validateKey($key);
 
         $item = $instance->newQuery()
             ->makeModelIsInstanceForAction()
             ->with($relations)
-            ->find($id);
+            ->find($key);
 
         if (!$item) {
-            throw ObjectNotFoundException::make($id);
+            throw ObjectNotFoundException::make($key);
         }
+
+        Session::client()->mayOrFail('retrieved', $item);
 
         return $item->toArray();
     }
@@ -115,6 +124,7 @@ abstract class Model extends EloquentModel
      * @param mixed[] $filter Serialized array from {@see \Egal\Model\Filter\FilterPart}.
      * @param mixed[] $order Sorting array of displayed entities, then converted to {@see \Egal\Model\Order\Order}[].
      * @return mixed[] The result of the query and the paginator as an associative array.
+     * @throws OrderException
      */
     public static function actionGetItems(
         ?array $pagination = null,
@@ -122,6 +132,8 @@ abstract class Model extends EloquentModel
         array  $filter = [],
         array  $order = []
     ): array {
+        Session::client()->mayOrFail('retrieving', static::class);
+
         $instance = new static();
         $instance->makeIsInstanceForAction();
 
@@ -145,6 +157,11 @@ abstract class Model extends EloquentModel
             ];
         }
 
+        foreach ($result['items'] as $item) {
+            $model = new static($item);
+            Session::client()->mayOrFail('retrieved', $model);
+        }
+
         return $result;
     }
 
@@ -155,12 +172,16 @@ abstract class Model extends EloquentModel
      */
     public static function actionGetCount(array $filter = []): array
     {
+        Session::client()->mayOrFail('retrievingCount', static::class);
+
         $instance = new static();
         $instance->makeIsInstanceForAction();
 
         $count = $instance->newQuery()
             ->setFilterFromArray($filter)
             ->count();
+
+        Session::client()->mayOrFail('retrievedCount', static::class);
 
         return ['count' => $count];
     }
@@ -173,10 +194,24 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreate(array $attributes = []): array
     {
+        Session::client()->mayOrFail('creating', static::class);
+
+        DB::beginTransaction();
         $entity = new static();
         $entity->makeIsInstanceForAction();
         $entity->fill($attributes);
         $entity->save();
+
+        try {
+            $entity->save();
+            Session::client()->mayOrFail('created', $entity);
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            throw $exception;
+        }
+
+        DB::commit();
 
         return $entity->toArray();
     }
@@ -190,6 +225,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionCreateMany(array $objects = []): array
     {
+        Session::client()->mayOrFail('creating', static::class);
+
         $model = new static();
         $model->makeIsInstanceForAction();
         $model->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
@@ -203,6 +240,7 @@ abstract class Model extends EloquentModel
 
             try {
                 $entity->save();
+                Session::client()->mayOrFail('created', $entity);
             } catch (Exception $exception) {
                 DB::rollBack();
 
@@ -220,36 +258,40 @@ abstract class Model extends EloquentModel
     /**
      * Entity update
      *
-     * @param int|string|null $id Entity identification.
+     * @param int|string|null $key Entity identification.
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] Updated entity as an associative array.
-     * @throws \Egal\Model\Exceptions\UpdateException
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
+     * @throws Exception
      */
-    public static function actionUpdate($id = null, array $attributes = []): array
+    public static function actionUpdate($key, array $attributes = []): array
     {
+        Session::client()->mayOrFail('updating', static::class);
+
+        DB::beginTransaction();
         $instance = new static();
-
-        if (!isset($id)) {
-            if (!isset($attributes[$instance->getKeyName()])) {
-                throw new UpdateException('The identifier of the entity being updated is not specified!');
-            }
-
-            $id = $attributes[$instance->getKeyName()];
-        }
-
         $instance->makeIsInstanceForAction();
-        $instance->validateKey($id);
+        $instance->validateKey($key);
 
         /** @var \Egal\Model\Model $entity */
-        $entity = $instance->newQuery()->find($id);
+        $entity = $instance->newQuery()->find($key);
 
         if (!$entity) {
-            throw ObjectNotFoundException::make($id);
+            throw ObjectNotFoundException::make($key);
         }
 
         $entity->makeIsInstanceForAction();
         $entity->update($attributes);
+        try {
+            $entity->save();
+            Session::client()->mayOrFail('updated', $entity);
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            throw $exception;
+        }
+
+        DB::commit();
 
         return $entity->toArray();
     }
@@ -264,6 +306,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateMany(array $objects = []): array
     {
+        Session::client()->mayOrFail('updating', static::class);
+
         $collection = new Collection();
         $instance = new static();
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
@@ -276,22 +320,30 @@ abstract class Model extends EloquentModel
                 throw new UpdateManyException('Object not specified index ' . $objectIndex . '!');
             }
 
-            $id = $attributes[$instance->getKeyName()];
+            $key = $attributes[$instance->getKeyName()];
             $instance->makeIsInstanceForAction();
-            $instance->validateKey($id);
+            $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($id);
+            $entity = $instance->newQuery()->find($key);
 
             if (!$entity) {
                 DB::rollBack();
 
-                throw ObjectNotFoundException::make($id);
+                throw ObjectNotFoundException::make($key);
             }
 
             $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
-            $entity->save();
+
+            try {
+                $entity->save();
+                Session::client()->mayOrFail('updated', $entity);
+            } catch (Exception $exception) {
+                DB::rollBack();
+
+                throw $exception;
+            }
             $collection->add($entity);
         }
 
@@ -310,6 +362,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionUpdateManyRaw(array $filter = [], array $attributes = []): array
     {
+        Session::client()->mayOrFail('updating', static::class);
+
         $instance = new static();
         $builder = $instance->newQuery()->makeModelIsInstanceForAction();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
@@ -324,6 +378,7 @@ abstract class Model extends EloquentModel
 
             try {
                 $entity->save();
+                Session::client()->mayOrFail('updated', static::class);
             } catch (Exception $exception) {
                 DB::rollBack();
 
@@ -341,25 +396,36 @@ abstract class Model extends EloquentModel
     /**
      * Deleting an entity.
      *
-     * @param int|string $id Entity identification.
+     * @param int|string $key Entity identification.
      * @return string[]
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionDelete($id): array
+    public static function actionDelete($key): array
     {
+        Session::client()->mayOrFail('deleting', static::class);
+
+        DB::beginTransaction();
         $instance = new static();
         $instance->makeIsInstanceForAction();
-        $instance->validateKey($id);
+        $instance->validateKey($key);
 
         /** @var \Egal\Model\Model $entity */
-        $entity = $instance->newQuery()->find($id);
+        $entity = $instance->newQuery()->find($key);
 
         if (!$entity) {
-            throw ObjectNotFoundException::make($id);
+            throw ObjectNotFoundException::make($key);
         }
 
         $entity->makeIsInstanceForAction();
-        $entity->delete();
+
+        try {
+            $entity->delete();
+            Session::client()->mayOrFail('deleted', static::class);
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            throw $exception;
+        }
 
         return ['message' => 'Entity deleted!'];
     }
@@ -367,32 +433,35 @@ abstract class Model extends EloquentModel
     /**
      * Multiple deletion of entities
      *
-     * @param int[]|string[] $ids Array of identifiers for the entities to be deleted.
+     * @param int[]|string[] $keys Array of identifiers for the entities to be deleted.
      * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionDeleteMany(array $ids): ?bool
+    public static function actionDeleteMany(array $keys): ?bool
     {
+        Session::client()->mayOrFail('deleting', static::class);
+
         $instance = new static();
-        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($ids));
+        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($keys));
         DB::beginTransaction();
 
-        foreach ($ids as $id) {
+        foreach ($keys as $key) {
             $instance->makeIsInstanceForAction();
-            $instance->validateKey($id);
+            $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
-            $entity = $instance->newQuery()->find($id);
+            $entity = $instance->newQuery()->find($key);
 
             if (!$entity) {
                 DB::rollBack();
 
-                throw ObjectNotFoundException::make($id);
+                throw ObjectNotFoundException::make($key);
             }
 
             try {
                 $entity->makeIsInstanceForAction();
                 $entity->delete();
+                Session::client()->mayOrFail('deleted', static::class);
             } catch (Exception $e) {
                 DB::rollBack();
 
@@ -414,6 +483,8 @@ abstract class Model extends EloquentModel
      */
     public static function actionDeleteManyRaw(array $filter = []): array
     {
+        Session::client()->mayOrFail('deleting', static::class);
+
         $instance = new static();
         $builder = $instance->newQuery()->makeModelIsInstanceForAction();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
@@ -426,6 +497,7 @@ abstract class Model extends EloquentModel
             try {
                 $entity->makeIsInstanceForAction();
                 $entity->delete();
+                Session::client()->mayOrFail('deleted', static::class);
             } catch (Exception $exception) {
                 DB::rollBack();
 

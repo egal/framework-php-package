@@ -11,6 +11,10 @@ use Egal\Auth\Tokens\ServiceServiceToken;
 use Egal\Auth\Tokens\Token;
 use Egal\Auth\Tokens\TokenType;
 use Egal\Auth\Tokens\UserServiceToken;
+use Egal\Auth\Entities\Client;
+use Egal\Auth\Entities\Guest;
+use Egal\Auth\Entities\Service;
+use Egal\Auth\Entities\User;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
@@ -26,6 +30,8 @@ final class Session
     private ?UserServiceToken $userServiceToken = null;
 
     private ?ServiceServiceToken $serviceServiceToken = null;
+
+    private ?Client $authEntity = null;
 
     public static function isActionMessageExists(): bool
     {
@@ -58,6 +64,11 @@ final class Session
         return self::isUserServiceTokenExists() || self::isServiceServiceTokenExists()
             ? StatusAccess::LOGGED
             : StatusAccess::GUEST;
+    }
+
+    public static function client(): Client
+    {
+        return self::getSingleton()->authEntity;
     }
 
     public static function isUserServiceTokenExists(): bool
@@ -107,11 +118,11 @@ final class Session
         self::unsetActionMessage();
         self::getSingleton()->actionMessage = $actionMessage;
 
-        if (!$actionMessage->isTokenExist()) {
-            return;
+        if ($actionMessage->isTokenExist()) {
+            self::setToken($actionMessage->getToken());
         }
 
-        self::setToken($actionMessage->getToken());
+        self::setAuthEntity($actionMessage);
     }
 
     public static function setServiceServiceToken(ServiceServiceToken $serviceServiceToken): void
@@ -159,7 +170,7 @@ final class Session
                 ? $exception
                 : new UnableDecodeTokenException();
         }
-        
+
         if (!isset($decodedToken['type'])) {
             throw new UndefinedTokenTypeException();
         }
@@ -174,6 +185,15 @@ final class Session
             default:
                 throw new WrongTokenTypeException();
         }
+    }
+
+    private static function setAuthEntity(ActionMessage $actionMessage): void
+    {
+        self::getSingleton()->authEntity = match (true) {
+            self::isUserServiceTokenExists() => new User(self::getUserServiceToken()),
+            self::isServiceServiceTokenExists() => new Service(self::getServiceServiceToken()),
+            default => new Guest(),
+        };
     }
 
 }
