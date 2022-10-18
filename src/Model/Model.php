@@ -149,18 +149,13 @@ abstract class Model extends EloquentModel
                 'current_page' => $paginator->currentPage(),
                 'total_count' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
-                'items' => $paginator->items(),
+                'items' => $paginator->items()
             ];
         } else {
-            $result = [
-                'items' => $builder->limit()->get()->toArray(),
-            ];
+            $result = ['items' => $builder->limit()->get()];
         }
 
-        foreach ($result['items'] as $item) {
-            $model = new static($item);
-            Session::client()->mayOrFail('retrieved', $model);
-        }
+        foreach ($result['items'] as $item) Session::client()->mayOrFail('retrieved', $item);
 
         return $result;
     }
