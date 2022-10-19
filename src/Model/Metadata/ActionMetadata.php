@@ -83,6 +83,13 @@ class ActionMetadata
         return $this;
     }
 
+    public function addParameter(ActionParameterMetadata $parameter): self
+    {
+        $this->parameters[] = $parameter;
+
+        return $this;
+    }
+
     /**
      * @return array
      */
