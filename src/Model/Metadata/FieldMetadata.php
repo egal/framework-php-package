@@ -9,17 +9,22 @@ use Egal\Model\Traits\VariableMetadata;
 class FieldMetadata
 {
 
-    use VariableMetadata;
+    use VariableMetadata {
+        required as requiredVariableMetadata;
+    }
 
     protected bool $hidden = false;
 
     protected bool $guarded = false;
+
+    protected bool $required = false;
 
     public function toArray(): array
     {
         return [
             'name' => $this->name,
             'type' => $this->type->value,
+            'required' => $this->required,
             'hidden' => $this->hidden,
             'guarded' => $this->guarded,
             'default' => $this->default,
@@ -38,6 +43,19 @@ class FieldMetadata
     {
         $this->guarded = true;
         return $this;
+    }
+
+    public function required(): self
+    {
+        $this->required = true;
+        $this->requiredVariableMetadata();
+
+        return $this;
+    }
+
+    public function isRequired(): bool
+    {
+        return $this->required;
     }
 
     public function isHidden(): bool
