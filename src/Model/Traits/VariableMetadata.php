@@ -33,6 +33,14 @@ trait VariableMetadata
     {
         $this->name = $name;
         $this->type = $type;
+        
+        switch ($type) {
+            case VariableType::DATETIME:
+                break;
+            default:
+                $this->addValidationRule($type->value);
+                break;
+        }
     }
 
     public static function make(string $name, VariableType $type): static
@@ -92,21 +100,6 @@ trait VariableMetadata
         return $this->nullable;
     }
 
-    protected function constructValidationRules(): void
-    {
-        if (in_array($this->type->value, $this->validationRules)) {
-            return;
-        }
-
-        switch ($this->type) {
-            case VariableType::DATETIME:
-                break;
-            default:
-                array_unshift($this->validationRules, $this->type->value);
-                break;
-        }
-    }
-
     public function getDefault(): mixed
     {
         return $this->default;
@@ -114,10 +107,6 @@ trait VariableMetadata
 
     public function getValidationRules(): array
     {
-        if (!isset($this->validationRules)) {
-            $this->constructValidationRules();
-        }
-
         return $this->validationRules;
     }
 
