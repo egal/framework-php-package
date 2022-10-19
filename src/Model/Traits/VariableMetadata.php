@@ -33,7 +33,7 @@ trait VariableMetadata
     {
         $this->name = $name;
         $this->type = $type;
-        
+
         switch ($type) {
             case VariableType::DATETIME:
                 break;
@@ -88,7 +88,7 @@ trait VariableMetadata
         return $this;
     }
 
-    public function addValidationRule(string $validationRule): static
+    public function addValidationRule(string|object $validationRule): static
     {
         $this->validationRules[] = $validationRule;
 
