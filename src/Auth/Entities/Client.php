@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Auth\Entities;
 
 use Egal\Auth\Exceptions\NoAccessToActionException;
+use Egal\Core\Session\Session;
 use Egal\Model\Facades\ModelMetadataManager;
 use Egal\Model\Model;
 
@@ -32,6 +33,10 @@ abstract class Client
 
     public function may(string $ability, string|Model $model): bool
     {
+        if (! Session::isAuthEnabled()) {
+            return true;
+        }
+
         $modelClass = is_string($model) ? $model : get_class($model);
         $policy = ModelMetadataManager::getModelMetadata($modelClass)->getPolicy();
 
