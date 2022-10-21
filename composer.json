@@ -13,7 +13,7 @@
         "php-amqplib/php-amqplib": "^v3.2",
         "firebase/php-jwt": "^v5.5.1",
         "centrifugal/phpcent": "~4.0",
-        "league/flysystem-aws-s3-v3": "^1"
+        "league/flysystem-aws-s3-v3": "^2"
     },
     "require-dev": {
         "mockery/mockery": "^1.5.1",

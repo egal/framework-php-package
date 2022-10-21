@@ -22,7 +22,7 @@ trait S3FileStoring
     public function initializeS3FileStoring(): void
     {
         $this->initializeFileStoring();
-        $this->client = $this->disk->getDriver()->getAdapter()->getClient();
+        $this->client = $this->disk->getClient();
     }
 
     public static function actionCreateMultipartUpload(string $fileBasename): array
