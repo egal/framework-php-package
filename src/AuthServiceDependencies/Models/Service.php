@@ -54,7 +54,7 @@ class Service
 
         $smt = new ServiceMasterToken();
         $smt->setSigningKey(config('app.service_key'));
-        $smt->setAuthIdentification($service->name);
+        $smt->setSub(['name' => $service->name]);
 
         return $smt->generateJWT();
     }
@@ -68,7 +68,7 @@ class Service
         $smt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\Service $senderService */
-        $senderService = static::find($smt->getAuthIdentification());
+        $senderService = static::find($smt->getSub()['name']);
 
         if (!$senderService) {
             throw new ServiceNotFoundAuthException();
@@ -82,7 +82,7 @@ class Service
 
         $sst = new ServiceServiceToken();
         $sst->setSigningKey($recipientService->key);
-        $sst->setAuthInformation($senderService->generateAuthInformation());
+        $sst->setSub($senderService->generateAuthInformation());
 
         return $sst->generateJWT();
     }

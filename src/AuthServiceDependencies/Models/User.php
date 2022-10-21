@@ -15,94 +15,73 @@ use Egal\Model\Model;
 abstract class User extends Model
 {
 
+    /**
+     * @return string[]
+     */
     abstract protected function getRoles(): array;
 
+    /**
+     * @return string[]
+     */
     abstract protected function getPermissions(): array;
 
-    /**
-     * Get the name of the unique identifier for the user.
-     */
-    public function getAuthIdentifierName(): string
-    {
-        return $this->getKeyName();
-    }
-
-    /**
-     * Get the unique identifier for the user.
-     *
-     * @return mixed
-     */
-    public function getAuthIdentifier()
-    {
-        return $this->getAttribute($this->getAuthIdentifierName());
-    }
-
-    public static function actionLoginToService(string $token, string $service_name): string
+    final public static function actionLoginToService(string $token, string $service_name): string
     {
         Session::client()->mayOrFail('loginToService', static::class);
-
-        /** @var \Egal\Auth\Tokens\UserMasterToken $umt */
         $umt = UserMasterToken::fromJWT($token, config('app.service_key'));
-        $umt->isAliveOrFail();
-
+        $model = new static();
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
-        $user = static::find($umt->getAuthIdentification());
+        $user = $model->query()->find($umt->getSub()[$model->primaryKey]);
         $service = Service::find($service_name);
-        if (!$user) {
-            throw new UserNotIdentifiedException();
-        }
 
-        if (!$service) {
-            throw new LoginException('Service not found!');
-        }
+        if (!$user) throw new UserNotIdentifiedException();
+        if (!$service) throw new LoginException('Service not found!');
 
         $ust = new UserServiceToken();
         $ust->setSigningKey($service->getKey());
-        $ust->setAuthInformation($user->generateAuthInformation());
-        $ust->setTargetServiceName($service_name);
+        $ust->setSub($user->generateUserServiceTokenSub());
+        $ust->setAud($service_name);
 
         return $ust->generateJWT();
     }
 
-    public static function actionRefreshUserMasterToken(string $token): array
+    final public static function actionRefreshUserMasterToken(string $token): array
     {
         Session::client()->mayOrFail('refreshUserMasterToken', static::class);
-
         $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
-        $oldUmrt->isAliveOrFail();
+        $model = new static();
+        $user = $model->query()->find($oldUmrt->getSub()[$model->primaryKey]);
 
-        /** @var \Egal\AuthServiceDependencies\Models\User $user */
-        $user = static::find($oldUmrt->getAuthIdentification());
+        if (!$user) throw new UserNotIdentifiedException();
 
-        if (!$user) {
-            throw new UserNotIdentifiedException();
-        }
-
-        $umt = new UserMasterToken();
-        $umt->setSigningKey(config('app.service_key'));
-        $umt->setAuthIdentification($oldUmrt->getAuthIdentification());
-
-        $umrt = new UserMasterRefreshToken();
-        $umrt->setSigningKey(config('app.service_key'));
-        $umrt->setAuthIdentification($oldUmrt->getAuthIdentification());
-
-        return [
-            'user_master_token' => $umt->generateJWT(),
-            'user_master_refresh_token' => $umrt->generateJWT(),
-        ];
+        return $user->generateLoginResult();
     }
 
-    // TODO: Переделать наполнение токена на основе спецификации протокола
-    protected function generateAuthInformation(): array
+    protected function generateUserServiceTokenSub(): array
     {
         return array_merge(
             $this->fresh()->toArray(),
             [
-                'auth_identification' => $this->getAuthIdentifier(),
                 'roles' => $this->getRoles(),
                 'permissions' => $this->getPermissions(),
             ]
         );
+    }
+
+    final protected function generateLoginResult(): array
+    {
+        $umt = new UserMasterToken();
+        $umt->setSigningKey(config('app.service_key'));
+        $umt->setSub([$this->primaryKey => $this->getKey()]);
+
+        $umrt = new UserMasterRefreshToken();
+        $umrt->setSigningKey(config('app.service_key'));
+        $umrt->setSub([$this->primaryKey => $this->getKey()]);
+
+        return [
+            'user_master_token' => $umt->generateJWT(),
+            'user_master_refresh_token' => $umrt->generateJWT()
+        ];
     }
 
 }

@@ -8,20 +8,18 @@ use Egal\Auth\Tokens\UserServiceToken;
 
 class User extends Client
 {
-    public readonly string $key;
 
     public readonly array $roles;
 
     public readonly array $permissions;
 
-    public readonly array $authInformation;
+    public readonly array $sub;
 
     public function __construct(UserServiceToken $ust)
     {
-        $this->key = $ust->getUid();
         $this->roles = $ust->getRoles();
         $this->permissions = $ust->getPermissions();
-        $this->authInformation = $ust->getAuthInformation();
+        $this->sub = $ust->getSub();
     }
 
 }

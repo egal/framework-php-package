@@ -205,7 +205,7 @@ class RabbitMQBus extends Bus
      * @throws \Egal\Core\Exceptions\TargetQueueNotProvidedException
      * @throws \Egal\Core\Exceptions\UnsupportedMessageTypeException
      * @throws \Egal\Core\Exceptions\InitializeMessageFromArrayException
-     * @throws \Egal\Core\Exceptions\UnableDecodeTokenException
+     * @throws \Egal\Core\Exceptions\AuthenticationFailedException
      * @throws \Egal\Core\Exceptions\UndefinedTypeOfMessageException
      */
     private function processActionMessage(array $body, AMQPMessage $message): void

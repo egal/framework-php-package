@@ -18,9 +18,10 @@ use Egal\Auth\Entities\User;
 use Egal\Core\Events\ServiceServiceTokenDetectedEvent;
 use Egal\Core\Events\UserServiceTokenDetectedEvent;
 use Egal\Core\Exceptions\CurrentSessionException;
-use Egal\Core\Exceptions\UnableDecodeTokenException;
+use Egal\Core\Exceptions\AuthenticationFailedException;
 use Egal\Core\Messages\ActionMessage;
 use Exception;
+use Firebase\JWT\ExpiredException;
 
 final class Session
 {
@@ -127,14 +128,12 @@ final class Session
 
     public static function setServiceServiceToken(ServiceServiceToken $serviceServiceToken): void
     {
-        $serviceServiceToken->isAliveOrFail();
         self::getSingleton()->serviceServiceToken = $serviceServiceToken;
         event(new ServiceServiceTokenDetectedEvent());
     }
 
     public static function setUserServiceToken(UserServiceToken $userServiceToken): void
     {
-        $userServiceToken->isAliveOrFail();
         self::getSingleton()->userServiceToken = $userServiceToken;
         event(new UserServiceTokenDetectedEvent());
     }
@@ -168,14 +167,14 @@ final class Session
         } catch (Exception $exception) {
             throw config('app.debug')
                 ? $exception
-                : new UnableDecodeTokenException();
+                : new AuthenticationFailedException();
         }
 
-        if (!isset($decodedToken['type'])) {
+        if (!isset($decodedToken['typ'])) {
             throw new UndefinedTokenTypeException();
         }
 
-        switch ($decodedToken['type']) {
+        switch ($decodedToken['typ']) {
             case TokenType::USER_SERVICE:
                 self::setUserServiceToken(UserServiceToken::fromArray($decodedToken));
                 break;

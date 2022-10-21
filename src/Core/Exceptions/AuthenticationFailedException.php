@@ -6,10 +6,10 @@ namespace Egal\Core\Exceptions;
 
 use Exception;
 
-class UnableDecodeTokenException extends Exception
+class AuthenticationFailedException extends Exception
 {
 
-    protected $message = 'Unable to decode token!';
+    protected $message = 'Authentication failed!';
 
     protected $code = 401;
 
