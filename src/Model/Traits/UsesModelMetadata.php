@@ -24,7 +24,7 @@ trait UsesModelMetadata
 
     public function initializeUsesModelMetadata(): void
     {
-        $this->modelMetadata = ModelMetadataManager::getModelMetadata(static::class);
+        $this->modelMetadata = $this->getModelMetadata(static::class);
         $this->keyType = $this->modelMetadata->getKey()->getType()->value;
         $this->keyName = $this->modelMetadata->getKey()->getName();
 

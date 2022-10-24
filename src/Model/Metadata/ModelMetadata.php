@@ -22,6 +22,8 @@ class ModelMetadata
 
     protected readonly ?FieldMetadata $key;
 
+    protected bool $dynamic = false;
+
     protected array $fakeFields = [];
 
     /**
@@ -133,6 +135,13 @@ class ModelMetadata
     public function policy(string $policy): self
     {
         $this->policy = $policy;
+
+        return $this;
+    }
+
+    public function dynamic(): self
+    {
+        $this->dynamic = true;
 
         return $this;
     }
@@ -267,6 +276,11 @@ class ModelMetadata
     public function getPolicy(): string
     {
         return $this->policy;
+    }
+
+    public function isDynamic(): bool
+    {
+        return $this->dynamic;
     }
 
 }
