@@ -92,11 +92,6 @@ abstract class Token
         throw new \Exception('REMOVE!');
     }
 
-    public function isAliveOrFail(): bool
-    {
-        throw new \Exception('REMOVE!');
-    }
-
     public function generateJWT(): string
     {
         return JWT::encode($this->toArray(), $this->getSigningKey());

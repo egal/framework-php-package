@@ -42,9 +42,9 @@ class Service
         return $this->name;
     }
 
-    public static function actionLogin(string $service_name, string $key): string
+    final public static function actionLogin(string $service_name, string $key): string
     {
-        Session::client()->mayOrFail('login', Service::class);
+        Session::client()->mayOrFail('login', static::class);
 
         $service = static::find($service_name);
 
@@ -59,13 +59,12 @@ class Service
         return $smt->generateJWT();
     }
 
-    public static function actionLoginToService(string $token, string $service_name): string
+    final public static function actionLoginToService(string $token, string $service_name): string
     {
-        Session::client()->mayOrFail('loginToService', Service::class);
+        Session::client()->mayOrFail('loginToService', static::class);
 
         /** @var \Egal\Auth\Tokens\ServiceMasterToken $smt */
         $smt = ServiceMasterToken::fromJWT($token, config('app.service_key'));
-        $smt->isAliveOrFail();
 
         /** @var \Egal\AuthServiceDependencies\Models\Service $senderService */
         $senderService = static::find($smt->getSub()['name']);
@@ -82,17 +81,9 @@ class Service
 
         $sst = new ServiceServiceToken();
         $sst->setSigningKey($recipientService->key);
-        $sst->setSub($senderService->generateAuthInformation());
+        $sst->setSub(['name' => $senderService->getName()]);
 
         return $sst->generateJWT();
-    }
-
-    protected function generateAuthInformation(): array
-    {
-        return [
-            'auth_identification' => $this->getName(),
-            'service' => $this->getName(),
-        ];
     }
 
 }

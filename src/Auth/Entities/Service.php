@@ -13,7 +13,7 @@ class Service extends Client
 
     public function __construct(ServiceServiceToken $sst)
     {
-        $this->service = $sst->getServiceName();
+        $this->service = $sst->getSub()['name'];
     }
 
 }
