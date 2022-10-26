@@ -82,7 +82,7 @@ class ActionCaller
             fn ($actionParameter) => !$this->modelActionMetadata->parameterExist($actionParameter)
         );
 
-        /** @var ActionParameterMetadata $parameter */
+        /** @var ActionParameterMetadata $parameterMetadata */
         foreach ($this->modelActionMetadata->getParameters() as $parameterMetadata) {
             if (array_key_exists($parameterMetadata->getName(), $actionParameters)
                 || $parameterMetadata->getDefault() === null
@@ -90,7 +90,7 @@ class ActionCaller
                 continue;
             }
 
-            $actionParameters[$parameter->getName()] = $parameter->getDefault();
+            $actionParameters[$parameterMetadata->getName()] = $parameterMetadata->getDefault();
         }
 
         $validator = Validator::make($actionParameters, $this->modelActionMetadata->getValidationRules());
