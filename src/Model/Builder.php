@@ -251,13 +251,6 @@ class Builder extends EloquentBuilder
         return $this->model;
     }
 
-    public function makeModelIsInstanceForAction(): Builder
-    {
-        $this->model->makeIsInstanceForAction();
-
-        return $this;
-    }
-
     /**
      * Apply filter condition to the builder query
      *

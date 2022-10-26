@@ -14,7 +14,6 @@ use Egal\Model\Traits\FilterConditionApplier;
 use Egal\Model\Traits\HasDefaultLimits;
 use Egal\Model\Traits\HasEvents;
 use Egal\Model\Traits\HashGuardable;
-use Egal\Model\Traits\InstanceForAction;
 use Egal\Model\Traits\Pagination;
 use Egal\Model\Traits\UsesBuilder;
 use Egal\Model\Traits\UsesModelMetadata;
@@ -36,7 +35,6 @@ abstract class Model extends EloquentModel
     use UsesModelMetadata;
     use UsesValidator;
     use XssGuardable;
-    use InstanceForAction;
     use FilterConditionApplier;
 
     /**
@@ -99,11 +97,9 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('retrieving', static::class);
 
         $instance = new static();
-        $instance->makeIsInstanceForAction();
         $instance->validateKey($key);
 
         $item = $instance->newQuery()
-            ->makeModelIsInstanceForAction()
             ->with($relations)
             ->find($key);
 
@@ -136,10 +132,8 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('retrieving', static::class);
 
         $instance = new static();
-        $instance->makeIsInstanceForAction();
 
         $builder = $instance->newQuery()
-            ->makeModelIsInstanceForAction()
             ->setOrderFromArray($order)
             ->setFilterFromArray($filter)
             ->setWithFromArray($relations);
@@ -171,7 +165,6 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('retrievingCount', static::class);
 
         $instance = new static();
-        $instance->makeIsInstanceForAction();
 
         $count = $instance->newQuery()
             ->setFilterFromArray($filter)
@@ -193,7 +186,6 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('creating', static::class);
 
         $entity = new static();
-        $entity->makeIsInstanceForAction();
         $entity->fill($attributes);
 
         DB::beginTransaction();
@@ -224,14 +216,12 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('creating', static::class);
 
         $model = new static();
-        $model->makeIsInstanceForAction();
         $model->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
 
 
         foreach ($objects as $attributes) {
             $entity = new static();
-            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
             $collection->add($entity);
         }
@@ -269,7 +259,6 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('updating', static::class);
 
         $instance = new static();
-        $instance->makeIsInstanceForAction();
         $instance->validateKey($key);
 
         /** @var \Egal\Model\Model $entity */
@@ -279,7 +268,6 @@ abstract class Model extends EloquentModel
             throw ObjectNotFoundException::make($key);
         }
 
-        $entity->makeIsInstanceForAction();
         $entity->fill($attributes);
 
         DB::beginTransaction();
@@ -323,7 +311,6 @@ abstract class Model extends EloquentModel
             }
 
             $key = $attributes[$instance->getKeyName()];
-            $instance->makeIsInstanceForAction();
             $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
@@ -335,7 +322,6 @@ abstract class Model extends EloquentModel
                 throw ObjectNotFoundException::make($key);
             }
 
-            $entity->makeIsInstanceForAction();
             $entity->fill($attributes);
 
             try {
@@ -367,7 +353,7 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('updating', static::class);
 
         $instance = new static();
-        $builder = $instance->newQuery()->makeModelIsInstanceForAction();
+        $builder = $instance->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
         $entities = $builder->get();
@@ -377,7 +363,6 @@ abstract class Model extends EloquentModel
 
         try {
             foreach ($entities as $key => $entity) {
-                $entity->makeIsInstanceForAction();
                 $entity->fill($attributes);
 
                 $entity->save();
@@ -408,7 +393,6 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('deleting', static::class);
 
         $instance = new static();
-        $instance->makeIsInstanceForAction();
         $instance->validateKey($key);
 
         /** @var \Egal\Model\Model $entity */
@@ -417,8 +401,6 @@ abstract class Model extends EloquentModel
         if (!$entity) {
             throw ObjectNotFoundException::make($key);
         }
-
-        $entity->makeIsInstanceForAction();
 
         DB::beginTransaction();
 
@@ -452,7 +434,6 @@ abstract class Model extends EloquentModel
         DB::beginTransaction();
 
         foreach ($keys as $key) {
-            $instance->makeIsInstanceForAction();
             $instance->validateKey($key);
 
             /** @var \Egal\Model\Model $entity */
@@ -465,7 +446,6 @@ abstract class Model extends EloquentModel
             }
 
             try {
-                $entity->makeIsInstanceForAction();
                 $entity->delete();
                 Session::client()->mayOrFail('deleted', static::class);
             } catch (Exception $e) {
@@ -492,7 +472,7 @@ abstract class Model extends EloquentModel
         Session::client()->mayOrFail('deleting', static::class);
 
         $instance = new static();
-        $builder = $instance->newQuery()->makeModelIsInstanceForAction();
+        $builder = $instance->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
         $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
@@ -501,7 +481,6 @@ abstract class Model extends EloquentModel
 
         foreach ($entities as $entity) {
             try {
-                $entity->makeIsInstanceForAction();
                 $entity->delete();
                 Session::client()->mayOrFail('deleted', static::class);
             } catch (Exception $exception) {
