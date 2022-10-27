@@ -8,7 +8,6 @@ use Egal\Model\Enums\VariableType;
 use Egal\Model\Facades\ModelMetadataManager;
 use Egal\Model\Metadata\FieldMetadata;
 use Egal\Model\Metadata\ModelMetadata;
-use Egal\Model\Model;
 
 /**
  * @package Egal\Model
@@ -24,17 +23,32 @@ trait UsesModelMetadata
 
     public function initializeUsesModelMetadata(): void
     {
-        $this->modelMetadata = $this->getModelMetadata(static::class);
+        $this->modelMetadata = $this->getModelMetadata();
         $this->keyType = $this->modelMetadata->getKey()->getType()->value;
         $this->keyName = $this->modelMetadata->getKey()->getName();
 
         $this->setKeyProperties();
         $this->setValidationRules();
-        $this->setDefaultAttributes();
         $this->mergeCasts($this->modelMetadata->getCasts());
 
         $this->mergeGuarded($this->modelMetadata->getGuardedFieldsNames());
         $this->makeHidden($this->modelMetadata->getHiddenFieldsNames());
+    }
+
+    public static function bootUsesModelMetadata(): void
+    {
+        static::creating(static fn (self $model): bool => $model->setDefaultValues());
+    }
+
+    private function setDefaultValues(): bool {
+        foreach ($this->getModelMetadata()->getFields() as $field) {
+            if ($field->getDefault() === null) continue;
+            $attribute = $this->getAttribute($field->getName());
+            if ($attribute) continue;
+            $this->setAttribute($field->getName(), $field->getDefault());
+        }
+
+        return true;
     }
 
     private function setKeyProperties(): void
@@ -48,21 +62,6 @@ trait UsesModelMetadata
             default:
                 $this->incrementing = false;
         }
-    }
-
-    private function setDefaultAttributes(): void
-    {
-        static::creating(static function (Model $model): void {
-            foreach ($model->getModelMetadata()->getFields() as $field) {
-                if ($field->getDefault() === null) {
-                    continue;
-                }
-
-                if (!$model->getAttribute($field->getName())) {
-                    $model->setAttribute($field->getName(), $field->getDefault());
-                }
-            }
-        });
     }
 
     public abstract static function constructMetadata(): ModelMetadata;
