@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Egal\Model\Traits;
 
+use BackedEnum;
 use Egal\Model\Enums\VariableType;
 use Egal\Model\Enums\ValidationRules;
 use Egal\Model\Exceptions\ValidateException;
@@ -62,9 +63,14 @@ trait VariableMetadata
     /**
      * @throws ValidateException
      */
-    public function default(mixed $defaultValue): static
+    public function default(mixed $value): static
     {
-        $validator = Validator::make([$this->getName() => $defaultValue], [$this->getName() => $this->getValidationRules()]);
+        if ($value instanceof BackedEnum) $value = $value->value;
+
+        $validator = Validator::make(
+            [$this->getName() => $value],
+            [$this->getName() => $this->getValidationRules()]
+        );
 
         if ($validator->fails()) {
             if ($validator->fails()) {
@@ -75,7 +81,7 @@ trait VariableMetadata
             }
         }
 
-        $this->default = $defaultValue;
+        $this->default = $value;
 
         return $this;
     }
