@@ -75,7 +75,7 @@ abstract class Model extends EloquentModel
     /**
      * Retrieving Model Metadata
      */
-    public static function actionGetMetadata(): array
+    final public static function actionGetMetadata(): array
     {
         Session::client()->mayOrFail('retrievingMetadata', static::class);
         $result = ModelMetadataManager::getModelMetadata(static::class)->toArray(true);
@@ -92,7 +92,7 @@ abstract class Model extends EloquentModel
      * @return mixed[] Entity as an associative array.
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionGetItem($key, array $relations = []): array
+    final public static function actionGetItem($key, array $relations = []): array
     {
         Session::client()->mayOrFail('retrieving', static::class);
 
@@ -122,7 +122,7 @@ abstract class Model extends EloquentModel
      * @return mixed[] The result of the query and the paginator as an associative array.
      * @throws OrderException
      */
-    public static function actionGetItems(
+    final public static function actionGetItems(
         ?array $pagination = null,
         array  $relations = [],
         array  $filter = [],
@@ -160,7 +160,7 @@ abstract class Model extends EloquentModel
      *
      * @param mixed[] $filter
      */
-    public static function actionGetCount(array $filter = []): array
+    final public static function actionGetCount(array $filter = []): array
     {
         Session::client()->mayOrFail('retrievingCount', static::class);
 
@@ -181,7 +181,7 @@ abstract class Model extends EloquentModel
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] The created entity as an associative array.
      */
-    public static function actionCreate(array $attributes = []): array
+    final public static function actionCreate(array $attributes = []): array
     {
         Session::client()->mayOrFail('creating', static::class);
 
@@ -211,7 +211,7 @@ abstract class Model extends EloquentModel
      * @return mixed[] Array of created objects.
      * @throws \Exception
      */
-    public static function actionCreateMany(array $objects = []): array
+    final public static function actionCreateMany(array $objects = []): array
     {
         Session::client()->mayOrFail('creating', static::class);
 
@@ -254,7 +254,7 @@ abstract class Model extends EloquentModel
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      * @throws Exception
      */
-    public static function actionUpdate($key, array $attributes = []): array
+    final public static function actionUpdate($key, array $attributes = []): array
     {
         Session::client()->mayOrFail('updating', static::class);
 
@@ -294,7 +294,7 @@ abstract class Model extends EloquentModel
      * @throws \Egal\Model\Exceptions\UpdateManyException
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionUpdateMany(array $objects = []): array
+    final public static function actionUpdateMany(array $objects = []): array
     {
         Session::client()->mayOrFail('updating', static::class);
 
@@ -348,7 +348,7 @@ abstract class Model extends EloquentModel
      * @return mixed[] Updated entities.
      * @throws \Exception
      */
-    public static function actionUpdateBatch(array $filter = [], array $attributes = []): array
+    final public static function actionUpdateBatch(array $filter = [], array $attributes = []): array
     {
         Session::client()->mayOrFail('updating', static::class);
 
@@ -388,7 +388,7 @@ abstract class Model extends EloquentModel
      * @return string[]
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionDelete($key): array
+    final public static function actionDelete($key): array
     {
         Session::client()->mayOrFail('deleting', static::class);
 
@@ -425,7 +425,7 @@ abstract class Model extends EloquentModel
      * @throws \Egal\Model\Exceptions\ExceedingTheLimitCountEntitiesForManipulationException
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      */
-    public static function actionDeleteMany(array $keys): ?bool
+    final public static function actionDeleteMany(array $keys): ?bool
     {
         Session::client()->mayOrFail('deleting', static::class);
 
@@ -467,7 +467,7 @@ abstract class Model extends EloquentModel
      * @return mixed[]
      * @throws \Exception
      */
-    public static function actionDeleteBatch(array $filter = []): array
+    final public static function actionDeleteBatch(array $filter = []): array
     {
         Session::client()->mayOrFail('deleting', static::class);
 
