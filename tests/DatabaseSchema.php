@@ -13,6 +13,8 @@ trait DatabaseSchema
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $db = new DB;
 
         $db->addConnection([
@@ -36,6 +38,8 @@ trait DatabaseSchema
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         $this->dropSchema();
     }
 
