@@ -19,6 +19,8 @@ class RelationMetadata
 
     protected readonly RelationType $type;
 
+    protected RelationSaverMetadata $saver;
+
     /**
      * @throws RelatedModelNotFoundException
      */
@@ -81,6 +83,23 @@ class RelationMetadata
     public function getRelatedMetadata(): ModelMetadata
     {
         return ModelMetadataManager::getModelMetadata($this->related);
+    }
+
+    public function setSaver(RelationSaverMetadata $saver): RelationMetadata
+    {
+        $this->saver = $saver;
+
+        return $this;
+    }
+
+    public function getSaver(): RelationSaverMetadata
+    {
+        return $this->saver;
+    }
+
+    public function isGuarded(): bool
+    {
+        return $this->guarded;
     }
 
 }

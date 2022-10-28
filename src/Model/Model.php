@@ -23,6 +23,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\DB;
+use Egal\Model\Traits\HasRelationships;
 
 abstract class Model extends EloquentModel
 {
@@ -36,6 +37,7 @@ abstract class Model extends EloquentModel
     use UsesValidator;
     use XssGuardable;
     use FilterConditionApplier;
+    use HasRelationships;
 
     /**
      * The default number of models to return for pagination.
@@ -181,7 +183,7 @@ abstract class Model extends EloquentModel
      * @param mixed[] $attributes Associative array of attributes.
      * @return mixed[] The created entity as an associative array.
      */
-    final public static function actionCreate(array $attributes = []): array
+    final public static function actionCreate(array $attributes = [], array $relations = []): array
     {
         Session::client()->mayOrFail('creating', static::class);
 
@@ -192,6 +194,7 @@ abstract class Model extends EloquentModel
 
         try {
             $entity->save();
+            foreach ($relations as $name => $value) $entity->saveRelation($name, $value);
             Session::client()->mayOrFail('created', $entity);
         } catch (Exception $exception) {
             DB::rollBack();
@@ -254,7 +257,7 @@ abstract class Model extends EloquentModel
      * @throws \Egal\Model\Exceptions\ObjectNotFoundException
      * @throws Exception
      */
-    final public static function actionUpdate($key, array $attributes = []): array
+    final public static function actionUpdate($key, array $attributes = [], array $relations = []): array
     {
         Session::client()->mayOrFail('updating', static::class);
 
@@ -274,6 +277,7 @@ abstract class Model extends EloquentModel
 
         try {
             $entity->save();
+            foreach ($relations as $name => $value) $entity->saveRelation($name, $value);
             Session::client()->mayOrFail('updated', $entity);
         } catch (Exception $exception) {
             DB::rollBack();

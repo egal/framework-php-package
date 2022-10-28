@@ -23,7 +23,7 @@ use Egal\Core\Messages\ActionMessage;
 use Exception;
 use Firebase\JWT\ExpiredException;
 
-final class Session
+class Session
 {
 
     private ?ActionMessage $actionMessage = null;

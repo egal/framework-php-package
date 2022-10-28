@@ -9,6 +9,7 @@ use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
+use Exception;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 
 class ModelMetadata
@@ -223,6 +224,19 @@ class ModelMetadata
     public function getRelations(): array
     {
         return $this->relations;
+    }
+
+    public function getRelation(string $name): RelationMetadata
+    {
+        foreach ($this->relations as $relation) {
+            if ($relation->getName() !== $name) continue;
+            $needed = $relation;
+            break;
+        }
+
+        if (!isset($needed)) throw new Exception('Relation not found!');
+
+        return $needed;
     }
 
     public function getModelClass(): string
