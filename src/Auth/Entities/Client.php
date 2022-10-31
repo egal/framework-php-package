@@ -11,7 +11,7 @@ use Egal\Model\Model;
 
 /**
  * @method bool isUserOrFail()
- * @method bool mayOrFail(string $ability, string|Model $model)
+ * @method bool mayOrFail(string $ability, Model $model)
  * @method bool isGuestOrFail()
  * @method bool isServiceOrFail()
  * @method bool hasRoleFail()
@@ -40,16 +40,11 @@ abstract class Client
         throw new NoAccessToActionException();
     }
 
-    public function may(string $ability, string|Model $model): bool
+    public function may(string $ability, Model $model): bool
     {
-        if (! Session::isAuthEnabled()) {
-            return true;
-        }
-
-        $modelClass = is_string($model) ? $model : get_class($model);
-        $policy = ModelMetadataManager::getModelMetadata($modelClass)->getPolicy();
-
-        return call_user_func_array([$policy, $ability], [$model]);
+        return Session::isAuthEnabled()
+            ? call_user_func_array([$model->getModelMetadata()->getPolicy(), $ability], [$this, $model])
+            : true;
     }
 
     public function isUser(): bool
