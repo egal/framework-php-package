@@ -183,8 +183,8 @@ abstract class Model extends EloquentModel
     final public static function actionCreate(array $attributes = [], array $relations = []): array
     {
         $entity = new static();
-        Session::client()->mayOrFail('creating', $entity);
         $entity->fill($attributes);
+        Session::client()->mayOrFail('creating', $entity);
 
         DB::beginTransaction();
 
@@ -213,7 +213,6 @@ abstract class Model extends EloquentModel
     final public static function actionCreateMany(array $objects = []): array
     {
         $model = new static();
-        Session::client()->mayOrFail('creating', $model);
         $model->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         $collection = new Collection();
 
@@ -221,6 +220,7 @@ abstract class Model extends EloquentModel
         foreach ($objects as $attributes) {
             $entity = new static();
             $entity->fill($attributes);
+            Session::client()->mayOrFail('creating', $entity);
             $collection->add($entity);
         }
 
@@ -255,7 +255,6 @@ abstract class Model extends EloquentModel
     final public static function actionUpdate($key, array $attributes = [], array $relations = []): array
     {
         $instance = new static();
-        Session::client()->mayOrFail('updating', $instance);
         $instance->validateKey($key);
 
         /** @var \Egal\Model\Model $entity */
@@ -266,6 +265,7 @@ abstract class Model extends EloquentModel
         }
 
         $entity->fill($attributes);
+        Session::client()->mayOrFail('updating', $instance);
 
         DB::beginTransaction();
 
@@ -295,7 +295,6 @@ abstract class Model extends EloquentModel
     final public static function actionUpdateMany(array $objects = []): array
     {
         $instance = new static();
-        Session::client()->mayOrFail('updating', $instance);
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($objects));
         DB::beginTransaction();
 
@@ -320,6 +319,7 @@ abstract class Model extends EloquentModel
             }
 
             $entity->fill($attributes);
+            Session::client()->mayOrFail('updating', $entity);
 
             try {
                 $entity->save();
@@ -348,7 +348,6 @@ abstract class Model extends EloquentModel
     final public static function actionUpdateBatch(array $filter = [], array $attributes = []): array
     {
         $instance = new static();
-        Session::client()->mayOrFail('updating', $instance);
         $builder = $instance->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         /** @var \Egal\Model\Model[]|\Illuminate\Database\Eloquent\Collection $entities */
@@ -360,6 +359,7 @@ abstract class Model extends EloquentModel
         try {
             foreach ($entities as $key => $entity) {
                 $entity->fill($attributes);
+                Session::client()->mayOrFail('updating', $entity);
 
                 $entity->save();
                 Session::client()->mayOrFail('updated', $entity);
@@ -387,15 +387,12 @@ abstract class Model extends EloquentModel
     final public static function actionDelete($key): array
     {
         $instance = new static();
-        Session::client()->mayOrFail('deleting', $instance);
         $instance->validateKey($key);
 
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->find($key);
-
-        if (!$entity) {
-            throw ObjectNotFoundException::make($key);
-        }
+        if (!$entity) throw ObjectNotFoundException::make($key);
+        Session::client()->mayOrFail('deleting', $instance);
 
         DB::beginTransaction();
 
@@ -423,7 +420,6 @@ abstract class Model extends EloquentModel
     final public static function actionDeleteMany(array $keys): ?bool
     {
         $instance = new static();
-        Session::client()->mayOrFail('deleting', $instance);
         $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail(count($keys));
         DB::beginTransaction();
 
@@ -438,6 +434,8 @@ abstract class Model extends EloquentModel
 
                 throw ObjectNotFoundException::make($key);
             }
+
+            Session::client()->mayOrFail('deleting', $entity);
 
             try {
                 $entity->delete();
@@ -464,16 +462,16 @@ abstract class Model extends EloquentModel
     final public static function actionDeleteBatch(array $filter = []): array
     {
         $instance = new static();
-        Session::client()->mayOrFail('deleting', $instance);
         $builder = $instance->newQuery();
         $filter === [] ?: $builder->setFilter(FilterPart::fromArray($filter));
         $entities = $builder->get();
-        $builder->getModel()->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
+        $instance->isLessThanMaxCountEntitiesCanToManipulateWithActionOrFail($entities->count());
 
         DB::beginTransaction();
 
         foreach ($entities as $entity) {
             try {
+                Session::client()->mayOrFail('deleting', $entity);
                 $entity->delete();
                 Session::client()->mayOrFail('deleted', $entity);
             } catch (Exception $exception) {
