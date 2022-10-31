@@ -6,16 +6,15 @@ namespace Egal\Auth\Entities;
 
 use Egal\Auth\Exceptions\NoAccessToActionException;
 use Egal\Core\Session\Session;
-use Egal\Model\Facades\ModelMetadataManager;
 use Egal\Model\Model;
 
 /**
- * @method bool isUserOrFail()
  * @method bool mayOrFail(string $ability, Model $model)
+ * @method bool isUserOrFail()
  * @method bool isGuestOrFail()
- * @method bool isServiceOrFail()
- * @method bool hasRoleFail()
- * @method bool hasRolesFail()
+ * @method bool isServiceOrFail(string|null $name = null)
+ * @method bool hasRoleOrFail(string $role)
+ * @method bool hasRolesOrFail(string[] $roles)
  */
 abstract class Client
 {

@@ -79,9 +79,10 @@ abstract class Model extends EloquentModel
      */
     final public static function actionGetMetadata(): array
     {
-        Session::client()->mayOrFail('retrievingMetadata', static::class);
+        $instance = new static();
+        Session::client()->mayOrFail('retrievingMetadata', $instance);
         $result = ModelMetadataManager::getModelMetadata(static::class)->toArray(true);
-        Session::client()->mayOrFail('retrievedMetadata', static::class);
+        Session::client()->mayOrFail('retrievedMetadata', $instance);
 
         return $result;
     }
