@@ -44,13 +44,13 @@ class Service
 
     final public static function actionLogin(string $service_name, string $key): string
     {
-        Session::client()->mayOrFail('login', static::class);
-
         $service = static::find($service_name);
 
         if (!$service || $service->getKey() !== $key) {
             throw new LoginException('Incorrect key or service name!');
         }
+
+        Session::client()->mayOrFail('login', $service);
 
         $smt = new ServiceMasterToken();
         $smt->setSigningKey(config('app.service_key'));
@@ -61,8 +61,6 @@ class Service
 
     final public static function actionLoginToService(string $token, string $service_name): string
     {
-        Session::client()->mayOrFail('loginToService', static::class);
-
         /** @var \Egal\Auth\Tokens\ServiceMasterToken $smt */
         $smt = ServiceMasterToken::fromJWT($token, config('app.service_key'));
 
@@ -72,6 +70,8 @@ class Service
         if (!$senderService) {
             throw new ServiceNotFoundAuthException();
         }
+
+        Session::client()->mayOrFail('loginToService', $senderService);
 
         $recipientService = static::find($service_name);
 

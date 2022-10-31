@@ -27,11 +27,13 @@ abstract class User extends Model
 
     final public static function actionLoginToService(string $token, string $service_name): string
     {
-        Session::client()->mayOrFail('loginToService', static::class);
         $umt = UserMasterToken::fromJWT($token, config('app.service_key'));
         $model = new static();
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
         $user = $model->query()->find($umt->getSub()[$model->primaryKey]);
+
+        Session::client()->mayOrFail('loginToService', $user);
+
         $service = Service::find($service_name);
 
         if (!$user) throw new UserNotIdentifiedException();
@@ -47,12 +49,13 @@ abstract class User extends Model
 
     final public static function actionRefreshUserMasterToken(string $token): array
     {
-        Session::client()->mayOrFail('refreshUserMasterToken', static::class);
         $oldUmrt = UserMasterRefreshToken::fromJWT($token, config('app.service_key'));
         $model = new static();
         $user = $model->query()->find($oldUmrt->getSub()[$model->primaryKey]);
 
         if (!$user) throw new UserNotIdentifiedException();
+
+        Session::client()->mayOrFail('refreshUserMasterToken', $user);
 
         return $user->generateLoginResult();
     }
