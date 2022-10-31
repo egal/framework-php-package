@@ -9,11 +9,16 @@ use Egal\Auth\Tokens\ServiceServiceToken;
 class Service extends Client
 {
 
-    public readonly string $service;
+    public readonly string $name;
 
     public function __construct(ServiceServiceToken $sst)
     {
-        $this->service = $sst->getSub()['name'];
+        $this->name = $sst->getSub()['name'];
+    }
+
+    public function isService(string|null $name = null): bool
+    {
+        return parent::isService($name) && ($name === null || $this->name === $name);
     }
 
 }

@@ -2,7 +2,7 @@
 
 namespace Egal\Auth\Tokens;
 
-class ServiceServiceToken extends Token
+class ServiceServiceToken extends ServiceToken
 {
 
     protected string $typ = TokenType::SERVICE_SERVICE;
