@@ -74,4 +74,9 @@ abstract class Client
         return false;
     }
 
+    public function getSub(): array
+    {
+        return [];
+    }
+
 }
