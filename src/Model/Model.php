@@ -96,11 +96,11 @@ abstract class Model extends EloquentModel
      */
     final public static function actionGetItem($key, array $relations = []): array
     {
-        Session::client()->mayOrFail('retrieving', static::class);
-
         $instance = new static();
+        Session::client()->mayOrFail('retrieving', $instance);
         $instance->validateKey($key);
 
+        /** @var Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null $item */
         $item = $instance->newQuery()
             ->with($relations)
             ->find($key);
