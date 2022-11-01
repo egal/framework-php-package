@@ -37,18 +37,17 @@ trait UsesModelMetadata
 
     public static function bootUsesModelMetadata(): void
     {
-        static::creating(static fn (self $model): bool => $model->setDefaultValues());
+        static::creating(static fn (self $model) => $model->setDefaultValues());
     }
 
-    private function setDefaultValues(): bool {
+    private function setDefaultValues(): void
+    {
         foreach ($this->getModelMetadata()->getFields() as $field) {
             if ($field->getDefault() === null) continue;
             $attribute = $this->getAttribute($field->getName());
             if ($attribute) continue;
             $this->setAttribute($field->getName(), $field->getDefault());
         }
-
-        return true;
     }
 
     private function setKeyProperties(): void
