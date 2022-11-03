@@ -266,7 +266,7 @@ abstract class Model extends EloquentModel
         }
 
         $entity->fill($attributes);
-        Session::client()->mayOrFail('updating', $instance);
+        Session::client()->mayOrFail('updating', $entity);
 
         DB::beginTransaction();
 
@@ -393,7 +393,7 @@ abstract class Model extends EloquentModel
         /** @var \Egal\Model\Model $entity */
         $entity = $instance->newQuery()->find($key);
         if (!$entity) throw ObjectNotFoundException::make($key);
-        Session::client()->mayOrFail('deleting', $instance);
+        Session::client()->mayOrFail('deleting', $entity);
 
         DB::beginTransaction();
 
