@@ -10,6 +10,7 @@ use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\RelationNotFoundException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 
 class ModelMetadata
@@ -193,10 +194,9 @@ class ModelMetadata
         );
         $field = reset($field);
 
-        $validationMethod = 'validate' . ucfirst($field->getType()->value);
-        $fieldValidated = $this->$validationMethod($fieldName, $value);
+        $validator = Validator::make(['value' => $value], ['value' => $field->getValidationRules()]);
 
-        if (!$fieldValidated) {
+        if ($validator->fails()) {
             throw UnsupportedFilterValueTypeException::make($fieldName, $field->getType()->value);
         }
     }
