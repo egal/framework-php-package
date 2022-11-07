@@ -30,7 +30,7 @@ abstract class User extends Model
         $umt = UserMasterToken::fromJWT($token, config('app.service_key'));
         $model = new static();
         /** @var \Egal\AuthServiceDependencies\Models\User $user */
-        $user = $model->query()->find($umt->getSub()[$model->primaryKey]);
+        $user = $model->query()->find($umt->getSub()['key']);
 
         Session::client()->mayOrFail('loginToService', $user);
 
@@ -63,11 +63,12 @@ abstract class User extends Model
     protected function generateUserServiceTokenSub(): array
     {
         return array_merge(
-            $this->fresh()->toArray(),
             [
+                'key' => $this->getKey(),
                 'roles' => $this->getRoles(),
                 'permissions' => $this->getPermissions(),
-            ]
+            ],
+            $this->fresh()->toArray(),
         );
     }
 
@@ -75,11 +76,11 @@ abstract class User extends Model
     {
         $umt = new UserMasterToken();
         $umt->setSigningKey(config('app.service_key'));
-        $umt->setSub([$this->primaryKey => $this->getKey()]);
+        $umt->setSub(['key' => $this->getKey()]);
 
         $umrt = new UserMasterRefreshToken();
         $umrt->setSigningKey(config('app.service_key'));
-        $umrt->setSub([$this->primaryKey => $this->getKey()]);
+        $umrt->setSub(['key' => $this->getKey()]);
 
         return [
             'user_master_token' => $umt->generateJWT(),
