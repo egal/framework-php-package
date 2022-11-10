@@ -6,11 +6,11 @@ namespace Egal\Auth\Entities;
 
 use Egal\Auth\Exceptions\NoAccessToActionException;
 use Egal\Core\Session\Session;
-use Egal\AuthServiceDependencies\Models\Service;
+use Egal\AuthServiceDependencies\Models\Service as ServiceModel;
 use Egal\Model\Model;
 
 /**
- * @method bool mayOrFail(string $ability, Model|Service $model)
+ * @method bool mayOrFail(string $ability, Model|ServiceModel $model)
  * @method bool isUserOrFail()
  * @method bool isGuestOrFail()
  * @method bool isServiceOrFail(string|null $name = null)
@@ -40,7 +40,7 @@ abstract class Client
         throw new NoAccessToActionException();
     }
 
-    public function may(string $ability, Model|Service $model): bool
+    public function may(string $ability, Model|ServiceModel $model): bool
     {
         return Session::isAuthEnabled()
             ? call_user_func_array([$model->getModelMetadata()->getPolicy(), $ability], [$this, $model])
