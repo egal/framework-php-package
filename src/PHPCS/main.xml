@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<ruleset name="egal/php">
+    <!--  PSRs, Generic, PEAR, Squiz  -->
+    <!--  https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties  -->
+
+    <rule ref="PSR1">
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+    </rule>
+    <rule ref="PSR2">
+        <exclude name="PSR2.Methods.FunctionCallSignature.SpaceBeforeCloseBracket"/>
+        <exclude name="PSR2.Classes.ClassDeclaration.CloseBraceAfterBody"/>
+        <exclude name="PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose"/>
+        <exclude name="PSR2.ControlStructures.SwitchDeclaration.TerminatingComment"/>
+    </rule>
+
+    <rule ref="PSR12">
+        <exclude name="PSR12.Traits.UseDeclaration.UseAfterBrace"/>
+        <exclude name="PSR12.Classes.OpeningBraceSpace.Found"/>
+        <exclude name="PSR12.Files.FileHeader.SpacingAfterBlock"/>
+        <exclude name="PSR12.Files.OpenTag.NotAlone"/>
+        <exclude name="PSR12.Classes.AnonClassDeclaration.CloseBraceAfterBody"/>
+        <exclude name="PSR12.Functions.ReturnTypeDeclaration.SpaceBeforeColon"/>
+    </rule>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+        <exclude name="PEAR.Functions.FunctionCallSignature.Indent"/>
+    </rule>
+
+    <rule ref="Generic.ControlStructures.InlineControlStructure.NotAllowed">
+        <exclude name="Generic.ControlStructures.InlineControlStructure.NotAllowed"/>
+    </rule>
+
+    <!--  <rule ref="Squiz"/>  -->
+    <rule ref="Squiz.WhiteSpace.FunctionSpacing">
+        <!--  https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties#squizwhitespacefunctionspacing  -->
+        <properties>
+            <property name="spacing" value="1"/>
+        </properties>
+    </rule>
+
+    <!--  SlevomatCodingStandard  -->
+    <!--  https://github.com/slevomat/coding-standard#installation  -->
+    <!--  <rule ref="SlevomatCodingStandard"/>  -->
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+        <properties>
+            <property name="linesCountBeforeDeclare" type="int" value="1"/>
+            <property name="linesCountAfterDeclare" type="int" value="1"/>
+            <property name="spacesCountAroundEqualsSign" type="int" value="0"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Commenting.EmptyComment"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses"/>
+    <rule ref="SlevomatCodingStandard.Whitespaces.DuplicateSpaces"/>
+    <rule ref="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode.DisallowedCommentAfterCode"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint"/>
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall.MissingTrailingComma"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing.WhitespaceBeforeColon"/>
+    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma.MissingTrailingComma"/>
+    <rule ref="SlevomatCodingStandard.Classes.TraitUseSpacing.IncorrectLinesCountBeforeFirstUse"/>
+    <!--  TODO: SlevomatCodingStandard.Classes.ClassStructure.IncorrectGroupOrder  -->
+    <!--  TODO: SlevomatCodingStandard.Functions.FunctionLength.FunctionLength  -->
+
+    <exclude-pattern type="relative-root">*/tests/*</exclude-pattern>
+    <exclude-pattern type="relative-root">*/vendor/*</exclude-pattern>
+
+    <file>.</file>
+    <arg name="report" value="full"/>
+    <arg name="report-xml" value=".phpcs.results.xml"/>
+</ruleset>
