@@ -61,6 +61,8 @@ trait UsesModelMetadata
             default:
                 $this->incrementing = false;
         }
+
+        $this->setKeyName($this->keyName);
     }
 
     public abstract static function constructMetadata(): ModelMetadata;
