@@ -26,6 +26,9 @@ class ModelMetadata
 
     protected bool $dynamic = false;
 
+    /**
+     * @var FieldMetadata[]
+     */
     protected array $fakeFields = [];
 
     /**
@@ -152,7 +155,7 @@ class ModelMetadata
     {
         return array_filter(
                 [...$this->fields, ...$this->fakeFields, $this->getKey()],
-                fn (FieldMetadata $field) => $field->getName() === $fieldName
+                fn(FieldMetadata $field) => $field->getName() === $fieldName
             ) !== [];
     }
 
@@ -168,7 +171,10 @@ class ModelMetadata
 
     public function relationExist(string $relationName): bool
     {
-        return isset($this->getRelations()[$relationName]);
+        return array_filter(
+                $this->getRelations(),
+                fn(RelationMetadata $relation) => $relation->getName() === $relationName,
+            ) !== [];
     }
 
     /**
@@ -190,7 +196,7 @@ class ModelMetadata
     {
         $field = array_filter(
             [...$this->fields, ...$this->fakeFields, $this->getKey()],
-            fn (FieldMetadata $field) => $field->getName() === $fieldName
+            fn(FieldMetadata $field) => $field->getName() === $fieldName
         );
         $field = reset($field);
 
@@ -211,16 +217,25 @@ class ModelMetadata
         return $this->key;
     }
 
+    /**
+     * @return FieldMetadata[]
+     */
     public function getFields(): array
     {
         return $this->fields;
     }
 
+    /**
+     * @return FieldMetadata[]
+     */
     public function getFakeFields(): array
     {
         return $this->fakeFields;
     }
 
+    /**
+     * @return RelationMetadata[]
+     */
     public function getRelations(): array
     {
         return $this->relations;
