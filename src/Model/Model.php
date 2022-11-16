@@ -147,7 +147,7 @@ abstract class Model extends EloquentModel
                 'total_count' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
             ];
-            $items = $paginator->items();
+            $items = collect($paginator->items());
         } else {
             $result = [];
             $items = $builder->limit()->get();
