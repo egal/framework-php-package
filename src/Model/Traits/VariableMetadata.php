@@ -73,12 +73,10 @@ trait VariableMetadata
         );
 
         if ($validator->fails()) {
-            if ($validator->fails()) {
-                $exception = new ValidateException();
-                $exception->setMessageBag($validator->errors());
+            $exception = new ValidateException();
+            $exception->setMessageBag($validator->errors());
 
-                throw $exception;
-            }
+            throw $exception;
         }
 
         $this->default = $value;
