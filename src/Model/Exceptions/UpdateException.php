@@ -9,8 +9,14 @@ use Exception;
 class UpdateException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Entity update exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

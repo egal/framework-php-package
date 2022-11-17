@@ -14,8 +14,14 @@ class EgalRunCommand extends Command
 
     protected const INTERCEPTION_SIGNALS = [SIGTERM, SIGINT, SIGHUP, SIGQUIT];
 
+    /**
+     * @var string
+     */
     protected $signature = 'egal:run';
 
+    /**
+     * @var string
+     */
     protected $description = 'Start service';
 
     public function handle(): void

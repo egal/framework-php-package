@@ -21,7 +21,6 @@ use Egal\Core\Exceptions\CurrentSessionException;
 use Egal\Core\Exceptions\AuthenticationFailedException;
 use Egal\Core\Messages\ActionMessage;
 use Exception;
-use Firebase\JWT\ExpiredException;
 
 class Session
 {

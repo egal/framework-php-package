@@ -9,8 +9,14 @@ use Exception;
 class InitializeFilterPartException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Failed initialize filter part!';
 
+    /**
+     * @var int
+     */
     protected $code = 403;
 
 }

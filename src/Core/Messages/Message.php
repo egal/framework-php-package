@@ -14,7 +14,7 @@ abstract class Message
 
     protected string $type;
 
-    abstract static public function fromArray(array $array): Message;
+    abstract public static function fromArray(array $array): Message;
 
     public function __construct()
     {

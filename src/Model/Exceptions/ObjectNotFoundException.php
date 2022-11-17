@@ -9,8 +9,14 @@ use Exception;
 class ObjectNotFoundException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Object not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 404;
 
     /**

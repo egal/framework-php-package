@@ -9,8 +9,14 @@ use Exception;
 class DuplicatePrimaryKeyModelMetadataException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Duplicate primary key in model metadata!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

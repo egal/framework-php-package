@@ -209,7 +209,7 @@ class Builder extends EloquentBuilder
             $pagination->setPerPage($this->model->getMaxPerPage());
         }
 
-        return $this->paginate($pagination->getPerPage(), ['*'], 'page', $pagination->getPage());
+        return $this->paginate($pagination->getPerPage(), page: $pagination->getPage());
     }
 
     /**

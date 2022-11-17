@@ -59,8 +59,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         mixed $value,
         string $operator,
         string $boolean
-    ): void
-    {
+    ): void {
         // For condition field like `morph_rel[first_type,second_type].field`.
         [$relation, $field, $types] = [$matches[1], $matches[3], explode(',', $matches[2])];
         $builder->getModel()->getModelMetadata()->relationExistOrFail($relation);
@@ -88,8 +87,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         mixed $value,
         Builder $builder,
         string $boolean
-    ): void
-    {
+    ): void {
         // For condition field like `rel.exists()`.
         [$relation, $function] = [$matches[1], $matches[2]];
         if ($operator !== '=') {
@@ -112,8 +110,7 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         mixed $value,
         string $operator,
         string $boolean
-    ): void
-    {
+    ): void {
         // For condition field like `rel.field`.
         [$relation, $field, $model] = [$matches[1], $matches[2], $builder->getModel()];
         $model->getModelMetadata()->relationExistOrFail($relation);
@@ -135,12 +132,11 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
      */
     protected static function filterByField(
         FilterCondition $condition,
-        Builder         $builder,
-        mixed           $value,
-        string          $operator,
-        string          $boolean
-    ): void
-    {
+        Builder $builder,
+        mixed $value,
+        string $operator,
+        string $boolean
+    ): void {
         // For condition field like `field`.
         [$field, $modelMetadata] = [$condition->getField(), $builder->getModel()->getModelMetadata()];
         $modelMetadata->fieldExistOrFail($field);

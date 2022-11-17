@@ -6,19 +6,16 @@ namespace Egal\Core\Exceptions;
 
 use Exception;
 
-/**
- * Class EgalCoreInitializationException
- */
 class EgalCoreInitializationException extends Exception
 {
 
     /**
-     * The error message
+     * @var string
      */
     protected $message = 'Egal Core initialization exception!';
 
     /**
-     * The error code
+     * @var int
      */
     protected $code = 500;
 

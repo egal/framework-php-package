@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 class TokenExpiredException extends InternalException
 {
 
+    /**
+     * @var int
+     */
     protected $code = 401;
 
     protected string $internalCode = 'token_expired';

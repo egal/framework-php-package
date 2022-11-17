@@ -9,8 +9,14 @@ use Exception;
 class QueueProcessingException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Queue processing exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

@@ -26,7 +26,7 @@ trait FileStoring
             $this->makeHidden(Str::snake($this->getContentPathPropertyName($contentName)));
             $this->fillable(array_merge(
                 $this->getFillable(),
-                [Str::snake($this->getContentPathPropertyName($contentName))]
+                [Str::snake($this->getContentPathPropertyName($contentName))],
             ));
         }
 
@@ -97,7 +97,7 @@ trait FileStoring
         $fileName = str_slug(
             date('Y_m_d_His')
             . '_'
-            . pathinfo($fileBasename, PATHINFO_FILENAME)
+            . pathinfo($fileBasename, PATHINFO_FILENAME),
         );
 
         $fileExtension = pathinfo($fileBasename, PATHINFO_EXTENSION);

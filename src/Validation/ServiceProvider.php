@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Validation;
 
 use Egal\Validation\Exceptions\RegistrationValidationRuleException;
 use Egal\Validation\Rules\LowerCaseRule;
 use Egal\Validation\Rules\Rule;
 use Egal\Validation\Rules\UpperCaseRule;
-use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
 
@@ -14,19 +15,19 @@ class ServiceProvider extends IlluminateServiceProvider
 {
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function boot()
     {
         $this->registerRules([
             UpperCaseRule::class,
-            LowerCaseRule::class
+            LowerCaseRule::class,
         ]);
         $this->registerCustomRules();
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function registerCustomRules()
     {
@@ -45,7 +46,7 @@ class ServiceProvider extends IlluminateServiceProvider
 
     /**
      * @param string $class
-     * @throws Exception
+     * @throws \Exception
      */
     protected function registerRule(string $class)
     {
@@ -59,7 +60,7 @@ class ServiceProvider extends IlluminateServiceProvider
 
     /**
      * @param string[] $rulesClasses
-     * @throws Exception
+     * @throws \Exception
      */
     protected function registerRules(array $rulesClasses)
     {

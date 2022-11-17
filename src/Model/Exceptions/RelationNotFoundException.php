@@ -9,8 +9,14 @@ use Exception;
 class RelationNotFoundException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Relation not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 403;
 
     public static function make(string $relation): self

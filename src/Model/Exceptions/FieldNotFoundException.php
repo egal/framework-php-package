@@ -9,8 +9,14 @@ use Exception;
 class FieldNotFoundException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Field not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 403;
 
     public static function make(string $field): self

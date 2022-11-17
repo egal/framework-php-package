@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Egal\Auth\Tokens;
 
 use Egal\Auth\Exceptions\InitializeServiceMasterTokenException;
+use Exception;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -29,7 +30,7 @@ abstract class Token
         $this->exp = Carbon::now('UTC')
             ->addSeconds(config(
                 'auth.tokens.' . Str::snake(get_class_short_name(static::class)) . '.ttl',
-                self::DEFAULT_TTL
+                self::DEFAULT_TTL,
             ));
     }
 
@@ -58,7 +59,7 @@ abstract class Token
         return [
             'typ' => $this->typ,
             'sub' => $this->sub,
-            'exp' => $this->exp->timestamp
+            'exp' => $this->exp->timestamp,
         ];
     }
 
@@ -89,7 +90,7 @@ abstract class Token
 
     public function isAlive(): bool
     {
-        throw new \Exception('REMOVE!');
+        throw new Exception('REMOVE!');
     }
 
     public function generateJWT(): string

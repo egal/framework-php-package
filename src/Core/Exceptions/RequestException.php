@@ -9,8 +9,14 @@ use Exception;
 class RequestException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Request exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

@@ -13,12 +13,12 @@ class ExceedingTheLimitCountEntitiesForManipulationException extends Exception
 {
 
     /**
-     * The error message
+     * @var string
      */
     protected $message = 'Exceeding the limit count entities for manipulation!';
 
     /**
-     * The error code
+     * @var int
      */
     protected $code = 422;
 

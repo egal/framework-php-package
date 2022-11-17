@@ -6,19 +6,16 @@ namespace Egal\Core\Exceptions;
 
 use Exception;
 
-/**
- * Class ImpossibilityDeterminingStatusOfResponseException
- */
 class ImpossibilityDeterminingStatusOfResponseException extends Exception
 {
 
     /**
-     * The error code
+     * @var string
      */
     protected $code = 500;
 
     /**
-     * The error message
+     * @var int
      */
     protected $message = 'Impossibility determining status of response!';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule as IlluminateValidationRule;
@@ -43,10 +45,10 @@ abstract class Rule implements IlluminateValidationRule
     public function getRule(): string
     {
         return $this->rule ?? Str::snake(str_replace(
-                'Rule',
-                '',
-                (new ReflectionClass(static::class))->getShortName()
-            ));
+            'Rule',
+            '',
+            (new ReflectionClass(static::class))->getShortName(),
+        ));
     }
 
 }

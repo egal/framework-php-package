@@ -9,6 +9,9 @@ use Exception;
 class NoResultMessageException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'No result message!';
 
 }

@@ -12,8 +12,14 @@ use Exception;
 class LoadModelImpossiblyException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Unable to load model!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

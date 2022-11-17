@@ -9,8 +9,14 @@ use Exception;
 class NotFoundException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

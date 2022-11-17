@@ -9,8 +9,14 @@ use Exception;
 class ModelActionMetadataException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Model action metadata exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

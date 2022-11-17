@@ -6,19 +6,16 @@ namespace Egal\Core\Exceptions;
 
 use Exception;
 
-/**
- * Class UnableDetermineMessageTypeException
- */
 class UnableDetermineMessageTypeException extends Exception
 {
 
     /**
-     * The error message
+     * @var string
      */
     protected $message = 'Unable determine message type!';
 
     /**
-     * The error code
+     * @var int
      */
     protected $code = 500;
 

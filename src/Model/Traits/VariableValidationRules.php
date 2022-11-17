@@ -170,7 +170,7 @@ trait VariableValidationRules
         return $this;
     }
 
-    public function mac_address(): self
+    public function macAddress(): self
     {
         $this->validationRules[] = ValidationRules::MAC_ADDRESS->value;
 

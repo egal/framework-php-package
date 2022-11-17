@@ -9,6 +9,9 @@ use Exception;
 class ModelNotFoundException extends Exception
 {
 
+    /**
+     * @var int
+     */
     protected $code = 404;
 
     public static function make(string $modelClassName): self

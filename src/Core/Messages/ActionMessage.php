@@ -62,7 +62,7 @@ class ActionMessage extends Message
             $array['model_name'],
             $array['action_name'],
             $array['parameters'],
-            $array['token'] ?? null
+            $array['token'] ?? null,
         );
 
         $actionMessage->uuid = $array['uuid'];

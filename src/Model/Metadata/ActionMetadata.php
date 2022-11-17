@@ -97,7 +97,10 @@ class ActionMetadata
     {
         $actionMetadata = [];
         $actionMetadata['name'] = $this->name;
-        $actionMetadata['parameters'] = array_map(static fn (ActionParameterMetadata $parameter) => $parameter->toArray(), $this->parameters);
+        $actionMetadata['parameters'] = array_map(
+            static fn(ActionParameterMetadata $parameter) => $parameter->toArray(),
+            $this->parameters,
+        );
 
         return $actionMetadata;
     }

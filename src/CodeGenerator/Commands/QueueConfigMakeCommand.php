@@ -44,7 +44,7 @@ class QueueConfigMakeCommand extends Command
     {
         $this->copyConfig(
             __DIR__ . '/stubs/config.queue.stub',
-            base_path('config/queue.php')
+            base_path('config/queue.php'),
         );
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Validation\Rules;
 
 use Illuminate\Support\Str;

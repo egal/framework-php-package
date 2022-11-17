@@ -9,8 +9,14 @@ use Exception;
 class InitializeMessageFromArrayException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Initialize message from array exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 400;
 
 }

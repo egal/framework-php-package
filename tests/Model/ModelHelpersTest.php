@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class ModelHelpersTest extends TestCase
 {
 
-    public function dataProviderIsArrayOfClasses()
+    public function dataProvider(): array
     {
         return [
             [
@@ -26,9 +26,9 @@ class ModelHelpersTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderIsArrayOfClasses
+     * @dataProvider dataProvider
      */
-    public function testIsArrayOfClasses($data, $class, $expectAssertEquals)
+    public function test($data, $class, $expectAssertEquals)
     {
         $this->assertEquals($expectAssertEquals, is_array_of_classes($data, $class));
     }

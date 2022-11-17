@@ -65,7 +65,7 @@ trait UsesModelMetadata
         $this->setKeyName($this->keyName);
     }
 
-    public abstract static function constructMetadata(): ModelMetadata;
+    abstract public static function constructMetadata(): ModelMetadata;
 
     private function setValidationRules(): void
     {
@@ -85,7 +85,7 @@ trait UsesModelMetadata
         $this->validationRules[$field->getName()] = $field->getValidationRules();
     }
 
-    public final function getModelMetadata(): ModelMetadata
+    final public function getModelMetadata(): ModelMetadata
     {
         return ModelMetadataManager::getModelMetadata(static::class);
     }

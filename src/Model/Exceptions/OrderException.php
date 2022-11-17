@@ -9,8 +9,14 @@ use Exception;
 class OrderException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Sort error!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

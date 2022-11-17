@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Metadata;
 
 use Egal\Model\Enums\VariableType;

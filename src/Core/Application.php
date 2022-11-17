@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core;
 
 use Laravel\Lumen\Application as LumenApplication;

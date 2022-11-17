@@ -94,7 +94,7 @@ class Response
         if ($this->isActionErrorMessageExists()) {
             throw new ResponseException(
                 $this->getActionErrorMessage()->getMessage(),
-                $this->getActionErrorMessage()->getCode()
+                $this->getActionErrorMessage()->getCode(),
             );
         }
     }
@@ -133,7 +133,7 @@ class Response
                 $actionErrorMessage = new ActionErrorMessage();
                 $actionErrorMessage->setCode(500);
                 $actionErrorMessage->setMessage(
-                    'The service responded, but did not process the request within the allotted time!'
+                    'The service responded, but did not process the request within the allotted time!',
                 );
                 $this->setActionErrorMessage($actionErrorMessage);
                 break;

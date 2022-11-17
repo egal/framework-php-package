@@ -30,7 +30,7 @@ class ServiceProvider extends IlluminateServiceProvider
     {
         if (!($this->app instanceof Application)) {
             throw new EgalCoreInitializationException(
-                'Application needs instants of ' . Application::class . ' detected ' . get_class($this->app) . '!'
+                'Application needs instants of ' . Application::class . ' detected ' . get_class($this->app) . '!',
             );
         }
 

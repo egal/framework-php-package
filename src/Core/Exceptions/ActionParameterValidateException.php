@@ -10,8 +10,14 @@ use Illuminate\Support\MessageBag;
 class ActionParameterValidateException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Action parameter validation failed!';
 
+    /**
+     * @var int
+     */
     protected $code = 405;
 
     private MessageBag $messageBag;

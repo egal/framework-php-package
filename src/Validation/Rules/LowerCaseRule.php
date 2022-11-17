@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Validation\Rules;
 
 use Egal\Validation\Rules\Rule as EgalRule;

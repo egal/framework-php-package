@@ -63,13 +63,13 @@ trait UsesValidator
         if ($primaryKey === null) {
             $validator = Validator::make(
                 [$this->getKeyName() => $keyValue],
-                [$this->getKeyName() => [$this->getKeyType()]]
+                [$this->getKeyName() => [$this->getKeyType()]],
             );
         } else {
             $validationRules = $this->getModelMetadata()->getKey()->getValidationRules();
             $validator = Validator::make(
                 [$primaryKey => $keyValue],
-                [$primaryKey => $validationRules === [] ? [$this->getKeyType()] : $validationRules]
+                [$primaryKey => $validationRules === [] ? [$this->getKeyType()] : $validationRules],
             );
         }
 

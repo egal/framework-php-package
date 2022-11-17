@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Egal\Core\ActionCaller;
 
 use Egal\Core\Exceptions\ActionParameterValidateException;
-use Egal\Core\Exceptions\NoAccessActionCallException;
-use Egal\Core\Session\Session;
 use Egal\Model\Facades\ModelMetadataManager;
 use Egal\Model\Metadata\ActionMetadata;
-use Egal\Model\Metadata\ActionParameterMetadata;
 use Egal\Model\Metadata\ModelMetadata;
 use Illuminate\Support\Facades\Validator;
 
@@ -62,7 +59,7 @@ class ActionCaller
                 $this->modelMetadata->getModelClass(),
                 $this->modelActionMetadata->getMethodName(),
             ],
-            $this->getValidActionParameters()
+            $this->getValidActionParameters(),
         );
     }
 
@@ -82,9 +79,10 @@ class ActionCaller
             fn ($actionParameter) => !$this->modelActionMetadata->parameterExist($actionParameter)
         );
 
-        /** @var ActionParameterMetadata $parameterMetadata */
+        /** @var Egal\Model\Metadata\ActionParameterMetadata $parameterMetadata */
         foreach ($this->modelActionMetadata->getParameters() as $parameterMetadata) {
-            if (array_key_exists($parameterMetadata->getName(), $actionParameters)
+            if (
+                array_key_exists($parameterMetadata->getName(), $actionParameters)
                 || $parameterMetadata->getDefault() === null
             ) {
                 continue;

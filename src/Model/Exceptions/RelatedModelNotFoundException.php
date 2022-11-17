@@ -9,8 +9,14 @@ use Exception;
 class RelatedModelNotFoundException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Related model not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
     /**

@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpMissingFieldTypeInspection */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\Core\Commands;
 
@@ -7,10 +9,16 @@ use Illuminate\Console\Command;
 class GenerateKeyCommand extends Command
 {
 
+    /**
+     * @var string
+     */
     protected $signature = 'egal:key:generate
                                 {--s|show : Показать ключ}
                            ';
 
+    /**
+     * @var string
+     */
     protected $description = '';
 
     public function handle(): void
@@ -19,7 +27,7 @@ class GenerateKeyCommand extends Command
             'abcdefghijklmnopqrstuvwxyz'
             . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             . '0123456789'
-            . '@#%^*'
+            . '@#%^*',
         );
         shuffle($seed);
         $key = '';

@@ -9,8 +9,14 @@ use Exception;
 class CurrentSessionException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Current session exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

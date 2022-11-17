@@ -9,8 +9,14 @@ use Exception;
 class UpdateManyException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Multiple entity update error!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

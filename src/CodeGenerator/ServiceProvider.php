@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\CodeGenerator;
 
 use Egal\CodeGenerator\Commands\EventMakeCommand;

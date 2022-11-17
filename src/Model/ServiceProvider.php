@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model;
 
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;

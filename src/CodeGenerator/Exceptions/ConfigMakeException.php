@@ -9,8 +9,14 @@ use Exception;
 class ConfigMakeException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Config make exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

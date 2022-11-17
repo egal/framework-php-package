@@ -9,8 +9,14 @@ use Exception;
 class InitializeServiceMasterTokenException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Initialize service master token exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 400;
 
 }

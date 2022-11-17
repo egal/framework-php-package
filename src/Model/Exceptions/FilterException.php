@@ -9,8 +9,14 @@ use Exception;
 class FilterException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Filter exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 400;
 
 }

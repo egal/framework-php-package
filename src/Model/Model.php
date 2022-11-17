@@ -6,7 +6,6 @@ namespace Egal\Model;
 
 use Egal\Core\Session\Session;
 use Egal\Model\Exceptions\ObjectNotFoundException;
-use Egal\Model\Exceptions\OrderException;
 use Egal\Model\Exceptions\UpdateManyException;
 use Egal\Model\Facades\ModelMetadataManager;
 use Egal\Model\Filter\FilterPart;
@@ -127,11 +126,10 @@ abstract class Model extends EloquentModel
      */
     final public static function actionGetItems(
         ?array $pagination = null,
-        array  $relations = [],
-        array  $filter = [],
-        array  $order = []
-    ): array
-    {
+        array $relations = [],
+        array $filter = [],
+        array $order = []
+    ): array {
 
         $instance = new static();
         Session::client()->mayOrFail('retrieving', $instance);

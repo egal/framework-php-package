@@ -9,8 +9,14 @@ use Exception;
 class UnsupportedMessageTypeException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Unsupported message type!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

@@ -56,7 +56,7 @@ class RabbitMQBus extends Bus
         $connector = Arr::get($config, 'connection', AMQPLazyConnection::class);
         $connection = $connector::create_connection(
             Arr::shuffle(Arr::get($config, 'hosts', [])),
-            $this->filterOptions(Arr::get($config, 'options', []))
+            $this->filterOptions(Arr::get($config, 'options', [])),
         );
 
         $this->channel = $connection->channel();
@@ -80,7 +80,7 @@ class RabbitMQBus extends Bus
             false,
             false,
             false,
-            new AMQPTable(['x-queue-mode' => 'default'])
+            new AMQPTable(['x-queue-mode' => 'default']),
         );
         $this->queue_bind($this->queueName, 'amq.direct', $serviceName . '.action');
     }
@@ -122,7 +122,7 @@ class RabbitMQBus extends Bus
                     'x-queue-mode' => 'default',
                     'x-expires' => config('app.request.wait_reply_message_ttl') * 1000,
                 ]),
-                null
+                null,
             );
 
             $this->basic_qos(null, 1, null);
@@ -202,11 +202,11 @@ class RabbitMQBus extends Bus
     }
 
     /**
-     * @throws \Egal\Core\Exceptions\TargetQueueNotProvidedException
-     * @throws \Egal\Core\Exceptions\UnsupportedMessageTypeException
-     * @throws \Egal\Core\Exceptions\InitializeMessageFromArrayException
-     * @throws \Egal\Core\Exceptions\AuthenticationFailedException
-     * @throws \Egal\Core\Exceptions\UndefinedTypeOfMessageException
+     * @throws Egal\Core\Exceptions\TargetQueueNotProvidedException
+     * @throws Egal\Core\Exceptions\UnsupportedMessageTypeException
+     * @throws Egal\Core\Exceptions\InitializeMessageFromArrayException
+     * @throws Egal\Core\Exceptions\AuthenticationFailedException
+     * @throws Egal\Core\Exceptions\UndefinedTypeOfMessageException
      */
     private function processActionMessage(array $body, AMQPMessage $message): void
     {
@@ -225,7 +225,7 @@ class RabbitMQBus extends Bus
             $actionCaller = new ActionCaller(
                 $actionMessage->getModelName(),
                 $actionMessage->getActionName(),
-                $actionMessage->getParameters()
+                $actionMessage->getParameters(),
             );
             $actionResultMessage->setData($actionCaller->call());
 
@@ -278,7 +278,7 @@ class RabbitMQBus extends Bus
             $listenerClasses = EventManager::getListeners(
                 $eventMessage->getServiceName(),
                 $eventMessage->getModelName(),
-                $eventMessage->getName()
+                $eventMessage->getName(),
             );
 
             foreach ($listenerClasses as $listenerClass) {

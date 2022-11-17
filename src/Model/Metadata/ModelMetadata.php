@@ -78,7 +78,10 @@ class ModelMetadata
 
         $modelMetadata['fields'] = array_map(fn(FieldMetadata $field) => $field->toArray(), $this->fields);
         $modelMetadata['fake_fields'] = array_map(fn(FieldMetadata $field) => $field->toArray(), $this->fakeFields);
-        $modelMetadata['relations'] = array_map(fn(RelationMetadata $relation) => $relation->toArray($loadRelatedMetadata), $this->relations);
+        $modelMetadata['relations'] = array_map(
+            fn(RelationMetadata $relation) => $relation->toArray($loadRelatedMetadata),
+            $this->relations,
+        );
         $modelMetadata['actions'] = array_map(fn(ActionMetadata $action) => $action->toArray(), $this->actions);
 
         return $modelMetadata;
@@ -154,9 +157,9 @@ class ModelMetadata
     public function fieldExist(string $fieldName): bool
     {
         return array_filter(
-                [...$this->fields, ...$this->fakeFields, $this->getKey()],
-                fn(FieldMetadata $field) => $field->getName() === $fieldName
-            ) !== [];
+            [...$this->fields, ...$this->fakeFields, $this->getKey()],
+            fn(FieldMetadata $field) => $field->getName() === $fieldName
+        ) !== [];
     }
 
     /**
@@ -172,9 +175,9 @@ class ModelMetadata
     public function relationExist(string $relationName): bool
     {
         return array_filter(
-                $this->getRelations(),
-                fn(RelationMetadata $relation) => $relation->getName() === $relationName,
-            ) !== [];
+            $this->getRelations(),
+            fn(RelationMetadata $relation) => $relation->getName() === $relationName,
+        ) !== [];
     }
 
     /**
@@ -286,7 +289,13 @@ class ModelMetadata
      */
     public function getHiddenFieldsNames(): array
     {
-        return array_map(fn($field) => $field->getName(), array_filter([...$this->fields, ...$this->fakeFields, $this->getKey()], fn($field) => $field->isHidden()));
+        return array_map(
+            fn($field) => $field->getName(),
+            array_filter(
+                [...$this->fields, ...$this->fakeFields, $this->getKey()],
+                fn($field) => $field->isHidden()
+            ),
+        );
     }
 
     /**
@@ -294,7 +303,13 @@ class ModelMetadata
      */
     public function getGuardedFieldsNames(): array
     {
-        return array_map(fn($field) => $field->getName(), array_filter([...$this->fields, ...$this->fakeFields, $this->getKey()], fn($field) => $field->isGuarded()));
+        return array_map(
+            fn($field) => $field->getName(),
+            array_filter(
+                [...$this->fields, ...$this->fakeFields, $this->getKey()],
+                fn($field) => $field->isGuarded()
+            ),
+        );
     }
 
     public function getCasts(): array

@@ -84,7 +84,7 @@ abstract class User extends Model
 
         return [
             'user_master_token' => $umt->generateJWT(),
-            'user_master_refresh_token' => $umrt->generateJWT()
+            'user_master_refresh_token' => $umrt->generateJWT(),
         ];
     }
 

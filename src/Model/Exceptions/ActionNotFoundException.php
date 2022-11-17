@@ -9,6 +9,9 @@ use Exception;
 class ActionNotFoundException extends Exception
 {
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
     public static function make(string $modelName, string $actionName): self

@@ -9,9 +9,15 @@ use Exception;
 class IncorrectAppServicesEnvironmentVariablePatternException extends Exception
 {
 
-    protected $code = 500;
-
+    /**
+     * @var string
+     */
     protected $message = 'Incorrect app services environment variable pattern!';
+
+    /**
+     * @var int
+     */
+    protected $code = 500;
 
     public static function make(string $string): self
     {

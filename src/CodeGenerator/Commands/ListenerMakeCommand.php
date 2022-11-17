@@ -42,7 +42,7 @@ class ListenerMakeCommand extends MakeCommand
         $this->setFileContents('{{ extends }}', $extends);
         $this->setFileContents(
             '{{ handle_parameters }}',
-            $this->option('global') ? 'array $data' : ''
+            $this->option('global') ? 'array $data' : '',
         );
         $this->writeFile();
     }

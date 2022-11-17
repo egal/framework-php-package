@@ -9,8 +9,14 @@ use Exception;
 class UserServiceTokenException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'User service token exception!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

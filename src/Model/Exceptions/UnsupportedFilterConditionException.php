@@ -9,8 +9,14 @@ use Exception;
 class UnsupportedFilterConditionException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Unsupported filter condition!';
 
+    /**
+     * @var int
+     */
     protected $code = 403;
 
 }

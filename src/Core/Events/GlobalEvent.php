@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Core\Events;
 
 use Egal\Core\Messages\EventMessage;
 use Egal\Model\Model;
 use Illuminate\Queue\SerializesModels;
-use ReflectionException;
 
 abstract class GlobalEvent
 {
@@ -21,7 +22,7 @@ abstract class GlobalEvent
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function publish()
     {
@@ -29,7 +30,7 @@ abstract class GlobalEvent
             $this->entity->getModelMetadata()->getModelShortName(),
             $this->entity->getKey() ?? '*',
             $this->message,
-            $this->entity->toArray()
+            $this->entity->toArray(),
         );
         $message->publish();
     }

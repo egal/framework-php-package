@@ -9,8 +9,14 @@ use Exception;
 class ActionParameterNotFoundException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Action parameter not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 403;
 
     public static function make(string $parameter): self

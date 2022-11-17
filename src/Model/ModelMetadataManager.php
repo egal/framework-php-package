@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Egal\Model;
 
-use Egal\AuthServiceDependencies\Models\Service;
 use Egal\Core\Exceptions\ModelNotFoundException;
 use Egal\Model\Metadata\ModelMetadata;
-use Mockery\Exception;
 
 class ModelMetadataManager
 {
@@ -16,10 +14,6 @@ class ModelMetadataManager
      * @var ModelMetadata[]
      */
     protected array $modelsMetadata = [];
-
-    public function __construct()
-    {
-    }
 
     public function registerDirectory(string $dir, string $modelsNamespace): void
     {
@@ -37,7 +31,7 @@ class ModelMetadataManager
                 $itemNamespace = str_replace($itemPath, '', $itemNamespace);
                 $itemNamespace = str_replace('/', '\\', $itemNamespace);
                 $itemNamespace = ucfirst($itemNamespace);
-                $itemPath = str_replace_first(base_path() . '/', '', $itemPath,);
+                $itemPath = str_replace_first(base_path() . '/', '', $itemPath);
 
                 $this->registerDirectory($itemPath, $itemNamespace);
                 continue;
@@ -66,7 +60,7 @@ class ModelMetadataManager
     {
         $modelShortName = $modelMetadata->getModelShortName();
 
-        if (isset($this->modelsMetadata[$modelShortName]) && ! $reset) {
+        if (isset($this->modelsMetadata[$modelShortName]) && !$reset) {
             throw new \Exception('Already exists!');
         }
 
@@ -79,14 +73,17 @@ class ModelMetadataManager
     public function getModelMetadata(string $model): ModelMetadata
     {
         if (isset($this->modelsMetadata[$model])) {
-            ! $this->modelsMetadata[$model]->dynamic() ?: $this->addModelMetadata($this->modelsMetadata[$model]->getModelClass()::constructMetadata(), true);
+            if ($this->modelsMetadata[$model]->dynamic()) {
+                $modelClass = $this->modelsMetadata[$model]->getModelClass();
+                $this->addModelMetadata($modelClass::constructMetadata(), true);
+            }
             $modelMetadata = $this->modelsMetadata[$model];
         }
 
         if (class_exists($model)) {
             $modelShortName = get_class_short_name($model);
 
-            if (! isset($this->modelsMetadata[$modelShortName]) || $this->modelsMetadata[$modelShortName]->dynamic()) {
+            if (!isset($this->modelsMetadata[$modelShortName]) || $this->modelsMetadata[$modelShortName]->dynamic()) {
                 $this->addModelMetadata($model::constructMetadata(), true);
             }
 

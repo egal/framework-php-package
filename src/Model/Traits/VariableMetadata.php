@@ -8,8 +8,6 @@ use BackedEnum;
 use Egal\Model\Enums\VariableType;
 use Egal\Model\Enums\ValidationRules;
 use Egal\Model\Exceptions\ValidateException;
-use Egal\Validation\Rules\Rule as EgalRule;
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 trait VariableMetadata
@@ -26,7 +24,7 @@ trait VariableMetadata
     protected bool $nullable = false;
 
     /**
-     * @var array<string, Rule, EgalRule>
+     * @var array<string, \Egal\Validation\Rules\Rule, \Illuminate\Contracts\Validation\Rule>
      */
     protected array $validationRules = [];
 
@@ -69,7 +67,7 @@ trait VariableMetadata
 
         $validator = Validator::make(
             [$this->getName() => $value],
-            [$this->getName() => $this->getValidationRules()]
+            [$this->getName() => $this->getValidationRules()],
         );
 
         if ($validator->fails()) {

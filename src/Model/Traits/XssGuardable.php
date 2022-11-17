@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Egal\Model\Traits;
 
 use Egal\Model\Casts\XssGuardCast;

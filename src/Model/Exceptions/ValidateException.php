@@ -10,8 +10,14 @@ use Illuminate\Support\MessageBag;
 class ValidateException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Validation failed!';
 
+    /**
+     * @var int
+     */
     protected $code = 405;
 
     private MessageBag $messageBag;

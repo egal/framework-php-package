@@ -9,8 +9,14 @@ use Exception;
 class UserNotIdentifiedException extends Exception
 {
 
-    protected $code = 400;
-
+    /**
+     * @var string
+     */
     protected $message = 'User not identified!';
+
+    /**
+     * @var int
+     */
+    protected $code = 400;
 
 }

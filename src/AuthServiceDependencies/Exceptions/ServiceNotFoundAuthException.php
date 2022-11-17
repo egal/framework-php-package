@@ -9,8 +9,14 @@ use Exception;
 class ServiceNotFoundAuthException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Service not found!';
 
+    /**
+     * @var int
+     */
     protected $code = 400;
 
 }

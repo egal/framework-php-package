@@ -9,8 +9,14 @@ use Exception;
 class UndefinedTypeOfMessageException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Undefined type of message!';
 
+    /**
+     * @var int
+     */
     protected $code = 400;
 
 }

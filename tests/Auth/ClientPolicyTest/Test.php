@@ -4,6 +4,7 @@ namespace Egal\Tests\Auth\ClientPolicyTest;
 
 use Egal\Auth\Entities\Guest;
 use Egal\Core\Session\Session;
+use Egal\Tests\Auth\ClientPolicyTest\Models\Post;
 use Egal\Tests\PHPUnitUtil;
 use Egal\Tests\TestCase;
 

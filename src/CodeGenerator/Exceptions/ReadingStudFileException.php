@@ -9,8 +9,14 @@ use Exception;
 class ReadingStudFileException extends Exception
 {
 
+    /**
+     * @var string
+     */
     protected $message = 'Error reading stub file!';
 
+    /**
+     * @var int
+     */
     protected $code = 500;
 
 }

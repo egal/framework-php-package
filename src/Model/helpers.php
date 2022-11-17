@@ -25,7 +25,7 @@ if (!function_exists('is_array_of_classes')) {
     {
         return count(array_filter(
             $array,
-            static fn ($entry) => $entry instanceof $class
+            static fn ($entry) => $entry instanceof $class,
         )) === count($array);
     }
 

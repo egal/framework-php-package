@@ -81,7 +81,7 @@ trait HashGuard
         $this->hashShieldingFields = array_diff(
             $this->hashShieldingFields,
             $this->ignoreHashShieldingFields,
-            $defaultIgnoreHashShieldingFields
+            $defaultIgnoreHashShieldingFields,
         );
 
         return $this;

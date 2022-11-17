@@ -1,12 +1,11 @@
-<?php /** @noinspection PhpUnused */
+<?php
+
+declare(strict_types=1);
 
 namespace Egal\Model\Filter;
 
 use Illuminate\Support\Str;
 
-/**
- * @package Egal\Model
- */
 class RawFilter
 {
 
@@ -26,7 +25,7 @@ class RawFilter
                 $rawFilter = str_replace(
                     "'" . $databaseProperty . "'",
                     '"' . $table . '"' . '.' . '"' . $databaseProperty . '"',
-                    $rawFilter
+                    $rawFilter,
                 );
             }
 

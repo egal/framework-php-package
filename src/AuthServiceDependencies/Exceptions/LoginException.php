@@ -9,6 +9,9 @@ use Exception;
 class LoginException extends Exception
 {
 
+    /**
+     * @var int
+     */
     protected $code = 400;
 
 }
