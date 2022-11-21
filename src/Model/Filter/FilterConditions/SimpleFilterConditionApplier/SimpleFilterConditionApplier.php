@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Egal\Model\Filter\FilterConditions;
+namespace Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
 
 use Egal\Model\Builder;
 use Egal\Model\Exceptions\FilterException;
@@ -10,6 +10,12 @@ use Egal\Model\Exceptions\UnsupportedFieldPatternInFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterConditionException;
 use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Egal\Model\Filter\FilterCondition;
+use Egal\Model\Filter\FilterConditions\FilterConditionApplier;
+use Egal\Model\Metadata\FieldMetadata;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\In;
 
 class SimpleFilterConditionApplier extends FilterConditionApplier
 {
@@ -140,7 +146,29 @@ class SimpleFilterConditionApplier extends FilterConditionApplier
         // For condition field like `field`.
         [$field, $modelMetadata] = [$condition->getField(), $builder->getModel()->getModelMetadata()];
         $modelMetadata->fieldExistOrFail($field);
-        $modelMetadata->validateFieldValueType($field, $value);
+
+        $fieldMetadata = array_filter(
+            [...$modelMetadata->getFields(), ...$modelMetadata->getFakeFields(), $modelMetadata->getKey()],
+            fn(FieldMetadata $value) => $value->getName() === $field
+        );
+        $fieldMetadata = reset($fieldMetadata);
+
+        $rules = array_filter($fieldMetadata->getValidationRules(), function (string|object $rule) {
+            if (!is_string($rule)) {
+                if ($rule instanceof Enum || $rule instanceof In) return true;
+                if (!method_exists($rule, '__toString')) return false;
+                $rule = $rule->__toString();
+            }
+
+            return Str::startsWith($rule, WhiteListValidationRulesForFilterValidation::values());
+        });
+
+        $validator = Validator::make(['value' => $value], ['value' => $rules]);
+
+        if ($validator->fails()) {
+            throw UnsupportedFilterValueTypeException::make($field);
+        }
+
         $builder->where($condition->getField(), $operator, $value, $boolean);
     }
 

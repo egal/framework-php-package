@@ -25,10 +25,10 @@ class Test extends TestCase
     protected function seedData(): void
     {
         $productsAttributes = [
-            ['id' => 1, 'string' => 'first', 'integer' => 1, 'numeric' => 1.1, 'boolean' => true, 'array' => ['first'], 'json' => '{"first":["first"]}'],
-            ['id' => 2, 'string' => 'second', 'integer' => 2, 'numeric' => 2.2, 'boolean' => false, 'array' => ['second'], 'json' => '{"second":["second"]}'],
-            ['id' => 3, 'string' => 'third', 'integer' => 3, 'numeric' => 3.3, 'boolean' => true, 'array' => ['third'], 'json' => '{"third":["third"]}'],
-            ['id' => 4, 'string' => 'fourth', 'integer' => 4, 'numeric' => 4.4, 'boolean' => false, 'array' => ['fourth'], 'json' => '{"fourth":["fourth"]}'],
+            ['id' => 1, 'string' => 'first', 'unique_string' => 'first', 'integer' => 1, 'numeric' => 1.1, 'boolean' => true, 'array' => ['first'], 'json' => '{"first":["first"]}'],
+            ['id' => 2, 'string' => 'second', 'unique_string' => 'second', 'integer' => 2, 'numeric' => 2.2, 'boolean' => false, 'array' => ['second'], 'json' => '{"second":["second"]}'],
+            ['id' => 3, 'string' => 'third', 'unique_string' => 'third', 'integer' => 3, 'numeric' => 3.3, 'boolean' => true, 'array' => ['third'], 'json' => '{"third":["third"]}'],
+            ['id' => 4, 'string' => 'fourth', 'unique_string' => 'fourth', 'integer' => 4, 'numeric' => 4.4, 'boolean' => false, 'array' => ['fourth'], 'json' => '{"fourth":["fourth"]}'],
         ];
 
         foreach ($productsAttributes as $attributes) Model::query()->create($attributes);
@@ -43,6 +43,10 @@ class Test extends TestCase
             ],
             [
                 [['string', 'eq', 'bar']],
+                null,
+            ],
+            [
+                [['unique_string', 'eq', 'first']],
                 null,
             ],
             [

@@ -8,9 +8,7 @@ use Egal\Auth\Policies\DenyAllPolicy;
 use Egal\Model\Exceptions\ActionNotFoundException;
 use Egal\Model\Exceptions\FieldNotFoundException;
 use Egal\Model\Exceptions\RelationNotFoundException;
-use Egal\Model\Exceptions\UnsupportedFilterValueTypeException;
 use Exception;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 
 class ModelMetadata
@@ -190,24 +188,6 @@ class ModelMetadata
         }
 
         return true;
-    }
-
-    /**
-     * @throws UnsupportedFilterValueTypeException
-     */
-    public function validateFieldValueType(string $fieldName, mixed $value): void
-    {
-        $field = array_filter(
-            [...$this->fields, ...$this->fakeFields, $this->getKey()],
-            fn(FieldMetadata $field) => $field->getName() === $fieldName
-        );
-        $field = reset($field);
-
-        $validator = Validator::make(['value' => $value], ['value' => $field->getValidationRules()]);
-
-        if ($validator->fails()) {
-            throw UnsupportedFilterValueTypeException::make($fieldName, $field->getType()->value);
-        }
     }
 
     public function getModelShortName(): string

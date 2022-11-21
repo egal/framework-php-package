@@ -12,6 +12,7 @@ return new class extends BaseMigration {
         Schema::create('models', function (Blueprint $table) {
             $table->increments('id');
             $table->string('string');
+            $table->string('unique_string');
             $table->integer('integer');
             $table->double('numeric');
             $table->boolean('boolean');

@@ -6,7 +6,7 @@ namespace Egal\Model\Traits;
 
 use Egal\Model\Builder;
 use Egal\Model\Filter\FilterCondition;
-use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier;
+use Egal\Model\Filter\FilterConditions\SimpleFilterConditionApplier\SimpleFilterConditionApplier;
 
 /**
  * @mixin \Egal\Model\Model

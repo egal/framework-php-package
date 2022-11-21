@@ -12,12 +12,12 @@ class UnsupportedFilterValueTypeException extends Exception
     /**
      * @var int
      */
-    protected $code = 403;
+    protected $code = 400;
 
-    public static function make(string $field, string $requiredType): self
+    public static function make(string $field): self
     {
         $exception = new static();
-        $exception->message = "Unsupported filter value type for field - ${field}! Required type - ${requiredType}";
+        $exception->message = "Unsupported filter value type for field - ${field}!";
 
         return $exception;
     }
