@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Egal\Auth\Tokens;
 
 use Egal\Auth\Exceptions\InitializeServiceMasterTokenException;
-use Exception;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -86,11 +85,6 @@ abstract class Token
     public static function fromJWT(string $encodedJWT, string $key): Token
     {
         return static::fromArray(static::decode($encodedJWT, $key));
-    }
-
-    public function isAlive(): bool
-    {
-        throw new Exception('REMOVE!');
     }
 
     public function generateJWT(): string
