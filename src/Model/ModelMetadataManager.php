@@ -56,11 +56,10 @@ class ModelMetadataManager
         $this->addModelMetadata($class::constructMetadata());
     }
 
-    private function addModelMetadata(ModelMetadata $modelMetadata, bool $reset = false): void
+    private function addModelMetadata(ModelMetadata $modelMetadata): void
     {
         $modelShortName = $modelMetadata->getModelShortName();
-
-        if (isset($this->modelsMetadata[$modelShortName]) && !$reset) {
+        if (isset($this->modelsMetadata[$modelShortName]) && !$modelMetadata->isDynamic()) {
             throw new \Exception('Already exists!');
         }
 
@@ -73,18 +72,20 @@ class ModelMetadataManager
     public function getModelMetadata(string $model): ModelMetadata
     {
         if (isset($this->modelsMetadata[$model])) {
-            if ($this->modelsMetadata[$model]->dynamic()) {
+            if ($this->modelsMetadata[$model]->isDynamic()) {
                 $modelClass = $this->modelsMetadata[$model]->getModelClass();
-                $this->addModelMetadata($modelClass::constructMetadata(), true);
+                $this->addModelMetadata($modelClass::constructMetadata());
             }
             $modelMetadata = $this->modelsMetadata[$model];
         }
 
         if (class_exists($model)) {
             $modelShortName = get_class_short_name($model);
-
-            if (!isset($this->modelsMetadata[$modelShortName]) || $this->modelsMetadata[$modelShortName]->dynamic()) {
-                $this->addModelMetadata($model::constructMetadata(), true);
+            if (
+                !isset($this->modelsMetadata[$modelShortName])
+                || $this->modelsMetadata[$modelShortName]->isDynamic()
+            ) {
+                $this->addModelMetadata($model::constructMetadata());
             }
 
             $modelMetadata = $this->modelsMetadata[$modelShortName];
